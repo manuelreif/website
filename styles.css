@@ -1,0 +1,108 @@
+/* css styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karma:wght@300&display=swap');
+
+.navbar-logo {
+    max-height: 44px;
+    width: auto;
+    padding-right: 4px;
+}
+
+.navbar-dark {
+    background-color: #f2eaae;
+}
+
+body {
+    font-family: 'Karma', serif;
+}
+
+/* das ist notwendig, weil sonst die icons komisch ausschauen! */
+
+div.quarto-about-solana .about-entity .about-link {
+        font-family: var(--bs-body-font-family);
+}
+
+
+
+h1 {
+  font-family: 'Quicksand', sans-serif;  
+}
+
+.navbar-brand {
+    font-family: 'Quicksand', sans-serif;  
+}
+
+.nav-link {
+    font-family: 'Quicksand', sans-serif; 
+}
+
+
+:root {
+    --bs-body-font-size: 1.1rem;
+ }
+ 
+ /*
+ div.sourceCode {
+    background-color: rgba(242,234,174,.55);
+}
+
+.code-annotation-gutter {
+    background-color: rgba(242,234,174,.85);
+}
+*/
+
+div.sourceCode {
+    background-color: rgba(1,1,1,.75);
+}
+
+.code-annotation-gutter {
+    background-color: rgba(1,1,1,.75);
+}
+
+.code-with-filename .code-with-filename-file, .code-with-filename .code-with-filename-file pre {
+    background-color: #f4fbff;
+}
+
+/*
+
+:root {
+    --code-block-bg: #04010a;
+}
+*/
+
+.callout.callout-style-default .callout-body {
+    font-size: 1.05rem;
+}
+
+.callout.callout-style-default>div.callout-header {
+    font-size: 1.07rem;
+}
+
+section#pp-package.level2.g-col-4.g-start-7 {
+    background-color: rgb(215,40,96, 0.6); 
+    border-radius: 10px; /* Abgerundete Ecken, Radius anpassen nach Bedarf */
+    padding: 15px; /* Innerer Abstand, um etwas Platz zwischen dem Inhalt und den Rändern zu schaffen */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: leichter Schatten für eine "Box"-Optik */
+}
+
+/*
+section#pp-package div.sourceCode {
+    background-color: rgb(255,255,255, 1); /* Ersetzen Sie #neueFarbe mit dem gewünschten Farbcode
+}
+*/
+
+
+section#mcirt.level2.g-col-4.g-start-7 {
+    background-color: rgb(205,118,50, 0.6); 
+    border-radius: 10px; /* Abgerundete Ecken, Radius anpassen nach Bedarf */
+    padding: 15px; /* Innerer Abstand, um etwas Platz zwischen dem Inhalt und den Rändern zu schaffen */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: leichter Schatten für eine "Box"-Optik */
+}
+
+section#svypv-package.level2.g-col-4.g-start-7 {
+    background-color: rgb(133,154,165,0.6); 
+    border-radius: 10px; /* Abgerundete Ecken, Radius anpassen nach Bedarf */
+    padding: 15px; /* Innerer Abstand, um etwas Platz zwischen dem Inhalt und den Rändern zu schaffen */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: leichter Schatten für eine "Box"-Optik */
+}

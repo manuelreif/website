@@ -1,0 +1,267 @@
+---
+title: "Presentation pipeline"
+description: "Wie aus Quarto Präsentationen mit revealjs automatisiert pdfs und Handouts werden."
+author: Manuel 
+date: 2024-01-22
+categories: [quarto, Python, bash, Linux]
+thumbnail: pipeline.png
+engine: knitr
+format:
+  html:
+    code-line-numbers: true
+    code-block-bg: true
+    code-block-border-left: true
+execute:
+  echo: false
+  draft: false 
+code-annotations: hover
+highlight-style: monokai
+---
+
+# {{< bi fullscreen >}} Folien, Folien, Folien
+
+::: {.callout-tip icon=false}
+## {{< bi book-half size=25px >}} Soll ich lesen?
+1. Erstellst du Folien mit reveal-js mittels quarto? <br>
+2. Willst du pdf Versionen und pdf Handouts? <br>
+3. Arbeitest du mit Linux/Ubuntu. <br>
+4. Dann Lesebefehl!
+:::
+
+<img src="pipeline.png" alt="Bildbeschreibung" style="float: right; width: 37%; margin-left: 20px; margin-bottom: 10px;"/>
+ 
+
+In meiner Lehrveranstaltung zu "Forschungsmethoden und Statistik" habe ich meine
+Folien mithilfe von `quarto` und `revealjs` erstellt. Das war natürlich nicht
+immer so. Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch
+meine Folien mit LaTeX `beamer` erstellt.
+2023 sprach allerdings kaum mehr etwas dafür `beamer` zu verwenden, denn alle
+Präsentation mit `revealjs` sahen einfach gut aus -- und das quasi "Out of the box".
+Also musste ich einen neuen Workflow aufbauen. Die `quarto` Dokumente schreibe
+ich in RStudio und zur schnellen Ansicht rendere ich auch direkt in RStudio.
+Das Ergebnis sind .html files. Ich brauche aber ebenso Handouts für meine Studierenden und 
+hätte selbst gerne noch eine .pdf Version meiner Präsentation falls alle 
+Browser streiken und Gott bewahre, etwas ähnliches ist mir bereits passiert.
+Üblicherweise trage ich meine files auf einem USB Stick herum. USB-Sticks 
+bleiben gerne mal wo liegen oder stecken und daher wäre es gut, 
+ein vernünftiges Backup in der Cloud zu haben, um im Falle des Falles auch so auf die 
+Präsentation zugreifen zu können. 
+
+Dieser Post wird sich damit beschäftigen, einen für mich funktionierenden
+automatisierten Ablauf für meine `quarto` Präsentationen zu erstellen. 
+Dieser Ablauf soll folgendermaßen geschehen:
+
+1. Render meine `quarto` Präsentationen
+2. Erstelle pdfs aus diesen
+3. Erstelle pdf Handouts
+4. Erstelle ein Backup auf google drive
+
+Bisher hatte ich für solche Aufgaben Makefiles. Damit bin ich nicht so schlecht
+gefahren -- allerdings musste ich die Makefiles immer wieder anpassen bzw.
+in einen neuen Ordner kopieren wenn eine neue Präsentation erstellt wird.
+Außerdem sagt mir jeder ich muss mehr in Python machen. 
+Ok, unter der Bedingung ich schreib mir so einen Ablauf in Python, dann will ich
+folgendes:
+
+1. Multiple `.qmd` Files sollen parallel gerendert etc. werden
+2. Das Herumkopieren find ich nicht so prickelnd -- daher wäre es toll
+wenn ich den Prozess direkt aus der bash triggern könnte.
+3. Naja und es soll in `Python` passieren.
+
+
+# {{< bi file-play >}} Rendern
+
+Das ist vermutlich der einfachste Part. Man muss nur sicherstellen `quarto`
+installiert zu haben. Am besten man holt sich das neueste [RStudio](https://posit.co/download/rstudio-desktop/), dann hat man `quarto`
+bereits an Board, oder man installiert es sich separat^[Unter Linux muss man sich ein .deb file downloaden und das installieren. Ich würde RStudio empfehlen.].
+
+Man kann nun:
+
+1. RStudio verwenden um das `.qmd` zu schreiben und auf den "render" Button drücken
+2. Was viel cooler ist: in der bash rendern.
+
+```{.bash filename="Terminal"}
+#| eval: FALSE
+#| echo: true
+
+quarto render FILE.qmd
+```
+
+In der bash rendern ist nicht nur cooler, sondern auch der erste Schritt um 
+das ganze Prozedere zu automatisieren. So far so good.
+Die pdfs zu erstellen wird ein wenig schwieriger.
+
+# {{< bi file-earmark-pdf >}} pdfs erstellen
+
+Ich hab viel Zeit mit google verbracht um dieses Problem zu lösen.
+Ziel ist es html slides automatisch zu einem pdf zu konvertieren.
+[Decktape](https://github.com/astefanutti/decktape) ist dafür ein wirklich ausgezeichnetes
+tool. Für decktape gibt es auch einen [Dockercontainer](https://hub.docker.com/r/astefanutti/decktape) was eine Anwendung
+wirklich einfach macht. Man muss sich nicht darüber Gedanken machen, welche
+obskure andere Software man noch installieren muss, weil alles schon mit dem
+Dockercontainer verschifft wird und zwar genau in den sicheren Hafen unseres 
+Computers.
+
+Also folgende To-Dos:
+
+1. [Docker holen](https://docs.docker.com/get-docker/)
+2. Docker image [pullen](https://docs.docker.com/engine/reference/commandline/image_pull/)
+3. Docker image verwenden $\rightarrow$ das ist genau was wir jetzt machen werden
+
+
+Um jetzt eine html Präsentation (revealjs) in pdf Folien zu verwandeln übergebe
+ich den folder an den docker container. Und das funktioniert folgendermaßen:
+
+```{.bash filename="Terminal"}
+#| eval: FALSE
+#| echo: true
+
+docker run --rm -t -v path/to/folder:/slides astefanutti/decktape --size='2048x1536' reveal FILE.html FILE.pdf
+```
+
+Was passiert hier?
+
+1. `docker run` okay, wir wollen irgendwas in docker machen, also soll der container der später genannt wird (`astefanutti/decktape`) laufen
+2. `--rm` es wird saubergemacht nachdem docker fertig ist
+3. `-t` damit sehen wir was passiert (stdin and stdout werden attached)
+4. `-v` wir wollen was mounten und zwar: `ordner/auf/meinem/computer:/container`. Der container rechtnet damit, dass das html file im Ordner "slides" liegt, daher wird der
+Ordner vom eigenen Rechner dort reingemountet.
+5. `--size='2048x1536'` so funktioniert es bei mir. Andere Einstellungen machen Probleme.
+6. `reveal` offensichtlich arbeiten wir mit reveal-js.
+7. `FILE.html FILE.pdf` hier dürfen wir noch einen Namen vergeben für das pdf
+
+Das Ergebnis ist `FILE.pdf`, eine pdf Verison der html Präsentation.
+
+# {{< bi hand-index-thumb >}} pdf handout
+
+Um Handouts zu erstellten, die 4 Folien auf einer Seite darstellen,
+verwenden wir [pdfjam](https://github.com/rrthomas/pdfjam). Das geht ratz-fatz.
+Kaum hat man auf Enter gedrückt ist das file auch schon da.
+Wir brauchen nur die dargestellte Zeile um ein Handout zu erhalten.
+
+
+```{.bash filename="Terminal"}
+#| eval: FALSE
+#| echo: true
+
+pdfjam --nup 2x2 --landscape --a4paper FILE.pdf --outfile HANDOUT.pdf
+```
+
+
+# {{< bi record >}} Ein Skript um alles zu builden
+
+Jetzt haben wir alle einzelnen Schritte beisammen um unsere Präsentation zu erstellen,
+eine pdf Version und ein Handout. Das ist gut, allerdings wollen wir das
+natürlich nicht jedesmal händisch ausführen, sondern ein Skript anfertigen,
+das die Schritte automatisiert macht. Ich habe manchmal auch mehrere Quarto 
+Präsentationsfiles in einem Ordner liegen und möchte nicht jedes Mal darüber
+nachdenken welches ich nun rendern will. Das Skript sollte also folgendes können:
+
+1. render -- decktape -- pdfjam
+2. für alle quarto files im Ordner
+3. parallel (da die Files z. T. längere Laufzeiten haben und mein Laptop > 10 Kerne hat) -- 
+es ist mir kurz gesagt egal ob er tw. umsonst rendert, ich will nur keine
+Zeit damit verschwenden über irgendwelche Files nachzudenken.
+
+Das hier gezeigte Python Skript definiert eine Funktion `process_file` 
+die im wesentlichen 3 Befehle ausführt: render -- decktape -- pdfjam.
+Die Dateinamen werden von den `quarto` Quarto Dokumenten übernommen und
+die Endungen angepasst. Um alles parallel ablaufen zu lassen wird hier der
+`ThreadPoolExecutor` verwendet.
+
+```{.python filename="Python"}
+#| eval: FALSE
+#| echo: true
+
+from concurrent.futures import ThreadPoolExecutor
+import os
+import glob
+import re
+import sys
+
+args = sys.argv[1:] # <1>
+
+def process_file(val): # Function
+    new_file_html = re.sub("qmd$", "html", val)
+    new_file_pdf = re.sub("qmd$", "pdf", val)
+    new_file_handout_pdf = re.sub(".qmd$", "_handout.pdf", val)
+    
+    run_quarto = "quarto render " + val
+    run_pdf = f"docker run --rm -t -v {file_path}:/slides -v :{file_path} astefanutti/decktape --size='2048x1536' reveal {new_file_html} {new_file_pdf}"
+    run_pdf_handout = f"pdfjam --nup 2x2 --landscape --a4paper {new_file_pdf} --outfile {new_file_handout_pdf}"
+    
+    os.system(run_quarto) # render
+    os.system(run_pdf) # decktape
+    os.system(run_pdf_handout) # pdfjam
+
+if __name__ == "__main__":
+    file_path = os.getcwd()
+    quarto_files = "*.qmd"
+    matching_files = glob.glob(os.path.join(file_path, quarto_files))
+    file_names = [os.path.basename(pth) for pth in matching_files]
+
+    with ThreadPoolExecutor(max_workers=4) as executor: #<2>
+        executor.map(process_file, file_names)
+
+if args[0] == "save": #<3>
+    print("backup to google drive")
+    os.system("bash -i -c backupLV2google")
+```
+1. Argumente werden eingesammelt. Ziel ist es einen Input zu ermöglichen in der
+Form: `render_praes save` bzw. `render_praes`. Wenn 'save' angegeben ist, dann
+soll von dem Folder auch ein backup gemacht werden (das wird hier jetzt nicht
+im Detail dargestellt).
+2. Hier hat mir als Noob ChatGPT geholfen. Meine schön programmierte Schleife
+wurde zu diesem Konstrukt umformuliert.
+3. Wenn 'save' angegeben wird, wird dieser Block getriggert.
+
+
+
+# {{< bi signpost-2 >}} Platzierung des Python Skripts
+
+Um dieses Skript ohne copy/paste in unterschiedlichen Projekten verwenden zu
+können, will ich es zentral zur Verfügung stellen und zwar so, dass es immer wenn
+eine Linux Terminal geöffnet wird zur Verfügung steht.
+Wie machen wir das?
+
+1. Wechsle in das Verzeichnis in dem das Skript liegt `cd da/is/mein/skript`
+2. Mache das Python Skript ausführbar: `chmod +x render_praes.py`
+3. Kopiere/verschiebe das Skript an einen zentraleren Ort (ist nicht unbedingt 
+notwendig). Skripts werden gerne zentral im `~/bin` Ordner gespeichert. Kann man 
+machen, muss man aber nicht. Wenn man das will (ich empfehle es zu wollen), 
+und hat keinen derartigen 
+Ordner, macht an zuerst `mkdir bin` und dann `cp render_praes.py ~/bin` um das 
+Skript reinzukopieren.
+4. Dann fügt man einen `alias` in die `~/.bashrc` ein. 
+Das ist der Moment, in dem man sich entscheiden
+muss mit welchem Namen man dieses Skript aufrufen will. 
+Hier ist der Name mit `render_praes` festgelegt.
+
+```{.bash filename="~/.bashrc"}
+#| eval: FALSE
+#| echo: true
+
+alias render_praes='/home/manuel/bin/render_praes_parallel.py'
+```
+
+Um die Funktion auszuprobieren startet man ein neues Terminal, wechselt
+in den Ordner mit zumindest einer Quarto revealjs Präsentation und schreibt
+`render_preas`. Boom {{< bi rocket >}}. Es sollte nun zuerst quarto rendern, decktape das
+pdf erzeugen und pdfjam anschließend das Handout. Und währenddessen kann
+man mal gemütlich einen Kaffee trinken gehen.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

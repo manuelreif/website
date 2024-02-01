@@ -1,0 +1,79 @@
+---
+title: "Manuel Reif"
+lightbox: auto
+image: ma1r.png
+toc: false
+about: 
+    template: solana #jolla, trestles, solana, marquee, broadside
+    image-shape: rounded
+    image-width: 15em
+    links:
+    - icon: linkedin
+      href: https://www.linkedin.com/in/manuel-reif-338a78258/
+    - icon: github
+      href: https://github.com/manuelreif
+    - icon: envelope
+      href: mailto:info@manuelreif.at
+    - icon: mastodon
+      href: https://bayes.club/@manuel
+---
+
+
+
+Ich bin Data Scientist bei Statistik Austria und externer Lehrbeauftragter
+an der Universität Wien. Es macht mir Spaß mit Daten zu arbeiten und 
+mir den Kopf über statistische Themen zu zerbrechen. Eines meiner
+Hauptinteressensgebiete ist Item Response Theory (IRT) und das Skalieren
+von Tests bzw. Fragebögen mittels Rasch- und verwandten Modellen.
+Privat interessiere ich mich für Astronomie, spiele viel zu selten GO
+und probiere gerne mit {{< fa brands r-project >}} , Python (seit neuestem) und wie man hier sieht 
+auch `quarto` herum. Ich bin Autor von drei R packages, die aber aus Zeitmangel
+nicht mehr maintained werden.
+
+
+```{r pkgs}
+#| include: false
+#| echo: false
+
+
+library(timevis)
+library(readxl)
+library(data.table)
+library(magrittr)
+library(vistime)
+library(gt)
+library(gtExtras)
+library(plotly)
+library(fontawesome)
+```
+
+
+```{r vistime-gra}
+#| echo: false
+
+dat = fread("cv_dat.csv") %>%
+    .[, group := factor(group, levels = c("Studium", "Uni", "Lektor", "Arbeit"))]
+
+gruppen_dt = data.table(group = c("Studium", "Uni", "Lektor", "Arbeit"),
+                        color = c("#f2eaae", "#E6A59A", "#E4BFF8", "#BAC1F4"))
+
+dat[gruppen_dt, color := i.color, on = "group"]
+
+p = vistime(dat,
+            col.event = "content",
+            col.start = "start",
+            col.end = "end",
+            col.group = "group", optimize_y = T)
+
+pp = plotly_build(p)
+
+pp$x$layout$yaxis$ticktext <- c("", "", "", "")
+
+pp
+```
+
+
+
+
+
+

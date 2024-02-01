@@ -1,0 +1,27 @@
+---
+title: "Bloggonaut"
+listing:
+  contents: blog/**/*.qmd
+  sort: "date desc"
+  type: default #table
+  categories: true
+  sort-ui: true
+  filter-ui: true
+  fields: [date, image, title, reading-time, description, categories]
+  feed: false
+page-layout: full
+title-block-banner: false
+engine: knitr
+---
+
+Das Ziel ist, hier regelmäßig interessante Inhalte zu allen möglichen Themen 
+zu posten. Typischerweise wird das was mit R und allem drumherum zu tun haben. 
+Ich hab selbst schon viel von anderen Blogs profitiert und würde mich freuen
+wenn hier Inhalte generiert werden, die anderen Personen helfen 
+ihre Arbeit besser zu machen. Zumindest sollen die Posts unterhaltsam sein. 
+Der Blog wird zuerst ausschließlich deutsche Posts beinhalten -- mittelfristig
+ist geplant, eventuell auch mit Hilfe von ChatGPT (ja ich bezahle dafür) 
+auch englische Versionen der Posts zur Verfügung zu stellen.
+
+
+

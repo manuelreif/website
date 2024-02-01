@@ -1,0 +1,34 @@
+project:
+  type: website
+  render:
+    - "*.qmd"
+    - "!dontgit/"
+    - "!cv"
+    
+website:
+  title: "Manuel Reif"
+  navbar:
+    search: true
+    logo: logo1.png
+    left:
+      - href: index.qmd
+        text: Home
+      - href: cv/reif_cv.pdf
+        text: CV
+      - href: pkgs.qmd
+        text: R-Packages
+      - href: blog.qmd
+        text: Blog {{< fa blog >}}
+        
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    page-layout: full
+
+filters:
+  - lightbox
+
+highlight-style: monokai
+

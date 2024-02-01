@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "pkgs.html#pp-package",
+    "href": "pkgs.html#pp-package",
+    "title": "Packages",
+    "section": "PP package",
+    "text": "PP package\nDas PP package schätzt Personenparameter für IRT Modelle wie das Rasch Modell (1-Pl Model), 2-PL, 3-PL, 4-PL Modell und das Partial Credit Model, mittels MLE, WLE, MAP, EAP oder robusten Methoden. Zusätzlich können unterschiedliche Person Fit Indices berechnet werden, wie Infit, Outfit, lz Statistik etc. . Es ist aus der Idee entstanden, unabhängig vom Software Package das die IRT Analyse durchgeführt hat, mit vorliegenden Item Parametern, Personenparameter berechnen zu können.\n\nlibrary(PP)\n\n#Example Code\ndata(fourpl_df)\ndiff_par &lt;- attr(fourpl_df,\"diffpar\")\nslope_par &lt;- attr(fourpl_df,\"slopes\")\n\nres1plmle &lt;- PP_4pl(respm = itmat, \n                    thres = diff_par, \n                    slopes = slope_par, \n                    type = \"mle\")"
+  },
+  {
+    "objectID": "pkgs.html#mcirt",
+    "href": "pkgs.html#mcirt",
+    "title": "Packages",
+    "section": "mcIRT",
+    "text": "mcIRT\nDas package wurde erstellt um das Nominal Response Model bzw. das Nested Logit Model zu schätzen und damit eine tiefere Einsicht in die Funktionalität von MC Items zu erlangen. Geschätzt wird mit MML Methode, mit oder ohne latenter Regression.\n\nlibrary(mcIRT)\n\nParList &lt;- lapply(1:3,function(x)\n{\n  Item1 &lt;- c(c(-2,-1,1,2),c(-1.2,0.3,0.2,0.7))\n  names(Item1) &lt;- c(paste(\"zeta\",1:4,sep=\"\"),\n                    paste(\"lamb\",1:4,sep=\"\"))\n  Item1\n})\n\nnames(ParList) &lt;- paste(\"item\",1:3,sep=\"\")\n\nperp1     &lt;- rnorm(1100, 0, 1)\nsim.nrm.1 &lt;- NRM.sim(ParList,perp1)\n\nreshdat1 &lt;- reshMG(sim.nrm.1,items=1:3,correct=rep(0,3))\nres_nrm  &lt;- nrm(reshdat1)"
+  },
+  {
+    "objectID": "pkgs.html#svypv-package",
+    "href": "pkgs.html#svypv-package",
+    "title": "Packages",
+    "section": "svyPV package",
+    "text": "svyPV package\nDieses package ist im Laufe des PIAAC Projekts entstanden und diente vor allem dazu, den Umgang mit dem komplexen Surveydesign und den Plausibel Values zu erleichtern. Mit den implementierten Funktionen wird sichergestellt, dass bei der Berechnung der Konfidenzintervalle sowohl der SE mittels Bootstrap bzw. Jackknive (mittels survey package), als auch die Imputationsvarianz berücksichtigt wird. Von einfachen Berechnungen wie Quantilen bis glm sind hier einige gängige Methoden umgesetzt die speziell auf diesen Anwendungszweck zugeschnitten sind.\n\nlibrary(svyPVpack)\n\ndata(svy_example1)\n\nres_glm &lt;- svyPVglm(plaus.. ~ otherPlaus.. + age, \n                    svy.exrep, \n                    placeholder = 1:3)\n\nres_glm\n\nWeiter Informationen"
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Bloggonaut",
+    "section": "",
+    "text": "Das Ziel ist, hier regelmäßig interessante Inhalte zu allen möglichen Themen zu posten. Typischerweise wird das was mit R und allem drumherum zu tun haben. Ich hab selbst schon viel von anderen Blogs profitiert und würde mich freuen wenn hier Inhalte generiert werden, die anderen Personen helfen ihre Arbeit besser zu machen. Zumindest sollen die Posts unterhaltsam sein. Der Blog wird zuerst ausschließlich deutsche Posts beinhalten – mittelfristig ist geplant, eventuell auch mit Hilfe von ChatGPT (ja ich bezahle dafür) auch englische Versionen der Posts zur Verfügung zu stellen.\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n  \n\n\n\n\nPresentation pipeline\n\n\n\n\n\n\n\nquarto\n\n\nPython\n\n\nbash\n\n\nLinux\n\n\n\n\nWie aus Quarto Präsentationen mit revealjs automatisiert pdfs und Handouts werden.\n\n\n\n\n\n\nJan 22, 2024\n\n\n7 min\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "blog/20240115_pipeline/index.html",
+    "href": "blog/20240115_pipeline/index.html",
+    "title": "Presentation pipeline",
+    "section": "",
+    "text": "Soll ich lesen?\n\n\n\n\nErstellst du Folien mit reveal-js mittels quarto? \nWillst du pdf Versionen und pdf Handouts? \nArbeitest du mit Linux/Ubuntu. \nDann Lesebefehl!\n\n\n\n\nIn meiner Lehrveranstaltung zu “Forschungsmethoden und Statistik” habe ich meine Folien mithilfe von quarto und revealjs erstellt. Das war natürlich nicht immer so. Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch meine Folien mit LaTeX beamer erstellt. 2023 sprach allerdings kaum mehr etwas dafür beamer zu verwenden, denn alle Präsentation mit revealjs sahen einfach gut aus – und das quasi “Out of the box”. Also musste ich einen neuen Workflow aufbauen. Die quarto Dokumente schreibe ich in RStudio und zur schnellen Ansicht rendere ich auch direkt in RStudio. Das Ergebnis sind .html files. Ich brauche aber ebenso Handouts für meine Studierenden und hätte selbst gerne noch eine .pdf Version meiner Präsentation falls alle Browser streiken und Gott bewahre, etwas ähnliches ist mir bereits passiert. Üblicherweise trage ich meine files auf einem USB Stick herum. USB-Sticks bleiben gerne mal wo liegen oder stecken und daher wäre es gut, ein vernünftiges Backup in der Cloud zu haben, um im Falle des Falles auch so auf die Präsentation zugreifen zu können.\nDieser Post wird sich damit beschäftigen, einen für mich funktionierenden automatisierten Ablauf für meine quarto Präsentationen zu erstellen. Dieser Ablauf soll folgendermaßen geschehen:\n\nRender meine quarto Präsentationen\nErstelle pdfs aus diesen\nErstelle pdf Handouts\nErstelle ein Backup auf google drive\n\nBisher hatte ich für solche Aufgaben Makefiles. Damit bin ich nicht so schlecht gefahren – allerdings musste ich die Makefiles immer wieder anpassen bzw. in einen neuen Ordner kopieren wenn eine neue Präsentation erstellt wird. Außerdem sagt mir jeder ich muss mehr in Python machen. Ok, unter der Bedingung ich schreib mir so einen Ablauf in Python, dann will ich folgendes:\n\nMultiple .qmd Files sollen parallel gerendert etc. werden\nDas Herumkopieren find ich nicht so prickelnd – daher wäre es toll wenn ich den Prozess direkt aus der bash triggern könnte.\nNaja und es soll in Python passieren."
+  },
+  {
+    "objectID": "blog/20240115_pipeline/index.html#footnotes",
+    "href": "blog/20240115_pipeline/index.html#footnotes",
+    "title": "Presentation pipeline",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nUnter Linux muss man sich ein .deb file downloaden und das installieren. Ich würde RStudio empfehlen.↩︎"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Manuel Reif",
+    "section": "",
+    "text": "Ich bin Data Scientist bei Statistik Austria und externer Lehrbeauftragter an der Universität Wien. Es macht mir Spaß mit Daten zu arbeiten und mir den Kopf über statistische Themen zu zerbrechen. Eines meiner Hauptinteressensgebiete ist Item Response Theory (IRT) und das Skalieren von Tests bzw. Fragebögen mittels Rasch- und verwandten Modellen. Privat interessiere ich mich für Astronomie, spiele viel zu selten GO und probiere gerne mit  , Python (seit neuestem) und wie man hier sieht auch quarto herum. Ich bin Autor von drei R packages, die aber aus Zeitmangel nicht mehr maintained werden."
+  }
+]

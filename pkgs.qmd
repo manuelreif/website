@@ -1,0 +1,174 @@
+---
+title: "Packages"
+format: html
+toc: true
+page-layout: custom
+---
+
+<style>
+/* Versteckt den automatisch generierten Titel */
+.title, .header { 
+    display: none;
+}
+</style>
+
+::: {.grid}
+
+::: {.g-col-4 .g-start-3}
+<h1>Packages</h1>
+:::
+
+
+::: {.g-col-2 .g-start-11}
+<nav id="TOC" class="toc-active">
+  <!-- Das ToC wird hier durch JavaScript gefüllt -->
+</nav>
+
+:::
+
+:::
+
+
+
+<br>
+
+::: {.grid}
+
+
+::: {.g-col-4 .g-start-3}
+[![](hex_sticker/pp1_hex_2.png)](https://cran.r-project.org/web/packages/PP/)
+:::
+
+::: {.g-col-4 .g-start-7}
+
+## PP package
+
+Das PP package schätzt Personenparameter für IRT Modelle wie das Rasch Modell 
+(1-Pl Model), 2-PL, 3-PL, 4-PL Modell und das Partial Credit Model, mittels
+MLE, WLE, MAP, EAP oder robusten Methoden. Zusätzlich
+können unterschiedliche Person Fit Indices berechnet werden, wie Infit, Outfit, 
+lz Statistik etc. . Es ist aus der Idee entstanden, unabhängig vom Software Package
+das die IRT Analyse durchgeführt hat, mit vorliegenden Item Parametern, 
+Personenparameter berechnen zu können.
+
+
+
+```{r pp-package-example-code}
+#| echo: true
+#| eval: false
+
+library(PP)
+
+#Example Code
+data(fourpl_df)
+diff_par <- attr(fourpl_df,"diffpar")
+slope_par <- attr(fourpl_df,"slopes")
+
+res1plmle <- PP_4pl(respm = itmat, 
+                    thres = diff_par, 
+                    slopes = slope_par, 
+                    type = "mle")
+```
+
+:::
+
+:::
+
+
+<br>
+
+
+::: {.grid}
+
+
+::: {.g-col-4 .g-start-3}
+[![](hex_sticker/mcirt_hex.png)](https://github.com/manuelreif/mcIRT)
+:::
+
+::: {.g-col-4 .g-start-7}
+
+## mcIRT
+
+Das package wurde erstellt um das Nominal Response Model bzw. das
+Nested Logit Model zu schätzen und damit eine tiefere Einsicht in die 
+Funktionalität von MC Items zu erlangen. Geschätzt wird mit
+MML Methode, mit oder ohne latenter Regression.
+
+
+```{r mcirt-package-example-code}
+#| echo: true
+#| eval: false
+#| 
+library(mcIRT)
+
+ParList <- lapply(1:3,function(x)
+{
+  Item1 <- c(c(-2,-1,1,2),c(-1.2,0.3,0.2,0.7))
+  names(Item1) <- c(paste("zeta",1:4,sep=""),
+                    paste("lamb",1:4,sep=""))
+  Item1
+})
+
+names(ParList) <- paste("item",1:3,sep="")
+
+perp1     <- rnorm(1100, 0, 1)
+sim.nrm.1 <- NRM.sim(ParList,perp1)
+
+reshdat1 <- reshMG(sim.nrm.1,items=1:3,correct=rep(0,3))
+res_nrm  <- nrm(reshdat1)
+```
+
+
+:::
+
+:::
+
+
+<br>
+
+
+::: {.grid}
+
+::: {.g-col-4 .g-start-3}
+[![](hex_sticker/pvpack_hex.png)](https://github.com/manuelreif/svyPVpack)
+:::
+
+::: {.g-col-4 .g-start-7}
+
+## svyPV package
+
+Dieses package ist im Laufe des PIAAC Projekts entstanden und diente
+vor allem dazu, den Umgang mit dem komplexen Surveydesign und den Plausibel Values
+zu erleichtern. Mit den implementierten Funktionen wird sichergestellt,
+dass bei der Berechnung der Konfidenzintervalle sowohl der SE mittels 
+Bootstrap bzw. Jackknive (mittels `survey` package), als auch die Imputationsvarianz 
+berücksichtigt wird. Von einfachen Berechnungen wie Quantilen bis glm sind 
+hier einige gängige Methoden umgesetzt die speziell auf diesen Anwendungszweck 
+zugeschnitten sind.
+
+```{r svypvpack-package-example-code}
+#| echo: true
+#| eval: false
+#| 
+library(svyPVpack)
+
+data(svy_example1)
+
+res_glm <- svyPVglm(plaus.. ~ otherPlaus.. + age, 
+                    svy.exrep, 
+                    placeholder = 1:3)
+
+res_glm
+```
+
+[Weiter Informationen](https://github.com/manuelreif/svyPVpack/wiki)
+
+:::
+
+
+:::
+
+<br>
+
+
+

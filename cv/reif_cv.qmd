@@ -1,0 +1,79 @@
+---
+author: Manuel Reif
+title: Data Scientist
+tagline: 
+  field1: Manuel Reif
+  field2: Data Scientist
+  field3: Wien, Österreich
+  colored: info@manuelreif.at
+  field5: Wien, Österreich
+format:
+  modern-cv-pdf: default
+cvfooter:
+  left: "manuelreif.at"
+  right: "github.com/manuelreif"
+cvcolor: 	7782cf #without `#`
+bgcolor: 616161
+cvfont: raleway #texlive fonts like raleway,fetamont,gillius,comfortaa
+cvmeta:
+  - title: Status
+    text: Data Scientist bei Statsitik Austria
+  - title: Field
+    text: Statistik, Data Science
+  - title: Software
+    text: R (fast 20 Jahre), stan, quarto, rmarkdown, git, bash, Linux User, Python (N00b)
+  - title: R-Packages
+    text: data.table, ggplot2, rstan, brms, marginaleffects, eRm, mirt \ldots         
+execute:
+  echo: false
+---
+
+```{r}
+#| label: cvevents
+cvevents <- function(tbl, when, what, where, para1,para2) {
+
+    command_start <- "\\cvevent"
+
+    res <- paste0(
+        command_start, "{", tbl[[when]], "}", 
+        "{", tbl[[what]], "}",
+        "{", tbl[[where]], "}",
+        "{", tbl[[para1]], "}",
+        "{", tbl[[para2]], "}"
+        )
+
+    cat(res, sep = "\n")
+}
+
+```
+
+
+# Arbeitserfahrung
+
+
+```{r}
+#| label: Arbeitserfahrung
+#| output: asis
+
+#dat_cv = readxl::read_excel("work.xlsx", sheet = "deutsch_work")
+dat_cv = read.csv("work_ger.csv")
+
+dat_cv |>
+    cvevents(when = "Zeitraum", 
+             what = "Bezeichnung", 
+             where = "Arbeitgeber", para1 = "pt1", para2 = "pt2")
+```
+
+# Ausbildung
+
+```{r }
+#| label: Ausbildung
+#| output: asis
+#| message: false
+
+#dat_edu = readxl::read_excel("work.xlsx", sheet = "deutsch_edu")
+dat_edu = read.csv("edu_ger.csv")
+
+dat_edu |>
+    cvevents(when = "dates", what = "degree", where = "location", para1 = "titel", para2 = "skills")
+```
