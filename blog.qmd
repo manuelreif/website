@@ -11,7 +11,6 @@ listing:
   feed: false
 page-layout: full
 title-block-banner: false
-engine: knitr
 ---
 
 <br>
