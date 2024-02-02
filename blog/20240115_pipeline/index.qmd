@@ -22,10 +22,10 @@ highlight-style: monokai
 
 ::: {.callout-tip icon=false}
 ## {{< bi book-half size=25px >}} Soll ich lesen?
-1. Erstellst du Folien mit reveal-js mittels quarto? <br>
-2. Willst du pdf Versionen und pdf Handouts? <br>
+1. Erstellst du Folien mit reveal-js mittels `quarto`? <br>
+2. Willst du .pdf Versionen und .pdf Handouts? <br>
 3. Arbeitest du mit Linux/Ubuntu. <br>
-4. Dann Lesebefehl!
+$\rightarrow$ Dann **Lesebefehl!**
 :::
 
 <img src="pipeline.png" alt="Bildbeschreibung" style="float: right; width: 37%; margin-left: 20px; margin-bottom: 10px;"/>
@@ -33,10 +33,12 @@ highlight-style: monokai
 
 In meiner Lehrveranstaltung zu "Forschungsmethoden und Statistik" habe ich meine
 Folien mithilfe von `quarto` und `revealjs` erstellt. Das war natürlich nicht
-immer so. Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch
+immer so.<br>
+Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch
 meine Folien mit LaTeX `beamer` erstellt.
 2023 sprach allerdings kaum mehr etwas dafür `beamer` zu verwenden, denn alle
 Präsentation mit `revealjs` sahen einfach gut aus -- und das quasi "Out of the box".
+Wer will nicht dass seine Folien geil aussehen?
 Also musste ich einen neuen Workflow aufbauen. Die `quarto` Dokumente schreibe
 ich in RStudio und zur schnellen Ansicht rendere ich auch direkt in RStudio.
 Das Ergebnis sind .html files. Ich brauche aber ebenso Handouts für meine Studierenden und 
@@ -49,21 +51,21 @@ Präsentation zugreifen zu können.
 
 Dieser Post wird sich damit beschäftigen, einen für mich funktionierenden
 automatisierten Ablauf für meine `quarto` Präsentationen zu erstellen. 
-Dieser Ablauf soll folgendermaßen geschehen:
+Folgender Ablauf ist geplant:
 
 1. Render meine `quarto` Präsentationen
 2. Erstelle pdfs aus diesen
 3. Erstelle pdf Handouts
 4. Erstelle ein Backup auf google drive
 
-Bisher hatte ich für solche Aufgaben Makefiles. Damit bin ich nicht so schlecht
+Bisher hatte ich für solche Aufgaben Makefiles^[Das ist eine wirklich gute kurze Einführung in Makefiles https://kbroman.org/minimal_make/]. Damit bin ich nicht so schlecht
 gefahren -- allerdings musste ich die Makefiles immer wieder anpassen bzw.
 in einen neuen Ordner kopieren wenn eine neue Präsentation erstellt wird.
 Außerdem sagt mir jeder ich muss mehr in Python machen. 
-Ok, unter der Bedingung ich schreib mir so einen Ablauf in Python, dann will ich
-folgendes:
+Ok, wenn ich das Ganze also in Python machen soll, dann will ich auch folgende
+Wohlfühl-Features haben:
 
-1. Multiple `.qmd` Files sollen parallel gerendert etc. werden
+1. Multiple `.qmd` Files sollen parallel gerendert etc. werden^[Man lebt ja nicht ewig!]
 2. Das Herumkopieren find ich nicht so prickelnd -- daher wäre es toll
 wenn ich den Prozess direkt aus der bash triggern könnte.
 3. Naja und es soll in `Python` passieren.
@@ -71,19 +73,17 @@ wenn ich den Prozess direkt aus der bash triggern könnte.
 
 # {{< bi file-play >}} Rendern
 
-Das ist vermutlich der einfachste Part. Man muss nur sicherstellen `quarto`
+Das ist vermutlich der einfachste Part.<br> 
+Man muss nur sicherstellen `quarto`
 installiert zu haben. Am besten man holt sich das neueste [RStudio](https://posit.co/download/rstudio-desktop/), dann hat man `quarto`
 bereits an Board, oder man installiert es sich separat^[Unter Linux muss man sich ein .deb file downloaden und das installieren. Ich würde RStudio empfehlen.].
 
 Man kann nun:
 
 1. RStudio verwenden um das `.qmd` zu schreiben und auf den "render" Button drücken
-2. Was viel cooler ist: in der bash rendern.
+2. Was viel cooler ist: in der bash^[STG + ALT + T öffnet ein Terminal in Linux.] rendern.
 
 ```{.bash filename="Terminal"}
-#| eval: FALSE
-#| echo: true
-
 quarto render FILE.qmd
 ```
 
@@ -93,11 +93,12 @@ Die pdfs zu erstellen wird ein wenig schwieriger.
 
 # {{< bi file-earmark-pdf >}} pdfs erstellen
 
-Ich hab viel Zeit mit google verbracht um dieses Problem zu lösen.
-Ziel ist es html slides automatisch zu einem pdf zu konvertieren.
+Ich hab viel Zeit mit Google verbracht um dieses Problem zu lösen.
+Ziel ist es .html slides automatisch zu einem .pdf zu konvertieren.
 [Decktape](https://github.com/astefanutti/decktape) ist dafür ein wirklich ausgezeichnetes
-tool. Für decktape gibt es auch einen [Dockercontainer](https://hub.docker.com/r/astefanutti/decktape) was eine Anwendung
-wirklich einfach macht. Man muss sich nicht darüber Gedanken machen, welche
+tool. Für decktape gibt es auch einen 
+[Dockercontainer](https://hub.docker.com/r/astefanutti/decktape)^[Man muss sich wirklich nicht mit Docker auskennen um Docker verwenden zu können!] $\rightarrow$ 
+man muss sich keine Gedanken darüber machen, welche
 obskure andere Software man noch installieren muss, weil alles schon mit dem
 Dockercontainer verschifft wird und zwar genau in den sicheren Hafen unseres 
 Computers.
@@ -109,63 +110,61 @@ Also folgende To-Dos:
 3. Docker image verwenden $\rightarrow$ das ist genau was wir jetzt machen werden
 
 
-Um jetzt eine html Präsentation (revealjs) in pdf Folien zu verwandeln übergebe
-ich den folder an den docker container. Und das funktioniert folgendermaßen:
+Um jetzt unsere .html Präsentation in .pdf Folien zu verwandeln übergebe
+ich den Folder in dem die Dateien liegen an den Docker-Container. Das 
+Ganze ist wieder nur eine einzige Zeile und funktioniert folgendermaßen:
 
 ```{.bash filename="Terminal"}
-#| eval: FALSE
-#| echo: true
-
 docker run --rm -t -v path/to/folder:/slides astefanutti/decktape --size='2048x1536' reveal FILE.html FILE.pdf
 ```
 
 Was passiert hier?
 
-1. `docker run` okay, wir wollen irgendwas in docker machen, also soll der container der später genannt wird (`astefanutti/decktape`) laufen
-2. `--rm` es wird saubergemacht nachdem docker fertig ist
-3. `-t` damit sehen wir was passiert (stdin and stdout werden attached)
-4. `-v` wir wollen was mounten und zwar: `ordner/auf/meinem/computer:/container`. Der container rechtnet damit, dass das html file im Ordner "slides" liegt, daher wird der
+1. `docker run`: okay, wir wollen irgendwas in docker machen, also soll der 
+container der später genannt wird (`astefanutti/decktape`) *laufen*
+2. `--rm`: es wird saubergemacht nachdem docker fertig ist
+3. `-t`: damit sehen wir was passiert (stdin and stdout werden attached)
+4. `-v`: wir wollen was mounten und zwar: `ordner/auf/meinem/computer:/container`. 
+Der container rechtnet damit, dass das .html file im Ordner "slides" liegt, daher wird der
 Ordner vom eigenen Rechner dort reingemountet.
-5. `--size='2048x1536'` so funktioniert es bei mir. Andere Einstellungen machen Probleme.
+5. `--size='2048x1536'`: so funktioniert es bei mir. Ich habe einige 
+Einstellungen probiert -- es läuft.
 6. `reveal` offensichtlich arbeiten wir mit reveal-js.
-7. `FILE.html FILE.pdf` hier dürfen wir noch einen Namen vergeben für das pdf
+7. `FILE.html FILE.pdf` hier dürfen wir noch einen Namen vergeben für das .pdf!
 
 Das Ergebnis ist `FILE.pdf`, eine pdf Verison der html Präsentation.
 
 # {{< bi hand-index-thumb >}} pdf handout
 
-Um Handouts zu erstellten, die 4 Folien auf einer Seite darstellen,
+Wir wollen Handouts erstellen, die 4 Folien auf einer Seite darstellen,
 verwenden wir [pdfjam](https://github.com/rrthomas/pdfjam). Das geht ratz-fatz.
 Kaum hat man auf Enter gedrückt ist das file auch schon da.
-Wir brauchen nur die dargestellte Zeile um ein Handout zu erhalten.
+Wir brauchen wieder nur eine Zeile um ein Handout zu erhalten.
 
 
 ```{.bash filename="Terminal"}
-#| eval: FALSE
-#| echo: true
-
 pdfjam --nup 2x2 --landscape --a4paper FILE.pdf --outfile HANDOUT.pdf
 ```
 
 
 # {{< bi record >}} Ein Skript um alles zu builden
 
-Jetzt haben wir alle einzelnen Schritte beisammen um unsere Präsentation zu erstellen,
-eine pdf Version und ein Handout. Das ist gut, allerdings wollen wir das
+Jetzt haben wir alle einzelnen Schritte beisammen (3 Zeilen) um unsere Präsentation zu erstellen,
+eine .pdf Version und ein Handout. Das ist gut, allerdings wollen wir das
 natürlich nicht jedesmal händisch ausführen, sondern ein Skript anfertigen,
-das die Schritte automatisiert macht. Ich habe manchmal auch mehrere Quarto 
+das die Schritte automatisiert macht. Ich habe manchmal auch mehrere `quarto` 
 Präsentationsfiles in einem Ordner liegen und möchte nicht jedes Mal darüber
 nachdenken welches ich nun rendern will. Das Skript sollte also folgendes können:
 
-1. render -- decktape -- pdfjam
-2. für alle quarto files im Ordner
+1. render .qmd files -- decktape -- pdfjam
+2. für alle `quarto` files im Ordner
 3. parallel (da die Files z. T. längere Laufzeiten haben und mein Laptop > 10 Kerne hat) -- 
 es ist mir kurz gesagt egal ob er tw. umsonst rendert, ich will nur keine
 Zeit damit verschwenden über irgendwelche Files nachzudenken.
 
 Das hier gezeigte Python Skript definiert eine Funktion `process_file` 
 die im wesentlichen 3 Befehle ausführt: render -- decktape -- pdfjam.
-Die Dateinamen werden von den `quarto` Quarto Dokumenten übernommen und
+Die Dateinamen werden von den `quarto` Dokumenten übernommen und
 die Endungen angepasst. Um alles parallel ablaufen zu lassen wird hier der
 `ThreadPoolExecutor` verwendet.
 
@@ -209,11 +208,12 @@ if args[0] == "save": #<3>
 ```
 1. Argumente werden eingesammelt. Ziel ist es einen Input zu ermöglichen in der
 Form: `render_praes save` bzw. `render_praes`. Wenn 'save' angegeben ist, dann
-soll von dem Folder auch ein backup gemacht werden (das wird hier jetzt nicht
-im Detail dargestellt).
-2. Hier hat mir als Noob ChatGPT geholfen. Meine schön programmierte Schleife
+soll von dem Folder auch ein backup gemacht werden (das wird jetzt nicht
+im Detail dargestellt -- vielleicht in einem anderen Post mal).
+2. Hier hat mir als N00b ChatGPT geholfen. Meine schön programmierte Schleife
 wurde zu diesem Konstrukt umformuliert.
-3. Wenn 'save' angegeben wird, wird dieser Block getriggert.
+3. Wenn 'save' angegeben wird, wird dieser Block getriggert. Den Teil kann man
+natürlich weglassen wenn man es nicht braucht.
 
 
 
@@ -226,30 +226,34 @@ Wie machen wir das?
 
 1. Wechsle in das Verzeichnis in dem das Skript liegt `cd da/is/mein/skript`
 2. Mache das Python Skript ausführbar: `chmod +x render_praes.py`
-3. Kopiere/verschiebe das Skript an einen zentraleren Ort (ist nicht unbedingt 
-notwendig). Skripts werden gerne zentral im `~/bin` Ordner gespeichert. Kann man 
-machen, muss man aber nicht. Wenn man das will (ich empfehle es zu wollen), 
-und hat keinen derartigen 
-Ordner, macht an zuerst `mkdir bin` und dann `cp render_praes.py ~/bin` um das 
+3. Kopiere/verschiebe das Skript an einen zentraleren Ort^[ist nicht unbedingt 
+notwendig -- aus Erfahrung kann ich aber sagen dass es sehr praktisch ist wenn 
+man weiß wo solche Skripts liegen.] wie z. B. den `~/bin` Ordner.
+Hat keinen derartigen Ordner, macht an zuerst `mkdir ~/bin` und dann 
+`cp render_praes.py ~/bin` um das 
 Skript reinzukopieren.
-4. Dann fügt man einen `alias` in die `~/.bashrc` ein. 
-Das ist der Moment, in dem man sich entscheiden
-muss mit welchem Namen man dieses Skript aufrufen will. 
+4. Dann fügt man einen `alias` in die `~/.bashrc` ein. Damit stellt man das Skript
+unter dem geannten Namen zur Verfügung -- daher ist das der Moment, in dem man 
+sich für einen Namen entscheiden muss. 
 Hier ist der Name mit `render_praes` festgelegt.
 
 ```{.bash filename="~/.bashrc"}
-#| eval: FALSE
-#| echo: true
-
 alias render_praes='/home/manuel/bin/render_praes_parallel.py'
 ```
 
 Um die Funktion auszuprobieren startet man ein neues Terminal, wechselt
-in den Ordner mit zumindest einer Quarto revealjs Präsentation und schreibt
-`render_preas`. Boom {{< bi rocket >}}. Es sollte nun zuerst quarto rendern, decktape das
-pdf erzeugen und pdfjam anschließend das Handout. Und währenddessen kann
-man mal gemütlich einen Kaffee trinken gehen.
+in den Ordner mit zumindest einer `quarto` `revealjs` Präsentation und schreibt
+`render_preas`. <br>
+Boom {{< bi rocket >}}. Es sollte nun zuerst `quarto` rendern, decktape das
+.pdf erzeugen und `pdfjam` anschließend das Handout. <br>
+Und währenddessen kann man mal gemütlich einen Kaffee trinken gehen.
+<br>
 
+::: {style='text-align:center;'}
+
+{{< bi cup-hot size=66px >}}
+
+:::
 
 
 

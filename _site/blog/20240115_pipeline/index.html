@@ -223,101 +223,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>Erstellst du Folien mit reveal-js mittels quarto? <br></li>
-<li>Willst du pdf Versionen und pdf Handouts? <br></li>
-<li>Arbeitest du mit Linux/Ubuntu. <br></li>
-<li>Dann Lesebefehl!</li>
+<li>Erstellst du Folien mit reveal-js mittels <code>quarto</code>? <br></li>
+<li>Willst du .pdf Versionen und .pdf Handouts? <br></li>
+<li>Arbeitest du mit Linux/Ubuntu. <br> <span class="math inline">\(\rightarrow\)</span> Dann <strong>Lesebefehl!</strong></li>
 </ol>
 </div>
 </div>
 <p><img src="pipeline.png" alt="Bildbeschreibung" style="float: right; width: 37%; margin-left: 20px; margin-bottom: 10px;"></p>
-<p>In meiner Lehrveranstaltung zu “Forschungsmethoden und Statistik” habe ich meine Folien mithilfe von <code>quarto</code> und <code>revealjs</code> erstellt. Das war natürlich nicht immer so. Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch meine Folien mit LaTeX <code>beamer</code> erstellt. 2023 sprach allerdings kaum mehr etwas dafür <code>beamer</code> zu verwenden, denn alle Präsentation mit <code>revealjs</code> sahen einfach gut aus – und das quasi “Out of the box”. Also musste ich einen neuen Workflow aufbauen. Die <code>quarto</code> Dokumente schreibe ich in RStudio und zur schnellen Ansicht rendere ich auch direkt in RStudio. Das Ergebnis sind .html files. Ich brauche aber ebenso Handouts für meine Studierenden und hätte selbst gerne noch eine .pdf Version meiner Präsentation falls alle Browser streiken und Gott bewahre, etwas ähnliches ist mir bereits passiert. Üblicherweise trage ich meine files auf einem USB Stick herum. USB-Sticks bleiben gerne mal wo liegen oder stecken und daher wäre es gut, ein vernünftiges Backup in der Cloud zu haben, um im Falle des Falles auch so auf die Präsentation zugreifen zu können.</p>
-<p>Dieser Post wird sich damit beschäftigen, einen für mich funktionierenden automatisierten Ablauf für meine <code>quarto</code> Präsentationen zu erstellen. Dieser Ablauf soll folgendermaßen geschehen:</p>
+<p>In meiner Lehrveranstaltung zu “Forschungsmethoden und Statistik” habe ich meine Folien mithilfe von <code>quarto</code> und <code>revealjs</code> erstellt. Das war natürlich nicht immer so.<br> Früher, in der guten alten Zeit, habe ich wie jeder vernünftige Mensch meine Folien mit LaTeX <code>beamer</code> erstellt. 2023 sprach allerdings kaum mehr etwas dafür <code>beamer</code> zu verwenden, denn alle Präsentation mit <code>revealjs</code> sahen einfach gut aus – und das quasi “Out of the box”. Wer will nicht dass seine Folien geil aussehen? Also musste ich einen neuen Workflow aufbauen. Die <code>quarto</code> Dokumente schreibe ich in RStudio und zur schnellen Ansicht rendere ich auch direkt in RStudio. Das Ergebnis sind .html files. Ich brauche aber ebenso Handouts für meine Studierenden und hätte selbst gerne noch eine .pdf Version meiner Präsentation falls alle Browser streiken und Gott bewahre, etwas ähnliches ist mir bereits passiert. Üblicherweise trage ich meine files auf einem USB Stick herum. USB-Sticks bleiben gerne mal wo liegen oder stecken und daher wäre es gut, ein vernünftiges Backup in der Cloud zu haben, um im Falle des Falles auch so auf die Präsentation zugreifen zu können.</p>
+<p>Dieser Post wird sich damit beschäftigen, einen für mich funktionierenden automatisierten Ablauf für meine <code>quarto</code> Präsentationen zu erstellen. Folgender Ablauf ist geplant:</p>
 <ol type="1">
 <li>Render meine <code>quarto</code> Präsentationen</li>
 <li>Erstelle pdfs aus diesen</li>
 <li>Erstelle pdf Handouts</li>
 <li>Erstelle ein Backup auf google drive</li>
 </ol>
-<p>Bisher hatte ich für solche Aufgaben Makefiles. Damit bin ich nicht so schlecht gefahren – allerdings musste ich die Makefiles immer wieder anpassen bzw. in einen neuen Ordner kopieren wenn eine neue Präsentation erstellt wird. Außerdem sagt mir jeder ich muss mehr in Python machen. Ok, unter der Bedingung ich schreib mir so einen Ablauf in Python, dann will ich folgendes:</p>
+<p>Bisher hatte ich für solche Aufgaben Makefiles<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Damit bin ich nicht so schlecht gefahren – allerdings musste ich die Makefiles immer wieder anpassen bzw. in einen neuen Ordner kopieren wenn eine neue Präsentation erstellt wird. Außerdem sagt mir jeder ich muss mehr in Python machen. Ok, wenn ich das Ganze also in Python machen soll, dann will ich auch folgende Wohlfühl-Features haben:</p>
 <ol type="1">
-<li>Multiple <code>.qmd</code> Files sollen parallel gerendert etc. werden</li>
+<li>Multiple <code>.qmd</code> Files sollen parallel gerendert etc. werden<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></li>
 <li>Das Herumkopieren find ich nicht so prickelnd – daher wäre es toll wenn ich den Prozess direkt aus der bash triggern könnte.</li>
 <li>Naja und es soll in <code>Python</code> passieren.</li>
 </ol>
 </section>
 <section id="bi-file-play-rendern" class="level1">
 <h1><i class="bi-file-play " style="" role="img" aria-hidden="true"></i> Rendern</h1>
-<p>Das ist vermutlich der einfachste Part. Man muss nur sicherstellen <code>quarto</code> installiert zu haben. Am besten man holt sich das neueste <a href="https://posit.co/download/rstudio-desktop/">RStudio</a>, dann hat man <code>quarto</code> bereits an Board, oder man installiert es sich separat<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>Das ist vermutlich der einfachste Part.<br> Man muss nur sicherstellen <code>quarto</code> installiert zu haben. Am besten man holt sich das neueste <a href="https://posit.co/download/rstudio-desktop/">RStudio</a>, dann hat man <code>quarto</code> bereits an Board, oder man installiert es sich separat<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <p>Man kann nun:</p>
 <ol type="1">
 <li>RStudio verwenden um das <code>.qmd</code> zu schreiben und auf den “render” Button drücken</li>
-<li>Was viel cooler ist: in der bash rendern.</li>
+<li>Was viel cooler ist: in der bash<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> rendern.</li>
 </ol>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Terminal</strong></pre>
 </div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#| echo: true</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="ex">quarto</span> render FILE.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">quarto</span> render FILE.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In der bash rendern ist nicht nur cooler, sondern auch der erste Schritt um das ganze Prozedere zu automatisieren. So far so good. Die pdfs zu erstellen wird ein wenig schwieriger.</p>
 </section>
 <section id="bi-file-earmark-pdf-pdfs-erstellen" class="level1">
 <h1><i class="bi-file-earmark-pdf " style="" role="img" aria-hidden="true"></i> pdfs erstellen</h1>
-<p>Ich hab viel Zeit mit google verbracht um dieses Problem zu lösen. Ziel ist es html slides automatisch zu einem pdf zu konvertieren. <a href="https://github.com/astefanutti/decktape">Decktape</a> ist dafür ein wirklich ausgezeichnetes tool. Für decktape gibt es auch einen <a href="https://hub.docker.com/r/astefanutti/decktape">Dockercontainer</a> was eine Anwendung wirklich einfach macht. Man muss sich nicht darüber Gedanken machen, welche obskure andere Software man noch installieren muss, weil alles schon mit dem Dockercontainer verschifft wird und zwar genau in den sicheren Hafen unseres Computers.</p>
+<p>Ich hab viel Zeit mit Google verbracht um dieses Problem zu lösen. Ziel ist es .html slides automatisch zu einem .pdf zu konvertieren. <a href="https://github.com/astefanutti/decktape">Decktape</a> ist dafür ein wirklich ausgezeichnetes tool. Für decktape gibt es auch einen <a href="https://hub.docker.com/r/astefanutti/decktape">Dockercontainer</a><a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> <span class="math inline">\(\rightarrow\)</span> man muss sich keine Gedanken darüber machen, welche obskure andere Software man noch installieren muss, weil alles schon mit dem Dockercontainer verschifft wird und zwar genau in den sicheren Hafen unseres Computers.</p>
 <p>Also folgende To-Dos:</p>
 <ol type="1">
 <li><a href="https://docs.docker.com/get-docker/">Docker holen</a></li>
 <li>Docker image <a href="https://docs.docker.com/engine/reference/commandline/image_pull/">pullen</a></li>
 <li>Docker image verwenden <span class="math inline">\(\rightarrow\)</span> das ist genau was wir jetzt machen werden</li>
 </ol>
-<p>Um jetzt eine html Präsentation (revealjs) in pdf Folien zu verwandeln übergebe ich den folder an den docker container. Und das funktioniert folgendermaßen:</p>
+<p>Um jetzt unsere .html Präsentation in .pdf Folien zu verwandeln übergebe ich den Folder in dem die Dateien liegen an den Docker-Container. Das Ganze ist wieder nur eine einzige Zeile und funktioniert folgendermaßen:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Terminal</strong></pre>
 </div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#| echo: true</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-t</span> <span class="at">-v</span> path/to/folder:/slides astefanutti/decktape <span class="at">--size</span><span class="op">=</span><span class="st">'2048x1536'</span> reveal FILE.html FILE.pdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-t</span> <span class="at">-v</span> path/to/folder:/slides astefanutti/decktape <span class="at">--size</span><span class="op">=</span><span class="st">'2048x1536'</span> reveal FILE.html FILE.pdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Was passiert hier?</p>
 <ol type="1">
-<li><code>docker run</code> okay, wir wollen irgendwas in docker machen, also soll der container der später genannt wird (<code>astefanutti/decktape</code>) laufen</li>
-<li><code>--rm</code> es wird saubergemacht nachdem docker fertig ist</li>
-<li><code>-t</code> damit sehen wir was passiert (stdin and stdout werden attached)</li>
-<li><code>-v</code> wir wollen was mounten und zwar: <code>ordner/auf/meinem/computer:/container</code>. Der container rechtnet damit, dass das html file im Ordner “slides” liegt, daher wird der Ordner vom eigenen Rechner dort reingemountet.</li>
-<li><code>--size='2048x1536'</code> so funktioniert es bei mir. Andere Einstellungen machen Probleme.</li>
+<li><code>docker run</code>: okay, wir wollen irgendwas in docker machen, also soll der container der später genannt wird (<code>astefanutti/decktape</code>) <em>laufen</em></li>
+<li><code>--rm</code>: es wird saubergemacht nachdem docker fertig ist</li>
+<li><code>-t</code>: damit sehen wir was passiert (stdin and stdout werden attached)</li>
+<li><code>-v</code>: wir wollen was mounten und zwar: <code>ordner/auf/meinem/computer:/container</code>. Der container rechtnet damit, dass das .html file im Ordner “slides” liegt, daher wird der Ordner vom eigenen Rechner dort reingemountet.</li>
+<li><code>--size='2048x1536'</code>: so funktioniert es bei mir. Ich habe einige Einstellungen probiert – es läuft.</li>
 <li><code>reveal</code> offensichtlich arbeiten wir mit reveal-js.</li>
-<li><code>FILE.html FILE.pdf</code> hier dürfen wir noch einen Namen vergeben für das pdf</li>
+<li><code>FILE.html FILE.pdf</code> hier dürfen wir noch einen Namen vergeben für das .pdf!</li>
 </ol>
 <p>Das Ergebnis ist <code>FILE.pdf</code>, eine pdf Verison der html Präsentation.</p>
 </section>
 <section id="bi-hand-index-thumb-pdf-handout" class="level1">
 <h1><i class="bi-hand-index-thumb " style="" role="img" aria-hidden="true"></i> pdf handout</h1>
-<p>Um Handouts zu erstellten, die 4 Folien auf einer Seite darstellen, verwenden wir <a href="https://github.com/rrthomas/pdfjam">pdfjam</a>. Das geht ratz-fatz. Kaum hat man auf Enter gedrückt ist das file auch schon da. Wir brauchen nur die dargestellte Zeile um ein Handout zu erhalten.</p>
+<p>Wir wollen Handouts erstellen, die 4 Folien auf einer Seite darstellen, verwenden wir <a href="https://github.com/rrthomas/pdfjam">pdfjam</a>. Das geht ratz-fatz. Kaum hat man auf Enter gedrückt ist das file auch schon da. Wir brauchen wieder nur eine Zeile um ein Handout zu erhalten.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Terminal</strong></pre>
 </div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#| echo: true</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="ex">pdfjam</span> <span class="at">--nup</span> 2x2 <span class="at">--landscape</span> <span class="at">--a4paper</span> FILE.pdf <span class="at">--outfile</span> HANDOUT.pdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">pdfjam</span> <span class="at">--nup</span> 2x2 <span class="at">--landscape</span> <span class="at">--a4paper</span> FILE.pdf <span class="at">--outfile</span> HANDOUT.pdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="bi-record-ein-skript-um-alles-zu-builden" class="level1">
 <h1><i class="bi-record " style="" role="img" aria-hidden="true"></i> Ein Skript um alles zu builden</h1>
-<p>Jetzt haben wir alle einzelnen Schritte beisammen um unsere Präsentation zu erstellen, eine pdf Version und ein Handout. Das ist gut, allerdings wollen wir das natürlich nicht jedesmal händisch ausführen, sondern ein Skript anfertigen, das die Schritte automatisiert macht. Ich habe manchmal auch mehrere Quarto Präsentationsfiles in einem Ordner liegen und möchte nicht jedes Mal darüber nachdenken welches ich nun rendern will. Das Skript sollte also folgendes können:</p>
+<p>Jetzt haben wir alle einzelnen Schritte beisammen (3 Zeilen) um unsere Präsentation zu erstellen, eine .pdf Version und ein Handout. Das ist gut, allerdings wollen wir das natürlich nicht jedesmal händisch ausführen, sondern ein Skript anfertigen, das die Schritte automatisiert macht. Ich habe manchmal auch mehrere <code>quarto</code> Präsentationsfiles in einem Ordner liegen und möchte nicht jedes Mal darüber nachdenken welches ich nun rendern will. Das Skript sollte also folgendes können:</p>
 <ol type="1">
-<li>render – decktape – pdfjam</li>
-<li>für alle quarto files im Ordner</li>
+<li>render .qmd files – decktape – pdfjam</li>
+<li>für alle <code>quarto</code> files im Ordner</li>
 <li>parallel (da die Files z. T. längere Laufzeiten haben und mein Laptop &gt; 10 Kerne hat) – es ist mir kurz gesagt egal ob er tw. umsonst rendert, ich will nur keine Zeit damit verschwenden über irgendwelche Files nachzudenken.</li>
 </ol>
-<p>Das hier gezeigte Python Skript definiert eine Funktion <code>process_file</code> die im wesentlichen 3 Befehle ausführt: render – decktape – pdfjam. Die Dateinamen werden von den <code>quarto</code> Quarto Dokumenten übernommen und die Endungen angepasst. Um alles parallel ablaufen zu lassen wird hier der <code>ThreadPoolExecutor</code> verwendet.</p>
+<p>Das hier gezeigte Python Skript definiert eine Funktion <code>process_file</code> die im wesentlichen 3 Befehle ausführt: render – decktape – pdfjam. Die Dateinamen werden von den <code>quarto</code> Dokumenten übernommen und die Endungen angepasst. Um alles parallel ablaufen zu lassen wird hier der <code>ThreadPoolExecutor</code> verwendet.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Python</strong></pre>
@@ -362,15 +352,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-4" data-code-annotation="1" data-code-lines="10">Argumente werden eingesammelt. Ziel ist es einen Input zu ermöglichen in der Form: <code>render_praes save</code> bzw. <code>render_praes</code>. Wenn ‘save’ angegeben ist, dann soll von dem Folder auch ein backup gemacht werden (das wird hier jetzt nicht im Detail dargestellt).</span>
+<span data-code-cell="annotated-cell-4" data-code-annotation="1" data-code-lines="10">Argumente werden eingesammelt. Ziel ist es einen Input zu ermöglichen in der Form: <code>render_praes save</code> bzw. <code>render_praes</code>. Wenn ‘save’ angegeben ist, dann soll von dem Folder auch ein backup gemacht werden (das wird jetzt nicht im Detail dargestellt – vielleicht in einem anderen Post mal).</span>
 </dd>
 <dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-4" data-code-annotation="2" data-code-lines="31">Hier hat mir als Noob ChatGPT geholfen. Meine schön programmierte Schleife wurde zu diesem Konstrukt umformuliert.</span>
+<span data-code-cell="annotated-cell-4" data-code-annotation="2" data-code-lines="31">Hier hat mir als N00b ChatGPT geholfen. Meine schön programmierte Schleife wurde zu diesem Konstrukt umformuliert.</span>
 </dd>
 <dt data-target-cell="annotated-cell-4" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-4" data-code-annotation="3" data-code-lines="34">Wenn ‘save’ angegeben wird, wird dieser Block getriggert.</span>
+<span data-code-cell="annotated-cell-4" data-code-annotation="3" data-code-lines="34">Wenn ‘save’ angegeben wird, wird dieser Block getriggert. Den Teil kann man natürlich weglassen wenn man es nicht braucht.</span>
 </dd>
 </dl>
 </section>
@@ -380,19 +370,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>Wechsle in das Verzeichnis in dem das Skript liegt <code>cd da/is/mein/skript</code></li>
 <li>Mache das Python Skript ausführbar: <code>chmod +x render_praes.py</code></li>
-<li>Kopiere/verschiebe das Skript an einen zentraleren Ort (ist nicht unbedingt notwendig). Skripts werden gerne zentral im <code>~/bin</code> Ordner gespeichert. Kann man machen, muss man aber nicht. Wenn man das will (ich empfehle es zu wollen), und hat keinen derartigen Ordner, macht an zuerst <code>mkdir bin</code> und dann <code>cp render_praes.py ~/bin</code> um das Skript reinzukopieren.</li>
-<li>Dann fügt man einen <code>alias</code> in die <code>~/.bashrc</code> ein. Das ist der Moment, in dem man sich entscheiden muss mit welchem Namen man dieses Skript aufrufen will. Hier ist der Name mit <code>render_praes</code> festgelegt.</li>
+<li>Kopiere/verschiebe das Skript an einen zentraleren Ort<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> wie z. B. den <code>~/bin</code> Ordner. Hat keinen derartigen Ordner, macht an zuerst <code>mkdir ~/bin</code> und dann <code>cp render_praes.py ~/bin</code> um das Skript reinzukopieren.</li>
+<li>Dann fügt man einen <code>alias</code> in die <code>~/.bashrc</code> ein. Damit stellt man das Skript unter dem geannten Namen zur Verfügung – daher ist das der Moment, in dem man sich für einen Namen entscheiden muss. Hier ist der Name mit <code>render_praes</code> festgelegt.</li>
 </ol>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>~/.bashrc</strong></pre>
 </div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#| echo: true</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="bu">alias</span> render_praes=<span class="st">'/home/manuel/bin/render_praes_parallel.py'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="bu">alias</span> render_praes=<span class="st">'/home/manuel/bin/render_praes_parallel.py'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Um die Funktion auszuprobieren startet man ein neues Terminal, wechselt in den Ordner mit zumindest einer Quarto revealjs Präsentation und schreibt <code>render_preas</code>. Boom <i class="bi-rocket " style="" role="img" aria-hidden="true"></i>. Es sollte nun zuerst quarto rendern, decktape das pdf erzeugen und pdfjam anschließend das Handout. Und währenddessen kann man mal gemütlich einen Kaffee trinken gehen.</p>
+<p>Um die Funktion auszuprobieren startet man ein neues Terminal, wechselt in den Ordner mit zumindest einer <code>quarto</code> <code>revealjs</code> Präsentation und schreibt <code>render_preas</code>. <br> Boom <i class="bi-rocket " style="" role="img" aria-hidden="true"></i>. Es sollte nun zuerst <code>quarto</code> rendern, decktape das .pdf erzeugen und <code>pdfjam</code> anschließend das Handout. <br> Und währenddessen kann man mal gemütlich einen Kaffee trinken gehen. <br></p>
+<div style="text-align:center;">
+<p><i class="bi-cup-hot " style="font-size: 66px;" role="img" aria-hidden="true"></i></p>
+</div>
 
 
 </section>
@@ -401,7 +391,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Unter Linux muss man sich ein .deb file downloaden und das installieren. Ich würde RStudio empfehlen.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Das ist eine wirklich gute kurze Einführung in Makefiles https://kbroman.org/minimal_make/<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Man lebt ja nicht ewig!<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Unter Linux muss man sich ein .deb file downloaden und das installieren. Ich würde RStudio empfehlen.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>STG + ALT + T öffnet ein Terminal in Linux.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Man muss sich wirklich nicht mit Docker auskennen um Docker verwenden zu können!<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>ist nicht unbedingt notwendig – aus Erfahrung kann ich aber sagen dass es sehr praktisch ist wenn man weiß wo solche Skripts liegen.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
