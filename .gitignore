@@ -5,6 +5,8 @@
 *.Rproj
 *.xlsx
 
+_site
+
 /.quarto/
 
 dontgit
