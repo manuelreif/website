@@ -27,9 +27,6 @@ format:
     toc: true
     page-layout: full
 
-filters:
-  - lightbox
-
 highlight-style: monokai
 
 execute: 
