@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: 881e5453-295c-40c8-8740-c0ad62f77ab6
+      url: 'https://exquisite-puffpuff-0f8a8f.netlify.app'
