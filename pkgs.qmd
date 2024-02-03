@@ -15,15 +15,7 @@ page-layout: custom
 ::: {.grid}
 
 ::: {.g-col-4 .g-start-3}
-<h1>Packages</h1>
-:::
-
-
-::: {.g-col-2 .g-start-11}
-<nav id="TOC" class="toc-active">
-  <!-- Das ToC wird hier durch JavaScript gefüllt -->
-</nav>
-
+<h1 class="packi">Packages</h1>
 :::
 
 :::

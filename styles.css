@@ -106,3 +106,33 @@ section#svypv-package.level2.g-col-4.g-start-7 {
     padding: 15px; /* Innerer Abstand, um etwas Platz zwischen dem Inhalt und den Rändern zu schaffen */
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: leichter Schatten für eine "Box"-Optik */
 }
+
+
+/* Stil für mobile Geräte */
+@media (max-width: 768px) {
+  .columns .column {
+    width: 100% !important; /* Erzwingen Sie 100% Breite auf kleinen Bildschirmen */
+    float: none !important; /* Entfernen Sie das Float-Verhalten, falls vorhanden */
+  }
+}
+
+
+@media (max-width: 768px) {
+  /* Setzen Sie alle Grid-Spalten auf volle Breite und ignorieren Sie die Startposition */
+  .grid .g-col-4, .grid .g-col-2 {
+    grid-column: 1 / -1 !important; /* Nimmt die volle Breite ein */
+  }
+
+  /* Optional: Anpassen der Navigation (ToC) auf kleinen Bildschirmen */
+  nav#TOC {
+    position: static !important; /* Entfernt spezifische Platzierung */
+    width: 100% !important; /* Setzt die Breite auf 100% */
+    margin-top: 20px; /* Fügt etwas Abstand oben hininzu */
+  }
+}
+
+
+h1.packi{
+    margin-top: 0;
+    margin-bottom: 0;
+}
