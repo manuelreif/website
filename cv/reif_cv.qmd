@@ -21,9 +21,11 @@ cvmeta:
   - title: Field
     text: Statistik, Data Science
   - title: Software
-    text: R (fast 20 Jahre), stan, quarto, rmarkdown, git, bash, Linux User, Python (N00b)
+    text: R (fast 20 Jahre), stan, git, bash, Linux User, Python (N00b)
   - title: R-Packages
-    text: data.table, ggplot2, rstan, brms, marginaleffects, eRm, mirt \ldots         
+    text: data.table, ggplot2, shiny, shinydashboard, rstan, brms, marginaleffects, eRm, mirt, quarto \ldots und selbst Autor von 3 R-Packages  
+  - title: Statistik
+    text: GLMs, Multilevel Models, Bayesian Statistics, IRT Models, Rasch Models, Scaling, Microsimulation, exponential Smoothing \ldots          
 execute:
   echo: false
 ---
