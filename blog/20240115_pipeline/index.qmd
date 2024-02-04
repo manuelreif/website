@@ -2,8 +2,8 @@
 title: "Presentation pipeline"
 description: "Wie aus Quarto Präsentationen mit revealjs automatisiert pdfs und Handouts werden."
 author: Manuel 
-date: 2024-01-22
-categories: [quarto, Python, bash, Linux]
+date: 2024-02-03
+categories: [quarto, bash, Linux, Python]
 thumbnail: pipeline.png
 format:
   html:

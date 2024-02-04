@@ -13,7 +13,7 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: cv/reif_cv.pdf
+      - href: cv.qmd
         text: CV
       - href: pkgs.qmd
         text: R-Packages
