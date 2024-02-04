@@ -1,0 +1,98 @@
+---
+title: "Logical"
+description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn sie mit Mixed Integer Programming und Python gelöst werden."
+author: Manuel Reif 
+date: 2024-02-05
+categories: [Python, OR]
+draft: false 
+highlight-style: monokai
+---
+
+
+
+<img src="media/pm_header.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Wenn ich mit dem Zug fahre vergeht die Zeit am schnellsten wenn ich versuche Rätsel
+zu lösen. Dann investiere ich mein Geld in den P. M. Logik Trainer, nehme mir sehr
+viel vor und es endet meist damit, dass das erste Rätsel mich so lang beschäftigt
+dass ich zu keinem Weiteren komme. Manchmal sind die Rätsel auch so schwierig,
+dass ich keine Lösung finde. Also bleibt das gekaufte Heft immer zum größten Teil
+unausgefüllt. Weihnachten 2023 packte mich der Ehrgeiz und ich wollte in einer
+ruhigen Stunde, ein sogenanntes Logical lösen, das zuvor auf einer Zugfahrt 
+ungelöst blieb. Doch obwohl Weihnachten ein Fest der Liebe ist, wurde es
+ob dieses Logicals beinahe ein Fest des Hasses, denn es wollte sich nicht lösen
+lassen obwohl ich bereits mehr als 10 Minuten investiert hatte.
+
+Der Gedanke, das Problem mittel Optimierung zu lösen kam sehr rasch nach der
+Erkenntnis dass es sich eigentlich lösen lassen müsste.
+
+
+# Das Problem
+
+
+
+::::{.columns}
+
+:::{.column width="47%"}
+
+Das zu lösende Problem sieht folgendermaßen aus:
+Es werden beliebige Wörter, in diesem Fall Namen von Bands genannt. Jedes Wort
+ist einer Zahl zugeordnet. Diese Zahl bezeichnet die Summe der Buchstabenwerte.
+Ziel ist es, die Buchstabenwerte herauszufinden. Die einzigen bekannten Informationen
+sind:
+
+1. Die Summe der Buchstaben jedes Wortes
+2. Jedem Buchstaben ist genau eine Zahl zwischen 1 und 26 zugeordnet
+3. Zwei Buchstaben haben nie dieselbe Zahl -- also es werden für 26 Buchstaben
+alle Zahlen von 1-26 zugeordnet.
+
+
+
+:::
+
+:::{.column width="4%"}
+
+
+
+
+:::
+
+:::{.column width="47%"}
+```{r logical-bandname-summe}
+#| echo: false
+#| eval: true
+
+library(data.table)
+library(readxl)
+library(magrittr)
+library(DT)
+
+wsi = fread("media/word_sum_input.csv")
+
+wsi_tb = wsi %>% 
+    setnames(old = c("words", "letter_sum"), new = c("Bands", "Buchstabensumme")) %>% 
+    datatable(options = list(pageLength = 7, bFilter=0, dom = 'ftp'), 
+              caption = "Bandnamen und deren zugehörige Buchstabensumme")
+
+wsi_tb
+
+```
+
+:::
+
+::::
+
+Normalerweise beginnt man nun damit, Wörter zu identifizieren bei denen man
+einzelene Buchstabenwerte gut identifizieren kann.
+
+
+# Die Lösung
+
+
+
+
+
+
+
+
+
