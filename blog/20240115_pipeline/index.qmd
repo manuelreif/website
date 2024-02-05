@@ -95,8 +95,8 @@ Die pdfs zu erstellen wird ein wenig schwieriger.
 Ich hab viel Zeit mit Google verbracht um dieses Problem zu lösen.
 Ziel ist es .html slides automatisch zu einem .pdf zu konvertieren.
 [Decktape](https://github.com/astefanutti/decktape) ist dafür ein wirklich ausgezeichnetes
-tool. Für decktape gibt es auch einen 
-[Dockercontainer](https://hub.docker.com/r/astefanutti/decktape)^[Man muss sich wirklich nicht mit Docker auskennen um Docker verwenden zu können!] $\rightarrow$ 
+tool. Für decktape gibt es auch ein
+[Dockerimage](https://hub.docker.com/r/astefanutti/decktape)^[Man muss sich wirklich nicht mit Docker auskennen um Docker verwenden zu können!] $\rightarrow$ 
 man muss sich keine Gedanken darüber machen, welche
 obskure andere Software man noch installieren muss, weil alles schon mit dem
 Dockercontainer verschifft wird und zwar genau in den sicheren Hafen unseres 
@@ -119,12 +119,12 @@ docker run --rm -t -v path/to/folder:/slides astefanutti/decktape --size='2048x1
 
 Was passiert hier?
 
-1. `docker run`: okay, wir wollen irgendwas in docker machen, also soll der 
-container der später genannt wird (`astefanutti/decktape`) *laufen*
+1. `docker run`: okay, wir wollen irgendwas in docker machen, also soll das Image
+das später genannt wird (`astefanutti/decktape`) *laufen*
 2. `--rm`: es wird saubergemacht nachdem docker fertig ist
 3. `-t`: damit sehen wir was passiert (stdin and stdout werden attached)
 4. `-v`: wir wollen was mounten und zwar: `ordner/auf/meinem/computer:/container`. 
-Der container rechtnet damit, dass das .html file im Ordner "slides" liegt, daher wird der
+Decktape rechtnet damit, dass das .html file im Ordner "slides" liegt, daher wird der
 Ordner vom eigenen Rechner dort reingemountet.
 5. `--size='2048x1536'`: so funktioniert es bei mir. Ich habe einige 
 Einstellungen probiert -- es läuft.
