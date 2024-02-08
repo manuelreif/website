@@ -19,6 +19,8 @@ website:
         text: R-Packages
       - href: blog.qmd
         text: Blog {{< fa blog >}}
+      - href: impressum.qmd
+        text: Impressum     
         
 format:
   html:
