@@ -1,0 +1,30 @@
+---
+title: "Impressum"
+format: html
+---
+
+<br>
+
+<br>
+
+<img src="media/impr.webp" alt="Beschreibung" style="float: right; width: 20%;">
+
+
+Verantwortlich für den Inhalt dieser Seite:
+
+
+**Name:** Mag. Manuel Reif, Bakk. <br>
+**Wohnort:** Wien <br>
+**E-Mail:** [info@manuelreif.at](mailto:info@manuelreif.at) <br>
+
+<br>
+
+## Haftungsausschluss
+
+Die Inhalte dieser Website werden mit größtmöglicher Sorgfalt erstellt. Der Anbieter übernimmt jedoch keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte.
+
+## Urheberrecht
+
+Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+
+
