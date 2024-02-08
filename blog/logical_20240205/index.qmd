@@ -6,6 +6,7 @@ date: 2024-02-05
 categories: [Python, OR]
 draft: false 
 highlight-style: monokai
+image: media/memes/logical_brain.jpg
 ---
 
 
@@ -38,10 +39,11 @@ Erkenntnis dass es sich eigentlich lösen lassen müsste.
 Das zu lösende Problem sieht folgendermaßen aus:
 Es werden beliebige Wörter, in diesem Fall Namen von Bands genannt. Jedes Wort
 ist einer Zahl zugeordnet. Diese Zahl bezeichnet die Summe der Buchstabenwerte.
+Also z. B. wissen wir laut nebenstehender Tabelle, dass `A + C + D + C = 45`.
 Ziel ist es, die Buchstabenwerte herauszufinden. Die einzigen bekannten Informationen
 sind:
 
-1. Die Summe der Buchstaben jedes Wortes
+1. Die **Summe** der Buchstaben jedes Wortes
 2. Jedem Buchstaben ist genau eine Zahl zwischen 1 und 26 zugeordnet
 3. Zwei Buchstaben haben nie dieselbe Zahl -- also es werden für 26 Buchstaben
 alle Zahlen von 1-26 zugeordnet.
@@ -58,9 +60,13 @@ alle Zahlen von 1-26 zugeordnet.
 :::
 
 :::{.column width="47%"}
+
+
 ```{r logical-bandname-summe}
 #| echo: false
 #| eval: true
+#| label: logbandname
+#| tbl-cap: "Bandnamen und deren zugehörige Buchstabensumme"
 
 library(data.table)
 library(readxl)
@@ -78,18 +84,183 @@ wsi_tb
 
 ```
 
+
 :::
 
 ::::
 
-Normalerweise beginnt man nun damit, Wörter zu identifizieren bei denen man
-einzelene Buchstabenwerte gut identifizieren kann.
+Normalerweise beginnt man nun damit Wörter die es einem leicht machen einzelne 
+Buchstabenwerte zu identifizieren. Das können möglichst kurze Wörter sein, 
+oder auch Wörter mit besonders niedrigen Buchstabensummen. 
+Oft gibt es dazu eine Einstiegshilfe, in Form eines Hinweises, welches Wort sich 
+besonders gut eignet.
+
+# Die Suche
+
+
+<img src="media/memes/logical_brain.jpg" alt="My brain when solving a logical" style="float: right; width: 55%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Das klingt alles sehr mühsam -- und ok, wenn man es dann gelöst hat stellt
+sich eine gewisse Zufriedenheit ein. Aber auf dem Weg dorthin erlebt man zahlreiche
+Frustrationen. Ich weiß nicht wie es euch geht, aber in meiner Freizeit lasse ich
+mich ungern frustrieren. Man will aber das Problem ja auch nicht ungelöst im Heft lassen.
+Wobei das wirkliche Problem ja nicht der "Ungelöst" Status des Problems ist, sondern
+vielmehr dass man es probiert hat um dann zu dem Schluss zu kommen es 
+"aus persönlichen Gründen" doch nicht zu lösen. 
+Das Problem wird zum Problem. Es prangt regelrecht wie ein frisch errichtetes 
+Denkmal des eigenen Scheiterns.
+Selbst wenn das Heft geschlossen auf dem Tisch liegt, dringt es hindurch und 
+erinnert uns daran, dass die "persönlichen Gründe" spezifischer formuliert,
+nichts anderes als das das eigene Unvermögen bezeichnen.
+Die Denkmalhaftigkeit hat sich inzwuschen auch auf das gesamte Heft übertragen
+und droht omnipräsent zu werden und uns bis ins Mark zu erschüttern. Um diesen
+Prozess zu unterbrechen ergibt sich die Notwendigkeit das Rätsel zu lösen auch
+wenn man dafür (ein bissi) Python lernen muss.
+
+Aber an diesem Punkt war ich noch lange nicht. Ich begann damit, in altem Wissen
+zu kramen aus längst vergangenen Tagen als ich mich noch mit Dingen wie 
+"integer programming" beschäftigen durfte. Das war unterhaltsam. Man musste doch
+eine Lösung finden auf eine ähnliche Art wie ich damals eine Lösung gefunden habe
+mit `SCIP` und `ZIMPL.` Das war die erste Station. Und es war keine gute Station.
+Auf der Achterbahnfahrt durch den kleinen Optimierungs-Horrorladen gab es noch 
+einige weitere Stationen wie z. B. das `ompr` package, das mir einfach bei meinem
+Problem nicht helfen konnte. Ich bin sicher, dass es viele Menschen gibt die
+dieses Package mit Freude verwenden, wo es gute Ergebnisse liefert und 
+alle glücklich macht. Doch es war einfach nicht das richtige für mich. Es 
+gab kein Kribbeln. Zumindest kein gutes.
+
+Um einmal zu wissen wonach man sucht, versuchen wir mal die Nebenbedingungen zu
+definieren. 
+
+
+## Buchstabensumme 
+
+Die erste Nebenbedingung ist die offensichtlichste, da sie explizit gegeben ist.
+Wie schon oben beschrieben ist jeweils die Summe der Buchstabe der einzelnen
+Wörter gegeben. Man kann sich das ganze auch als eine Matrix vorstellen: Jede
+Spalte stellt einen Buchstaben dar (wie unten in der $n \times l$ Matrix). 
+Die erste Spalte ist **a** die zweite
+Spalte **b** und so weiter. Beim ersten Wort **ACDC** sehen wir eine **1** 
+in der ersten Spalte (A), eine **2** in der dritten Spalte (C) und wieder eine
+**1** in der vierten Spalte (D) $\rightarrow$ zusammen 
+ACDC^[oder ACCD -- beim Summieren ist die Reihenfolge ja völlig egal.]. 
+Jede Zeile stellt ein Wort, in diesem konkreten Fall eine Band dar.
+D. h. wir haben **n Wörter** und **l Buchstaben**^[Das sind immer 26 Buchstaben. Also könnte man auch 26 schreiben. Aber mit **l** schaut es viel cooler aus.].
+Multipliziert wird diese Matrix mit einem Vektor $\vec{\theta}$. Dieser beinhalten
+das was man wissen will: die Werte der einzelnen Buchstaben. $\theta_a$ ist 
+der Wert den Buchtabe **a** hat. Die Werte kennen wir nicht. Das ultimative
+Ziel ist es sie zu ermitteln. Wenn wir die $n \times l$ Matrix mit $\vec{\theta}$
+multiplizieren, muss die vorgegeben Summe rauskommen. Das sind genau die 
+Summen die im Logical vorgegeben sind: Für **ACDC** z. B. **45**.
+Das schaut alles mega kompliziert aus. Das ist aber noch die netteste Nebenbedngung.
+Die kann ich auch an `SCIP` verfüttern. Aber die kommende Nebenbedingung ist
+schon schwieriger umzusetzen^[Vor allem wenn man eben ein Tool verwendet, das man eigentlich für ein solches Problem nicht verwenden sollte.].
+
+\begin{align}
+```{python}
+#| output: asis
+#| echo: false
+
+import sys
+import os
+import pandas as pd
+import numpy as np
+
+module_dir = 'syntax'
+if module_dir not in sys.path:
+    sys.path.append(module_dir)
+
+import logical_functions as lfu
+
+def numpy_to_latex(matrix, max_rows=None, max_cols=None):
+    
+    num_rows, num_cols = matrix.shape
+    displayed_rows = min(max_rows, num_rows) if max_rows is not None else num_rows
+    displayed_cols = min(max_cols, num_cols) if max_cols is not None else num_cols
+    
+    latex_str = "\\begin{bmatrix}\n"
+    for i in range(displayed_rows):
+        row = matrix[i, :displayed_cols]  # Select the first 'displayed_cols' columns of the current row
+        row_str = " & ".join(map(str, row)) + " & \\ldots"
+        latex_str += "  " + row_str + " \\\\\n"
+    
+    # Add the last row with \vdots for each column, including the extra column for \ldots
+    latex_str += "  " + " & ".join(["\\vdots" for _ in range(displayed_cols)]) + " & \\\\\n"
+    
+    latex_str += "\\end{bmatrix}"
+    
+    return latex_str
+
+
+word_pd = pd.read_csv("media/word_sum_input.csv")
+
+letter_matrix = lfu.create_letter_matrix(word_pd)
+latex_matrix = numpy_to_latex(letter_matrix, 5, 10)
+
+print(latex_matrix)
+```
+_{n \times l} \times \quad \begin{bmatrix}
+   \theta_a  \\
+   \theta_b \\
+   \theta_c \\
+   \theta_d \\
+   \theta_e \\
+   \vdots
+\end{bmatrix}_{l \times 1} = \quad
+\begin{bmatrix}
+   45  \\
+   52 \\
+   62 \\
+   27 \\
+   82 \\
+   \vdots
+\end{bmatrix}_{l \times 1}
+\end{align}
+
+
+## Verschiedene Elemente
+
+<img src="media/memes/worst_constraint.jpg" alt="My brain when solving a logical" style="float: right; width: 35%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Wenn man sich obenstehende Tabelle ansieht, dann merkt man, dass man 26 Buchstaben
+hat, aber nur 20 Nebenbedingungen. Daher kann das nicht alles sein. Es darf nicht
+alles sein, wenn wir das hier lösen wollen. Die implizite Nebenbedingung ist, dass
+jeder Buchstabe eine eigene Zahl zwischen 1 und 26 bekommen soll. Keine zwei
+Elemente dürfen ident sein. Also etwas formeller angeschrieben sieht das ca. so aus:
+
+
+\begin{align}
+1 \leq \theta_i \leq 26, & \quad i = a, b, \ldots, z, \\
+\theta_i \neq \theta_j, & \quad \forall i, j \in \{a, b, \ldots, z\}, i \neq j.
+\end{align}
+
+Die Suche nach einer Lösung mittels Integer Programming war noch unlustiger
+als das Ganze per Hand zu lösen. Für solche Fragen konsultiere ich normalerweise
+mein Optimierungs-Orakel -- so auch dieses Mal. 
+
 
 
 # Die Lösung
 
+<!--
+- Download machen für das .py file
+- auf csv umstellen
+- download machen für das csv file
+- verweis zu harri machen
+-->
+
+Wir brauchen folgende Ingredienzien:
+
+1. Ein Excel File in dem das jeweilige Wort und die die Wortsumme gespeichert ist
+2. Python installiert samt: `numpy`, `pandas`, `os`, `string`, `pyexcel_ods3` und 
+`ortools.sat.python`
+3. Die Funktion `solve_logical()`
 
 
+## Buchstabenmatrix erstellen
+
+
+## 
 
 
 

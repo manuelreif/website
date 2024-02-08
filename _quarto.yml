@@ -32,3 +32,6 @@ highlight-style: monokai
 execute: 
   freeze: auto
 
+comments:
+  hypothesis: true
+
