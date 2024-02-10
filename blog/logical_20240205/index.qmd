@@ -254,7 +254,7 @@ Die Suche und das Herumprobieren war noch wesentlich unlustiger
 als das Ganze per Hand zu lösen. Ein sanfter Hinweis eines guten Freundes, 
 ließen mich verstehen: Es war eine Sackgasse und ich musste irgendwas mit 
 Python machen. Was schlimmer war ließ sich in diesem Moment noch nicht entscheiden.
-Es schickte mir [seine Lösung](https://cocalc.com/haraldschilly/ideas/rockbands) 
+Er schickte mir [seine Lösung](https://cocalc.com/haraldschilly/ideas/rockbands) 
 und empfahl mir die Google [OR-Tools](https://developers.google.com/optimization?hl=en)
 zu verwenden wenn ich das Problem lösen will.
 
