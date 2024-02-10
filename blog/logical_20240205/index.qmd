@@ -26,7 +26,7 @@ $\rightarrow$ Dann **Lesebefehl!**
 <img src="media/pm_header.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
 
 Wenn ich mit dem Zug fahre vergeht die Zeit am schnellsten wenn ich versuche Rätsel
-zu lösen. Dann investiere ich mein Geld in den P. M. Logik Trainer, nehme mir sehr
+zu lösen. Dann investiere ich mein Geld in den [P. M. Logik Trainer](https://www.verlagshaus24.at/pm-logik-trainer-vorteilsabo/)^[Ich werde (leider) nicht gesponsert von P. M.!], nehme mir sehr
 viel vor und es endet meist damit, dass das erste Rätsel mich so lang beschäftigt
 dass ich zu keinem Weiteren komme. Manchmal sind die Rätsel auch so schwierig,
 dass ich keine Lösung finde. Also bleibt das gekaufte Heft immer zum größten Teil
@@ -129,9 +129,9 @@ Selbst wenn das Heft geschlossen auf dem Tisch liegt, dringt es hindurch und
 erinnert uns daran, dass die "persönlichen Gründe" spezifischer formuliert,
 nichts anderes als das das eigene Unvermögen bezeichnen.
 Die Denkmalhaftigkeit hat sich inzwischen auch auf das gesamte Heft übertragen
-und droht omnipräsent zu werden und uns bis ins Mark zu erschüttern. Um diesen
-Prozess zu unterbrechen ergibt sich die Notwendigkeit das Rätsel zu lösen auch
-wenn man dafür (ein bissi) Python lernen muss.
+und droht omnipräsent zu werden und uns bis ins Mark zu erschüttern. 
+Daher wird es jetzt gelöst auch wenn wir uns dafür (ein bissi) mit Python 
+auseinandersetzen müssen.
 
 Aber an diesem Punkt war ich noch lange nicht. Ich begann damit, in altem Wissen
 zu kramen aus längst vergangenen Tagen, als ich mich (im Studium) noch mit Dingen wie 
