@@ -1,14 +1,26 @@
 ---
 title: "Logical"
-description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn sie mit Mixed Integer Programming und Python gelöst werden."
+description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn man sie mit Google OR-Tools und Python gelöst werden."
 author: Manuel Reif 
-date: 2024-02-05
-categories: [Python, OR]
+date: 2024-02-10
+categories: [Python, OR-Tools, docker]
 draft: false 
 highlight-style: monokai
 image: media/memes/logical_brain.jpg
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
+
+::: {.callout-tip icon=false}
+## {{< bi book-half size=25px >}} Soll ich lesen?
+1. Liebst du Rätsel? <br>
+2. Findest du Optimierung cool? <br>
+3. Findest du Python zumindest ok? <br>
+$\rightarrow$ Dann **Lesebefehl!**
+:::
 
 
 <img src="media/pm_header.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
@@ -24,8 +36,12 @@ ungelöst blieb. Doch obwohl Weihnachten ein Fest der Liebe ist, wurde es
 ob dieses Logicals beinahe ein Fest des Hasses, denn es wollte sich nicht lösen
 lassen obwohl ich bereits mehr als 10 Minuten investiert hatte.
 
-Der Gedanke, das Problem mittel Optimierung zu lösen kam sehr rasch nach der
-Erkenntnis dass es sich eigentlich lösen lassen müsste.
+
+Es ungelöst zu lassen war keine Option. Das würde scheitern bedeuten -- und 
+scheitern ist keine Option. Also musste ich mit dem schweren Werkzeug ran. 
+Ich kramte in meinem Gedächtnis und in meinen Ordnern um mich an die Tools zu erinnern
+mit denen ich im Studium zu tun hatte. Spoileralarm: Diese Tools brachten mich
+nicht zum Erfolg -- dafür durfte ich was neues lernen!
 
 
 # Das Problem
@@ -38,13 +54,13 @@ Erkenntnis dass es sich eigentlich lösen lassen müsste.
 
 Das zu lösende Problem sieht folgendermaßen aus:
 Es werden beliebige Wörter, in diesem Fall Namen von Bands genannt. Jedes Wort
-ist einer Zahl zugeordnet. Diese Zahl bezeichnet die Summe der Buchstabenwerte.
+ist einer Zahl zugeordnet. Diese Zahl bezeichnet die **Summe** der Buchstabenwerte.
 Also z. B. wissen wir laut nebenstehender Tabelle, dass `A + C + D + C = 45`.
 Ziel ist es, die Buchstabenwerte herauszufinden. Die einzigen bekannten Informationen
 sind:
 
 1. Die **Summe** der Buchstaben jedes Wortes
-2. Jedem Buchstaben ist genau eine Zahl zwischen 1 und 26 zugeordnet
+2. Jedem Buchstaben ist genau eine Zahl zwischen 1 und 26 zugeordnet.
 3. Zwei Buchstaben haben nie dieselbe Zahl -- also es werden für 26 Buchstaben
 alle Zahlen von 1-26 zugeordnet.
 
@@ -89,7 +105,7 @@ wsi_tb
 
 ::::
 
-Normalerweise beginnt man nun damit Wörter die es einem leicht machen einzelne 
+Normalerweise beginnt man nun damit bei Wörtern die es einem leicht machen einzelne 
 Buchstabenwerte zu identifizieren. Das können möglichst kurze Wörter sein, 
 oder auch Wörter mit besonders niedrigen Buchstabensummen. 
 Oft gibt es dazu eine Einstiegshilfe, in Form eines Hinweises, welches Wort sich 
@@ -112,25 +128,24 @@ Denkmal des eigenen Scheiterns.
 Selbst wenn das Heft geschlossen auf dem Tisch liegt, dringt es hindurch und 
 erinnert uns daran, dass die "persönlichen Gründe" spezifischer formuliert,
 nichts anderes als das das eigene Unvermögen bezeichnen.
-Die Denkmalhaftigkeit hat sich inzwuschen auch auf das gesamte Heft übertragen
+Die Denkmalhaftigkeit hat sich inzwischen auch auf das gesamte Heft übertragen
 und droht omnipräsent zu werden und uns bis ins Mark zu erschüttern. Um diesen
 Prozess zu unterbrechen ergibt sich die Notwendigkeit das Rätsel zu lösen auch
 wenn man dafür (ein bissi) Python lernen muss.
 
 Aber an diesem Punkt war ich noch lange nicht. Ich begann damit, in altem Wissen
-zu kramen aus längst vergangenen Tagen als ich mich noch mit Dingen wie 
-"integer programming" beschäftigen durfte. Das war unterhaltsam. Man musste doch
-eine Lösung finden auf eine ähnliche Art wie ich damals eine Lösung gefunden habe
-mit `SCIP` und `ZIMPL.` Das war die erste Station. Und es war keine gute Station.
-Auf der Achterbahnfahrt durch den kleinen Optimierungs-Horrorladen gab es noch 
-einige weitere Stationen wie z. B. das `ompr` package, das mir einfach bei meinem
+zu kramen aus längst vergangenen Tagen, als ich mich (im Studium) noch mit Dingen wie 
+Integer Programming beschäftigen durfte. Das war unterhaltsam. Die Tools schienen
+mächtig, als könnten sie alle Probleme der Welt lösen wenn man ihnen nur genügend
+Zeit ließe. Ich googlete nach den neuesten Informationen zu [SCIP](https://www.scipopt.org/) und [ZIMPL](https://zimpl.zib.de/index.php#download). Das war die erste Station. 
+Und es war keine gute Station. Auf der Achterbahnfahrt durch den kleinen Optimierungs-Horrorladen gab es noch einige weitere Stationen wie z. B. das `ompr` package, das mir einfach bei meinem
 Problem nicht helfen konnte. Ich bin sicher, dass es viele Menschen gibt die
 dieses Package mit Freude verwenden, wo es gute Ergebnisse liefert und 
-alle glücklich macht. Doch es war einfach nicht das richtige für mich. Es 
-gab kein Kribbeln. Zumindest kein gutes.
+alle glücklich macht. Doch "Ungleich" Bedingungen werden von diesen Software 
+Paketen gleichermaßen gehasst.
 
-Um einmal zu wissen wonach man sucht, versuchen wir mal die Nebenbedingungen zu
-definieren. 
+Um einmal im Detail darzustellen wonach man eigentlich sucht, 
+definieren wir im nächsten Abschnitt die Nebenbedingungen. 
 
 
 ## Buchstabensumme 
@@ -234,36 +249,189 @@ Elemente dürfen ident sein. Also etwas formeller angeschrieben sieht das ca. so
 \theta_i \neq \theta_j, & \quad \forall i, j \in \{a, b, \ldots, z\}, i \neq j.
 \end{align}
 
-Die Suche nach einer Lösung mittels Integer Programming war noch unlustiger
-als das Ganze per Hand zu lösen. Für solche Fragen konsultiere ich normalerweise
-mein Optimierungs-Orakel -- so auch dieses Mal. 
+Für mich schien es das Naheliegendste das Problem mit Integer Programming zu lösen.
+Die Suche und das Herumprobieren war noch wesentlich unlustiger
+als das Ganze per Hand zu lösen. Ein sanfter Hinweis eines guten Freundes, 
+ließen mich verstehen: Es war eine Sackgasse und ich musste irgendwas mit 
+Python machen. Was schlimmer war ließ sich in diesem Moment noch nicht entscheiden.
+Es schickte mir [seine Lösung](https://cocalc.com/haraldschilly/ideas/rockbands) 
+und empfahl mir die Google [OR-Tools](https://developers.google.com/optimization?hl=en)
+zu verwenden wenn ich das Problem lösen will.
 
+Also begann ich mit Python und den OR-Tools.
+
+## OR-Tools
+
+
+<img src="media/memes/oneline.jpg" alt="Oneline" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Der Witz ist, dass sich dieses Problem mit **Constraint Optimization** sehr 
+effizient lösen lässt. In unserem Beispiel haben wir nicht mal eine Zielfunktion.
+Wir wollen einfach eine Lösung die alle Nebenbedingungen erfüllt, und gehen davon
+aus, dass es nur eine Lösung gibt $\rightarrow$ fertig. [Hier ist ein einfacheres
+Beispiel dazu.](https://developers.google.com/optimization/cp/cp_example) 
+Dem Solver von `ortools` mitzuteilen, dass jeder Buchstabe einer
+anderen Zahl zugeordnet werden soll, ist besonders einfach und ist unten im 
+Python Code Block zu sehen: `model.AddAllDifferent(intvars)`. Das ist alles.
+Keine Tricks, keine Schleife die alle Variabenpaare ungleich setzen muss, einfach
+dieses Statement und der shit happened einfach so, als wäre es das einfachste der Welt.
+Das Ganze hab ich in 2 Funktionen gegossen. Wer sich diese im Detail ansehen will,
+bittesehr -- einfach unfolden:
+
+```{python}
+#| eval: false
+
+from ortools.sat.python import cp_model
+import pandas as pd
+import numpy as np
+import string
+import os
+
+## Funktion um die Matrix zu erstellen
+def create_letter_matrix(word_sum):
+    #word_sum = pd.read_excel(word_sum_file)
+
+    # es wird eine lettermatrix erstellt.
+    # zeilen sind die NB, spalten sind die Buchstaben
+    anz_zeilen = word_sum.shape[0]
+    letter_matrix = np.zeros((anz_zeilen,26),dtype=int)
+
+    # letter zu pos. DataFrame
+    letter_pos = pd.DataFrame({
+    'position': range(0, 26),
+    'buchstaben': list(string.ascii_lowercase)
+    })
+
+# matrix befuellen
+    woerter = word_sum["words"].apply(lambda x: x.replace(" ", "").lower()).tolist()
+    for zei, val in enumerate(woerter):
+        for i, letval in enumerate(val):
+            pos_spalte = letter_pos[letter_pos["buchstaben"] == letval]["position"]
+            if not pos_spalte.empty: # das kam von chatGPT
+                letter_matrix[zei,pos_spalte.iloc[0]] += int(1)
+
+    return letter_matrix
+
+
+## Funktion um das Ganze zu solven
+def solve_logical(word_sum_file = "word_sum_input.csv", outfile = "loesung.csv"):
+
+    # word sum - hier sind die wörter plus die summen drinnen!
+    #word_pd = pd.read_excel(word_sum_file)
+    word_pd = pd.read_csv(word_sum_file)
+    wordsum = word_pd["letter_sum"].tolist()
+    letters = list(string.ascii_lowercase)
+
+    # eine matrix wird erstellt, wie haeufig jeder buchstabe in einem wort vorkommt
+    letter_matrix = create_letter_matrix(word_sum = word_pd)
+    
+    # optimieren
+
+    model = cp_model.CpModel()
+
+    intvars = np.array([])
+    for i, val in enumerate(letters):
+        intvars = np.append(intvars, model.NewIntVar(1, 26, val))
+    
+    # alle muessen unterschiedlich sein
+    model.AddAllDifferent(intvars)
+
+    # nebenbedingungen - summe der buchstaben der woerter als matrixmultiplikation
+    res_sum = letter_matrix @ intvars
+
+    for i, val in enumerate(res_sum):
+        model.Add(val == wordsum[i])
+
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
+
+    # rausspeichern
+    res_dat = []
+    for i in intvars:
+        res_dat.append(solver.Value(i))
+
+    loesung = pd.DataFrame({'Buchstabe': letters, 'value':  res_dat})
+
+    data = {"Loesung": [loesung.columns.tolist()] + loesung.values.tolist()}
+    loesung.to_csv(outfile)
+
+    return data
+
+```
+
+
+Nicht jeder hat jetzt vielleicht die Lust Python zu installieren bzw. die 
+notwendigen Packages, will aber trotzdem das Beispiel ausprobieren bzw. sein
+eigenes Logical lösen. Dazu kommen wir im nächsten Abschnitt!
 
 
 # Die Lösung
 
-<!--
-- Download machen für das .py file
-- auf csv umstellen
-- download machen für das csv file
-- verweis zu harri machen
--->
+Um das Problem zu lösen brauchen wir mal ein Inputfile.
 
-Wir brauchen folgende Ingredienzien:
+::: {.callout-tip icon=false}
+## {{< bi save size=25px >}} Input File
 
-1. Ein Excel File in dem das jeweilige Wort und die die Wortsumme gespeichert ist
-2. Python installiert samt: `numpy`, `pandas`, `os`, `string`, `pyexcel_ods3` und 
-`ortools.sat.python`
-3. Die Funktion `solve_logical()`
+**Wie muss das Input .csv aussehen?**
 
+- Es muss ein csv sein mit "," (Beistrich) als seperator
+- Es muss eine Spalte mit dem Namen `words` beinhalten in dem die **Wörter** angeführt sind
+- Es muss eine Spalte mit den **Buchstabensummen** namens `letter_sum` beinhalten 
 
-## Buchstabenmatrix erstellen
+Hier ist das [.csv File](media/word_sum_input.csv) für genau das hier dargestellte Problem.
+:::
 
+Dann brauchen wir 2 Funktionen:
 
-## 
-
+1. Eine Funktion die aus den Wörtern eine Matrix macht wie oben gezeigt
+2. Eine Funktion die die Nebenbedingungen formuliert und die Lösung errechnet
 
 
+Das alles soll "Out of the box" funktionieren -- daher verwenden wir ein, 
+genau für diesen Zweck erstelltes, Docker Image. Es beinhaltet die Python
+Funktionen und kann wie folgt aufgerufen werden.
+Wichtig ist, dass [Docker am Computer installiert ist!](https://docs.docker.com/engine/install/)
 
 
+```{.bash filename="Terminal"}
+# pull image
+docker pull seebaer/logical-python
+
+# check: es sollte das gerade gepullte image aufgelistet sein
+docker image ls
+
+# word_sum_input.csv wird an docker übergeben
+docker run -v /home/USER/logical:/data logical_img python logical_python_functions.py --word_sum_file /data/word_sum_input.csv --outfile /data/loesung_docker.csv
+```
+
+Was passiert hier?
+
+1. Es wird ein Docker image von Docker Hub gezogen (`docker pull ...`). Dieses Image wurde speziell
+für diesen Zweck gebaut. Es beinhaltet ein minimales Linux, Python und die Python Funktionen
+die notwendig sind um das Problem zu lösen.
+2. Wenn das Image am Computer ist (Kontrolle mit: `docker image ls`) kann man es
+laufen lassen.
+    - `docker run` lässt das gerade gezogene image laufen (`logical_img`)
+    - `-v /home/USER/logical:/data` mounted mein Verzeichnis `/home/USER/logical`
+    in das Verzeichnis des docker container `/data` $\rightarrow$ in diesem Verzeichnis
+    muss sich die Datei: `word_sum_input.csv` befinden!
+    - Ausgeführt wird das Skript das sich im Container befindet: `python logical_python_functions.py`
+    - Input ist eben das .csv file: `--word_sum_file /data/word_sum_input.csv` das in `/data` liegt, also
+    bei uns in `/home/USER/logical`^[Oder in einem anderen beliebigen Verzeichnis!]
+    - Wohin soll der Output **gespeichert** werden und wie soll der output heißen? 
+    Das wird hier angegeben: `--outfile /data/loesung_docker.csv`
+
+
+
+<br>
+
+Damit wurde das Problem gelöst. Es erklingt fröhliche Schlussmusik. 
+Es hat lang gedauert. Es wäre wohl schneller gewesen
+hätte ich es per Hand gelöst. Dafür hab kann nun jeder in Zukunft Probleme dieser
+Art im Handumdrehen lösen: Dank Python und Docker.
+
+
+::: {style='text-align:center;'}
+![](media/whale_python.webp){width=20%}
+:::
 
