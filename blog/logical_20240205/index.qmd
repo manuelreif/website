@@ -1,6 +1,6 @@
 ---
 title: "Logical"
-description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn man sie mit Google OR-Tools und Python gelöst werden."
+description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn sie mit Google OR-Tools und Python gelöst werden."
 author: Manuel Reif 
 date: 2024-02-10
 categories: [Python, OR-Tools, docker]
