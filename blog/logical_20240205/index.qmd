@@ -394,6 +394,7 @@ Wichtig ist, dass [Docker am Computer installiert ist!](https://docs.docker.com/
 
 
 ```{.bash filename="Terminal"}
+# eventuell muss vor jeden Befehl ein sudo
 # pull image
 docker pull seebaer/logical-python
 
@@ -401,7 +402,7 @@ docker pull seebaer/logical-python
 docker image ls
 
 # word_sum_input.csv wird an docker übergeben
-docker run -v /home/USER/logical:/data logical_img python logical_python_functions.py --word_sum_file /data/word_sum_input.csv --outfile /data/loesung_docker.csv
+docker run -v /home/USER/logical:/data seebaer/logical-python python logical_python_functions.py --word_sum_file /data/word_sum_input.csv --outfile /data/result.csv
 ```
 
 Was passiert hier?
