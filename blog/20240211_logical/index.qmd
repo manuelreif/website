@@ -2,7 +2,7 @@
 title: "Logical"
 description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn sie mit Google OR-Tools und Python gelöst werden."
 author: Manuel Reif 
-date: 2024-02-10
+date: 2024-02-11
 categories: [Python, OR-Tools, docker]
 draft: false 
 highlight-style: monokai
@@ -37,8 +37,7 @@ ob dieses Logicals beinahe ein Fest des Hasses, denn es wollte sich nicht lösen
 lassen obwohl ich bereits mehr als 10 Minuten investiert hatte.
 
 
-Es ungelöst zu lassen war keine Option. Das würde scheitern bedeuten -- und 
-scheitern ist keine Option. Also musste ich mit dem schweren Werkzeug ran. 
+Es ungelöst zu lassen war keine Option. Also musste ich mit dem schweren Werkzeug ran. 
 Ich kramte in meinem Gedächtnis und in meinen Ordnern um mich an die Tools zu erinnern
 mit denen ich im Studium zu tun hatte. Spoileralarm: Diese Tools brachten mich
 nicht zum Erfolg -- dafür durfte ich was neues lernen!
@@ -77,8 +76,6 @@ alle Zahlen von 1-26 zugeordnet.
 
 :::{.column width="47%"}
 
-
-
 ```{r}
 #| echo: false
 #| eval: true
@@ -103,8 +100,6 @@ wsi_tb = wsi %>%
 
 wsi_tb
 ```
-
-
 
 :::
 
@@ -131,14 +126,14 @@ vielmehr dass man es probiert hat um dann zu dem Schluss zu kommen es
 Das Problem wird zum Problem. Es prangt regelrecht wie ein frisch errichtetes 
 Denkmal des eigenen Scheiterns.
 Selbst wenn das Heft geschlossen auf dem Tisch liegt, dringt es hindurch und 
-erinnert uns daran, dass die "persönlichen Gründe" spezifischer formuliert,
-nichts anderes als das das eigene Unvermögen bezeichnen.
+erinnert uns an das eigene Unvermögen.
 Die Denkmalhaftigkeit hat sich inzwischen auch auf das gesamte Heft übertragen
 und droht omnipräsent zu werden und uns bis ins Mark zu erschüttern. 
-Daher wird es jetzt gelöst auch wenn wir uns dafür (ein bissi) mit Python 
+Daher bleibt uns nur eine Option: Unseren gottverdammten Job zu tun und 
+das Rätsel zu lösen auch wenn wir uns dafür (ein bissi) mit Python 
 auseinandersetzen müssen.
 
-Aber an diesem Punkt war ich noch lange nicht. Ich begann damit, in altem Wissen
+Ich begann damit, in altem Wissen
 zu kramen aus längst vergangenen Tagen, als ich mich (im Studium) noch mit Dingen wie 
 Integer Programming beschäftigen durfte. Das war unterhaltsam. Die Tools schienen
 mächtig, als könnten sie alle Probleme der Welt lösen wenn man ihnen nur genügend
@@ -147,7 +142,7 @@ Und es war keine gute Station. Auf der Achterbahnfahrt durch den kleinen Optimie
 Problem nicht helfen konnte. Ich bin sicher, dass es viele Menschen gibt die
 dieses Package mit Freude verwenden, wo es gute Ergebnisse liefert und 
 alle glücklich macht. Doch "Ungleich" Bedingungen werden von diesen Software 
-Paketen gleichermaßen gehasst.
+Paketen allen gleichermaßen gehasst.
 
 Um einmal im Detail darzustellen wonach man eigentlich sucht, 
 definieren wir im nächsten Abschnitt die Nebenbedingungen. 
@@ -159,11 +154,11 @@ Die erste Nebenbedingung ist die offensichtlichste, da sie explizit gegeben ist.
 Wie schon oben beschrieben ist jeweils die Summe der Buchstabe der einzelnen
 Wörter gegeben. Man kann sich das ganze auch als eine Matrix vorstellen: Jede
 Spalte stellt einen Buchstaben dar (wie unten in der $n \times l$ Matrix). 
-Die erste Spalte ist **a** die zweite
-Spalte **b** und so weiter. Beim ersten Wort **ACDC** sehen wir eine **1** 
+Die erste Spalte steht für den Buchstaben **a** die zweite
+Spalte für **b** und so weiter. Beim ersten Wort **ACDC** sehen wir eine **1** 
 in der ersten Spalte (A), eine **2** in der dritten Spalte (C) und wieder eine
 **1** in der vierten Spalte (D) $\rightarrow$ zusammen 
-ACDC^[oder ACCD -- beim Summieren ist die Reihenfolge ja völlig egal.]. 
+ACDC^[Oder ACCD -- beim Summieren ist die Reihenfolge ja völlig egal.]. 
 Jede Zeile stellt ein Wort, in diesem konkreten Fall eine Band dar.
 D. h. wir haben **n Wörter** und **l Buchstaben**^[Das sind immer 26 Buchstaben. Also könnte man auch 26 schreiben. Aber mit **l** schaut es viel cooler aus.].
 Multipliziert wird diese Matrix mit einem Vektor $\vec{\theta}$. Dieser beinhalten
@@ -173,7 +168,7 @@ Ziel ist es sie zu ermitteln. Wenn wir die $n \times l$ Matrix mit $\vec{\theta}
 multiplizieren, muss die vorgegeben Summe rauskommen. Das sind genau die 
 Summen die im Logical vorgegeben sind: Für **ACDC** z. B. **45**.
 Das schaut alles mega kompliziert aus. Das ist aber noch die netteste Nebenbedngung.
-Die kann ich auch an `SCIP` verfüttern. Aber die kommende Nebenbedingung ist
+Die kann ich auch an `SCIP` und Freunde verfüttern. Aber die kommende Nebenbedingung ist
 schon schwieriger umzusetzen^[Vor allem wenn man eben ein Tool verwendet, das man eigentlich für ein solches Problem nicht verwenden sollte.].
 
 \begin{align}
@@ -254,16 +249,16 @@ Elemente dürfen ident sein. Also etwas formeller angeschrieben sieht das ca. so
 \theta_i \neq \theta_j, & \quad \forall i, j \in \{a, b, \ldots, z\}, i \neq j.
 \end{align}
 
-Für mich schien es das Naheliegendste das Problem mit Integer Programming zu lösen.
-Die Suche und das Herumprobieren war noch wesentlich unlustiger
-als das Ganze per Hand zu lösen. Ein sanfter Hinweis eines guten Freundes, 
-ließen mich verstehen: Es war eine Sackgasse und ich musste irgendwas mit 
-Python machen. Was schlimmer war ließ sich in diesem Moment noch nicht entscheiden.
+Diese Art von Nebenbedingungen sind nicht einfach zu implementieren wenn versucht
+sie mit den zuvor erwähnten Tools zu lösen.
+Nach viel Herumprobieren, schlaflosen Nächten und kurz vor dem Meltdown half mir
+der sanfter Hinweis eines guten Freundes: Es war eine Sackgasse und ich musste irgendwas mit 
+Python machen. Es traf mich mitten ins Herz. Musste ich wirklich Python verwenden?
 Er schickte mir [seine Lösung](https://cocalc.com/haraldschilly/ideas/rockbands) 
 und empfahl mir die Google [OR-Tools](https://developers.google.com/optimization?hl=en)
 zu verwenden wenn ich das Problem lösen will.
 
-Also begann ich mit Python und den OR-Tools.
+Also begann ich mit Python und den OR-Tools. {{< bi cloud-drizzle >}}
 
 ## OR-Tools
 
@@ -379,7 +374,7 @@ Um das Problem zu lösen brauchen wir mal ein Inputfile.
 
 **Wie muss das Input .csv aussehen?**
 
-- Es muss ein csv sein mit "," (Beistrich) als seperator
+- Es muss ein .csv sein mit "," (Beistrich) als seperator
 - Es muss eine Spalte mit dem Namen `words` beinhalten in dem die **Wörter** angeführt sind
 - Es muss eine Spalte mit den **Buchstabensummen** namens `letter_sum` beinhalten 
 
@@ -417,27 +412,67 @@ für diesen Zweck gebaut. Es beinhaltet ein minimales Linux, Python und die Pyth
 die notwendig sind um das Problem zu lösen.
 2. Wenn das Image am Computer ist (Kontrolle mit: `docker image ls`) kann man es
 laufen lassen.
-    - `docker run` lässt das gerade gezogene image laufen (`logical_img`)
-    - `-v /home/USER/logical:/data` mounted mein Verzeichnis `/home/USER/logical`
-    in das Verzeichnis des docker container `/data` $\rightarrow$ in diesem Verzeichnis
-    muss sich die Datei: `word_sum_input.csv` befinden!
+    - `docker run` lässt das gerade gezogene image laufen (`seebaer/logical-python`)
+    - `-v /home/USER/logical:/data` mounted mein Verzeichnis `/home/USER/logical` 
+    (in diesem Verzeichnis muss sich die Datei: `word_sum_input.csv` befinden!!)
+    in das Verzeichnis des docker container `/data`.
     - Ausgeführt wird das Skript das sich im Container befindet: `python logical_python_functions.py`
     - Input ist eben das .csv file: `--word_sum_file /data/word_sum_input.csv` das in `/data` liegt, also
     bei uns in `/home/USER/logical`^[Oder in einem anderen beliebigen Verzeichnis!]
     - Wohin soll der Output **gespeichert** werden und wie soll der output heißen? 
     Das wird hier angegeben: `--outfile /data/loesung_docker.csv`
 
+::::{.columns}
 
-
+:::{.column width="47%"}
 <br>
 
-Damit wurde das Problem gelöst. Es erklingt fröhliche Schlussmusik. 
+Damit wurde das Problem gelöst. Der Output ist ein .csv mit den Buchstaben 
+und den jeweiligen Werten wie in der Tabelle nebenan zu sehen ist.
+Im Hintergrund erklingt fröhliche Schlussmusik. 
 Es hat lang gedauert. Es wäre wohl schneller gewesen
 hätte ich es per Hand gelöst. Dafür hab kann nun jeder in Zukunft Probleme dieser
 Art im Handumdrehen lösen: Dank Python und Docker.
+:::
 
+:::{.column width="6%"}
+
+:::
+
+:::{.column width="47%"}
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: result
+
+library(data.table)
+library(readxl)
+library(magrittr)
+library(reactable)
+library(reactablefmtr)
+
+outi = fread("media/out.csv")
+
+o_tb = outi[,2:3] %>%
+    reactable(defaultPageSize = 3, striped = TRUE) %>% 
+    add_title("Optimierungsergebnis", 
+              font_size = 16, 
+              align="center",
+              font_weight = "normal")
+
+o_tb
+```
+
+
+:::
+
+::::
+
+<br>
 
 ::: {style='text-align:center;'}
-![](media/whale_python.webp){width=20%}
+![](media/whale_python.webp){width=14%}
 :::
 
