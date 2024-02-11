@@ -457,7 +457,7 @@ outi = fread("media/out.csv")
 
 o_tb = outi[,2:3] %>%
     reactable(defaultPageSize = 3, striped = TRUE) %>% 
-    add_title("Optimierungsergebnis", 
+    add_title("Optimierungsergebnis vom Optimierungserlebnis", 
               font_size = 16, 
               align="center",
               font_weight = "normal")
