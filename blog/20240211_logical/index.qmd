@@ -78,7 +78,8 @@ alle Zahlen von 1-26 zugeordnet.
 :::{.column width="47%"}
 
 
-```{r logical-bandname-summe}
+
+```{r}
 #| echo: false
 #| eval: true
 #| label: logbandname
@@ -87,18 +88,22 @@ alle Zahlen von 1-26 zugeordnet.
 library(data.table)
 library(readxl)
 library(magrittr)
-library(DT)
+library(reactable)
+library(reactablefmtr)
 
 wsi = fread("media/word_sum_input.csv")
 
 wsi_tb = wsi %>% 
     setnames(old = c("words", "letter_sum"), new = c("Bands", "Buchstabensumme")) %>% 
-    datatable(options = list(pageLength = 7, bFilter=0, dom = 'ftp'), 
-              caption = "Bandnamen und deren zugehörige Buchstabensumme")
+    reactable(defaultPageSize = 7, striped = TRUE) %>% 
+    add_title("Bandnamen und deren zugehörige Buchstabensumme", 
+              font_size = 16, 
+              align="center",
+              font_weight = "normal")
 
 wsi_tb
-
 ```
+
 
 
 :::
