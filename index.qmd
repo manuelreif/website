@@ -16,6 +16,8 @@ about:
       href: mailto:info@manuelreif.at
     - icon: mastodon
       href: https://bayes.club/@manuel
+    - text: "{{< fa brands docker >}}"
+      href: https://hub.docker.com/repositories/seebaer
 ---
 
 

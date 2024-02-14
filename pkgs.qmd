@@ -5,6 +5,12 @@ toc: true
 page-layout: custom
 ---
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+::: {.column width="50%"}
+=======
+>>>>>>> Stashed changes
 <style>
 /* Versteckt den automatisch generierten Titel */
 .title, .header { 
@@ -28,6 +34,10 @@ page-layout: custom
 
 
 ::: {.g-col-4 .g-start-3}
+<<<<<<< Updated upstream
+=======
+>>>>>>> main
+>>>>>>> Stashed changes
 [![](hex_sticker/pp1_hex_2.png)](https://cran.r-project.org/web/packages/PP/)
 :::
 
