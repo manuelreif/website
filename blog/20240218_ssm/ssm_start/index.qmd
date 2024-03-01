@@ -2,7 +2,7 @@
 title: "State Space Models - Teil 1"
 description: "Mittels State Space Models können Zeitreihen beschrieben werden. Natürlich interessieren wir uns auch für Predictions. Wer möchte nicht die Zukunft kennen? Es wird spannend, es wird wild, es geht auf und es geht ab. Das ist Teil 1."
 author: Manuel Reif 
-date: 2024-03-11
+date: 2024-03-02
 categories: [state-space-models, R, stan]
 draft: false 
 highlight-style: monokai
