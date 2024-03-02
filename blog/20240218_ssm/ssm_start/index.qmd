@@ -508,7 +508,7 @@ dann schaut weiter -- ich gehe aber jetzt nicht im Detail auf die Grafiken ein!
 
 <br>
 
-**Spoiler: Die Chains sind konvergiert. Alles ist gut!**
+**TL;DR: Die Chains sind konvergiert. Alles ist gut!**
 
 <br>
 
@@ -669,13 +669,13 @@ sigma_compact %>%
 
 Jetzt kann man das Ganze auch schön grafisch darstellen. @fig-dat1-fitted zeigt
 den Vergleich zwischen den wahren Werten und den durch das Modell geschätzten.
-Das sieht eigentlich ganz gut.
+Das sieht eigentlich ganz gut aus.
 
 Was ist konkret in @fig-dat1-fitted zu sehen?
 
 1. Die wahren Werte nach denen simuliert wurde (siehe Legende)
 2. Die von `stan` geschätzten latenten Parameter $\tau$ (orange/hellere Linie)
-3. Das 95\ % CI (Credible Interbal) (als farbige Band um die orange/hellere Linie)
+3. Das 95\ % CI ([Credible Interval](https://easystats.github.io/bayestestR/articles/credible_interval.html#:~:text=What%20is%20a%20Credible%20Interval,you%20are%20trying%20to%20estimate.)) (als farbige Band um die orange/hellere Linie)
 4. Die Punkte, als die tatsächlichen (simulierten) Beobachtungen
 
 
