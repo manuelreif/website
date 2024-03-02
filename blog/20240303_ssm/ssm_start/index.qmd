@@ -2,7 +2,7 @@
 title: "State Space Models - Teil 1"
 description: "Mittels State Space Models können Zeitreihen beschrieben werden. Natürlich interessieren wir uns auch für Predictions. Wer möchte nicht die Zukunft kennen? Es wird spannend, es wird wild, es geht auf und es geht ab. Das ist Teil 1."
 author: Manuel Reif 
-date: 2024-03-02
+date: 2024-03-03
 categories: [state-space-models, R, stan]
 draft: false 
 highlight-style: monokai
@@ -18,10 +18,12 @@ execute:
 bibliography: ../texts.bib
 code-annotations: hover
 code-fold: false
+code-block-bg: true
+code-line-numbers: true
+code-block-border-left: true
 freeze: auto
 filters:
    - include-code-files
-   - shinylive
 ---
 
 # Einführung
@@ -209,9 +211,6 @@ font_add_google("Barlow Semi Condensed", "barr")
 #| include: true
 #| code-fold: true
 #| code-summary: "Code: Alle packages die geladen werden müssen"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 
 # Zum installieren:
 
@@ -281,9 +280,7 @@ font_add_google("Barlow Semi Condensed", "barr")
 #| include: true
 #| code-fold: true
 #| code-summary: "Code: Theme"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 ssm_theme <- function(){
     
     theme_bw() + 
@@ -309,9 +306,6 @@ ssm_theme <- function(){
 #| code-fold: true
 #| code-summary: "Code: Funktion zur Simulation eines Local Level Models"
 #| file: ../R/ssm_functions.R
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 ```
 
 Um sich mal besser vorstellen zu können wie solche Daten aussehen, näheren wir uns
@@ -349,9 +343,7 @@ $\epsilon$ – man weiß nie, wo sie hinspringen – daher ist das Ganze auch ei
 ```{r sim-ssm1}
 #| echo: true
 #| eval: true
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 set.seed(111)
 
 dat1 = sim_state_space(100, xi = 1, epsilon = 2)
@@ -369,9 +361,6 @@ dat1 = sim_state_space(100, xi = 1, epsilon = 2)
 #| fig-cap: "Simulierte 'Local Level Model' Daten"
 #| label: fig-sim-lolemo
 #| code-summary: "Code: Grafik mit simulierten Daten"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 
 dat1_filtered = dat1[14:17] %>% 
     .[, label_tau := paste0("tau", time)] %>% 
@@ -448,9 +437,7 @@ haben pro Parameter nicht nur einen Wert, sondern **viele** plausible Werte mit 
 wir dann anstellen können, was wir wollen. {{< bi emoji-heart-eyes >}}
 
 ```{.stan include="stan/01_local_level_model.stan"}
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 ```
 
 ### `stan` Modell mit Datensatz 1
@@ -458,9 +445,7 @@ wir dann anstellen können, was wir wollen. {{< bi emoji-heart-eyes >}}
 ```{r fit-stan-ssm1}
 #| code-fold: true
 #| code-summary: "Code: Stan Model wird gefittet"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 if(!file.exists("stan/01_local_level_model.rds")){ #<1>
 # compiles and writes rds in same dir
 ssm1 = stan_model("stan/01_local_level_model.stan", 
@@ -549,9 +534,7 @@ rstan::stan_rhat(fit_ssm1,
 ```{r extract-samples-ssm1}
 #| code-fold: true
 #| code-summary: "Code: Extrahieren von Samples"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 # Extrahieren und verarbeiten der Draws
 extract_draws_ssm <- function(FIT){ #<1>
     drws1 = tidybayes::gather_draws(model = FIT, tau[i], regex = F)  %>% 
@@ -604,9 +587,7 @@ aus dem Modell entfernt (sie 0 setzt).
 #| code-summary: "Code: Parameter Tabelle"
 #| label: tbl-dat1-sigmas
 #| tbl-cap: "Parameterschätzungen der Standardabweichungen"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 # help from here:
 ## https://gt.albert-rapp.de/fancy_stuff
 
@@ -686,9 +667,6 @@ Was ist konkret in @fig-dat1-fitted zu sehen?
 #| fig-cap: "Local Level zu Datensatz 1"
 #| code-summary: "Code: Grafik zum Fit"
 #| fig-showtext: true
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 
 dat1m = dat1[,.SD,.SDcols = c("y", "time", "lower1", "upper1", "true_values", "est_tau1")] %>%
     melt(id.vars = c("y", "time", "lower1", "upper1")) %>% 
@@ -810,9 +788,7 @@ Man muss schon mehr Info reinstecken wenn man substanziellere Predictions will!
 ```{r fit-stan-ssm1-fc}
 #| code-fold: true
 #| code-summary: "Code: Stan Forecast Fit"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 if(!file.exists("stan/01_local_level_model_fc.rds")){ #<1>
 # compiles and writes rds in same dir
 ssm1fc = stan_model("stan/01_local_level_model_fc.stan", 
@@ -850,9 +826,7 @@ fc_stan_dat1 = tidybayes::gather_draws(model = fit_ssm1fc, pred[i], regex = TRUE
 #| code-fold: true
 #| message: false
 #| code-summary: "Code: Statespacer fit"
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
+
 y_spacer = dat1[, .(y)] %>% as.matrix()
 
 spacer_res = statespacer::statespacer(y = y_spacer, local_level_ind = TRUE)
@@ -895,9 +869,6 @@ Beide wissen, dass sie nichts wissen -- oder zumindest sehr wenig.
 #| fig-cap: "Local Level zu Datensatz 1 inkl. Forecasts (Modelle von: Stan und Statespacer)"
 #| code-summary: "Code: Forecast Grafik"
 #| fig-showtext: true
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 #| eval: false
 #| include: false
 
@@ -948,9 +919,6 @@ print(p)
 #| fig-cap: "Local Level zu Datensatz 1 inkl. Forecasts (Modelle von: Stan und Statespacer)"
 #| code-summary: "Code: Forecast Grafik"
 #| fig-showtext: true
-#| code-block-bg: true
-#| code-line-numbers: true
-#| code-block-border-left: true
 
 dat_dy = dat1[, .(time, true_values, est_tau1, spacer_tau)] %>% 
     setnames(old = c("true_values", "est_tau1", "spacer_tau"),
