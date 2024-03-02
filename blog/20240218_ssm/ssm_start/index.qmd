@@ -50,7 +50,7 @@ Ich bin nur neugierig und probiere herum. Man darf es ruhig besser machen.
 
 Bei einer ersten Recherche sind mir State-Space Models schon mal positiv aufgefallen
 Warum? 
-Sie haben mich an bisschen an [klassische Testtheorie](https://dorsch.hogrefe.com/stichwort/klassische-testtheorie) erinnert. Für alle
+Sie haben mich bisschen an [klassische Testtheorie](https://dorsch.hogrefe.com/stichwort/klassische-testtheorie) erinnert. Für alle
 coolen IRT-Kids da draußen: Ja, ja, ich weiß es gibt noch was anderes als KTT.
 Also, was sagt die Klassische Testtheorie?
 Als Psychologe erhält man Messwerte von irgendeiner Testperson, die z. B. einen
@@ -78,7 +78,7 @@ Ausgangslage ist eine Zeitreihe: Wir haben also metrische Beobachtungen in
 einer zeitlichen Abfolge. Wir nennen diesen Vektor: $y$ wobei $y_t$ ein einzelner
 Wert zum Zeitpunkt $t$ ist. Wenn man so einen Vektor an Messwerten sieht, kann
 man vielleicht nicht widerstehen und fittet ein Lineares Modell (`lm()`) um
-mal zu sehen, in welche Richtung es geht: bergauf oder bergab? Wenn man allerdigs mit
+mal zu sehen, in welche Richtung es geht: bergauf oder bergab? Wenn man allerdings mit
 seinen Konfidenzintervallen am Ende des Tages auch irgendwas anfangen will, ist
 das keine so gute Idee. Warum? Weil in einer linearen Regression geht man 
 davon aus, dass die gemessenen Werte unabhängig von einander gezogen wurden.
@@ -161,8 +161,8 @@ $y_t$ nichts mehr gemeinsam.
 ::: {.callout-tip}
 ## $\sigma_\xi = 0$
 Als kleine Hilfe kann man sich mal vorstellen dass $\sigma_\xi$ immer kleiner
-wird bzw. einmal genau 0 erreicht. Dann wäre $\mu_{t} = \mu_{t-1}$. Immer.
-$\mu_{t}$ wäre also eine Konstante -- eine horizontale Linie. Sobald $\sigma_\xi$
+wird bzw. einmal genau 0 erreicht. Dann wäre $\tau_{t} = \tau_{t-1}$. Immer.
+$\tau_{t}$ wäre also eine Konstante -- eine horizontale Linie. Sobald $\sigma_\xi$
 größer als 0 wird 'bewegt' sich der Intercept quasi von Zeitpunkt zu Zeitpunkt.
 :::
 
