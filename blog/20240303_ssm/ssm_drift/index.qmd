@@ -1,0 +1,167 @@
+---
+title: "State Space Models - Teil 2"
+description: "Es geht weiter in der Space Saga."
+author: Manuel Reif 
+date: 2024-03-11
+categories: [R, stan, state-space-models]
+draft: false 
+highlight-style: monokai
+format:
+  html:
+    resources:
+        - shinylive-sw.js
+execute:
+    eval: false
+    message: false
+    echo: false
+filters:
+   - include-code-files
+---
+
+
+# With DRIFT 
+
+\begin{align}
+y_t &= \tau_t + \epsilon_t & \quad \text{measurement equation}\\
+\tau_{t} &= \tau_{t-1} + \nu_{t-1} + \xi_{t-1} & \quad \text{state/transition equation}\\
+\nu_{t} &= \nu_{t-1} + \theta_{t-1} & \quad \text{drift equation}
+\end{align}
+
+
+
+
+```{r}
+set.seed(235)
+
+dat3 = sim_state_space2()
+
+p = ggplot(data = dat3, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), alpha = 0.3) + 
+    theme_bw()
+
+p
+
+```
+
+
+
+
+```{r}
+ssm2 = "
+data {
+  int<lower=0> N; // Anzahl der Beobachtungen
+  vector[N] y; // beobachtete Werte
+  vector[N] time; // zeitpunkte
+}
+
+parameters {
+  vector[N] tau; // 
+  real<lower=0> sigma; // Sd - je nachdem wie sich tau 'bewegt'
+  real<lower=0> obs_sigma; // Error Term für die Obs
+  real drift;
+}
+
+model {
+  // Zustandsgleichung
+  for (n in 2:N)
+    tau[n] ~ normal(tau[n-1] + drift, sigma);
+  
+  // Beobachtungsgleichung
+  for (n in 1:N)
+    y[n] ~ normal(tau[n], obs_sigma);
+    
+  sigma ~ student_t(2, 0, 3);
+  obs_sigma ~ student_t(2, 0, 3);
+  drift ~ normal(0,2);
+}
+
+generated quantities{
+array[N] real y_sim;
+
+for(i in 1:(N-1)){
+y_sim[i] = student_t_rng(2, tau[i], obs_sigma);
+}
+}
+
+
+"
+```
+
+```{r}
+### daten 2
+data_list3 = list(y = dat3$y, 
+                 time = dat3$time, 
+                 N = length(dat3$y))
+
+fit_ssm2 = stan(model_code = ssm2, 
+                data = data_list3, 
+                iter = 3000, 
+                cores = 4)
+
+# fit_ssm2@sim$pars_oi
+print(fit_ssm2, pars = "tau", include = FALSE)
+
+samp_ssm2 = rstan::extract(object = fit_ssm2)
+
+est_taus2 = samp_ssm2[[1]] %>% colMeans
+
+dat3[, est_tau := est_taus2]
+
+p = ggplot(data = dat3, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), alpha = 0.3) + 
+    geom_step(aes(y = est_tau), color = "red") +
+    theme_bw()
+
+p
+```
+
+
+
+```{r}
+
+ss <- list()
+ss <- bsts::AddSemilocalLinearTrend(ss, dat3$y)
+res_bt2 = bsts::bsts(dat3$y, ss, niter = 3000)
+
+plot(res_bt2)
+
+burn = SuggestBurn(0.1, res_bt2)
+
+state2 = res_bt2$state.contributions[-(1:burn), , , drop = FALSE]
+
+state_mean2 = rowSums(aperm(state2, c(1, 3, 2)), dims = 2) %>% colMeans()
+
+dat3[, bsts_tau := state_mean2]
+
+
+# ok das sieht hier schon ganz anders aus!
+p = ggplot(data = dat3, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), alpha = 0.3) + 
+    geom_step(aes(y = est_tau), color = "red") +
+    geom_step(aes(y = bsts_tau), color = "steelblue") +
+    theme_bw()
+
+p
+
+plot(res_bt2, "components")
+
+bsts::predict.bsts(res_bt2, horizon = 100) %>% plot
+
+
+
+ss <- list()
+ss <- bsts::AddLocalLinearTrend(ss, dat3$y)
+res_bt3 = bsts::bsts(dat3$y, ss, niter = 3000)
+
+bsts::predict.bsts(res_bt3, horizon = 100) %>% plot
+
+```
+
+
+
+
+
+
