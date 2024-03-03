@@ -199,7 +199,7 @@ library(gt)
 library(gtExtras)
 
 
-source("../R/ssm_functions.R") # r functions
+source("../R/sim_ssm_lolemo.R") # r functions
 
 ## Loading Google fonts (https://fonts.google.com/)
 font_add_google("Barlow Semi Condensed", "barr")
@@ -265,7 +265,7 @@ library(gt)
 library(gtExtras)
 
 
-source("../R/ssm_functions.R") # r functions
+source("../R/sim_ssm_lolemo.R") # r functions
 
 ## Loading Google fonts (https://fonts.google.com/)
 font_add_google("Manrope", "manrope")
@@ -305,7 +305,7 @@ ssm_theme <- function(){
 #| eval: true
 #| code-fold: true
 #| code-summary: "Code: Funktion zur Simulation eines Local Level Models"
-#| file: ../R/ssm_functions.R
+#| file: ../R/sim_ssm_lolemo.R
 ```
 
 Um sich mal besser vorstellen zu können wie solche Daten aussehen, näheren wir uns

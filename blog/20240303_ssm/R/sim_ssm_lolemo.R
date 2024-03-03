@@ -1,7 +1,6 @@
 sim_state_space = function(time_points = 100, 
                            xi = 1, 
-                           epsilon = 2,
-                           drift = 0){
+                           epsilon = 2){
     
     true_values = vector(mode = "numeric", 
                          length = time_points)
@@ -11,7 +10,7 @@ sim_state_space = function(time_points = 100,
     
     true_values[1] = 1 # true value 1
     for(i in 2:time_points){
-        true_values[i] <- true_values[i-1] + drift + rnorm(1, mean = 0, sd = xi)
+        true_values[i] <- true_values[i-1] + rnorm(1, mean = 0, sd = xi)
     }
     
     y = true_values + rnorm(time_points, mean = 0, sd = epsilon)
