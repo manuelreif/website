@@ -3,6 +3,7 @@ title: "State Space Models - Teil 1"
 description: "Mittels State Space Models können Zeitreihen beschrieben werden. Natürlich interessieren wir uns auch für Predictions. Wer möchte nicht die Zukunft kennen? Es wird spannend, es wird wild, es geht auf und es geht ab. Das ist Teil 1."
 author: Manuel Reif 
 date: 2024-03-03
+lang: de
 categories: [state-space-models, R, stan]
 draft: false 
 highlight-style: monokai
@@ -21,7 +22,7 @@ code-fold: false
 code-block-bg: true
 code-line-numbers: true
 code-block-border-left: true
-freeze: auto
+freeze: true
 filters:
    - include-code-files
 ---
@@ -118,7 +119,7 @@ Terme. Wie zum Teufel sollen diese beiden auseinandergehalten werden, d. h.
 schon einen Schritt weiter gedacht: Wie sollen diese denn geschätzt werden?
 
 Mache Leute sind ja eher visuelle Typen. Da ist die grafische Darstellung dieses
-Modells sicherlich eine Hilfe. Grafik @fig-lolemo-flow zeigt das Local Level Modell
+Modells sicherlich eine Hilfe. @fig-lolemo-flow zeigt das Local Level Modell
 nochmal anschaulicher.
 Man sieht hier nochmal deutlich, dass die einzelnen $\tau$ voneinander
 abhängen -- wenn man diese aber kennt bzw. konstanthält, haben die Beobachtungen

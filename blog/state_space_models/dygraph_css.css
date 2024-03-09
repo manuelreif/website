@@ -18,3 +18,14 @@ font-family: 'Barlow Semi Condensed', serif;
   font-style: normal;
     font-size: 12px;
 }
+
+#hover-info {
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  position: absolute;
+  border: 1px solid black;
+  background: white;
+  padding: 5px;
+  display: none;
+  z-index: 1000;
+}
+
