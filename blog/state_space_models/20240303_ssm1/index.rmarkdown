@@ -1,0 +1,997 @@
+---
+title: "State Space Models - Teil 1"
+description: "Mittels State Space Models können Zeitreihen beschrieben werden. Natürlich interessieren wir uns auch für Predictions. Wer möchte nicht die Zukunft kennen? Es wird spannend, es wird wild, es geht auf und es geht ab. Das ist Teil 1."
+author: Manuel Reif 
+date: 2024-03-03
+lang: de
+categories: [state-space-models, R, stan]
+draft: false 
+highlight-style: monokai
+image: media/ssm_thumbnail.webp
+format:
+  html:
+    css: ssm1.css
+    resources:
+        - shinylive-sw.js
+execute:
+    eval: true
+    message: false
+bibliography: ../texts.bib
+code-annotations: hover
+code-fold: false
+code-block-bg: true
+code-line-numbers: true
+code-block-border-left: true
+freeze: true
+filters:
+   - include-code-files
+---
+
+
+# Einführung
+
+::: {.callout-tip icon=false}
+## {{< bi book-half size=25px >}} Soll ich lesen?
+1. Findest du geile, **State** of the Art, statistische Modelle geil? <br>
+2. Hat Statistik nicht genügend **Space** in deinem Leben? <br>
+3. Ist dein derzeitiger emotionaler **State**: 'Spacig'?<br>
+$\rightarrow$ Der **Lesebefehl** erfolgt unabhängig der gegebenen Antworten!
+:::
+
+<img src="media/ssm_thumbnail.webp" alt="State Space Model" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Zeitreihen haben mich nie wirklich interessiert. Als Psychologe bekommt man es 
+nicht so leicht mit Zeitreihen zu tun -- vielleicht deshalb. Einerseits will 
+man ja seiner Disziplin treu bleiben und andererseits hat man ja auch genug zu tun mit
+verrückten Modellen die sich Psychologen ausgedacht haben. 
+Trotzdem interessieren mich inzwischen (zwangsläufig und wirklich nur selten)
+Themen, bei denen es sich anbieten würde, eine Art Zeitreihenanalyse zu machen,
+wobei ich zugeben muss, ich hab kein Bild im Kopf wie "die" oder 
+eine "gute" Zeitreihenanalyse aussehen soll. Ich bitte gleich vorweg um
+Verzeihung an alle Profis, die jeden Tag mit solcherlei Daten zu tun haben, dies lesen
+und sich schon jetzt an ihrer Wurstsemmel vor Schreck verschlucken. 
+Ich bin nur neugierig und probiere herum. Man darf es ruhig besser machen.
+
+Bei einer ersten Recherche sind mir State-Space Models schon mal positiv aufgefallen
+Warum? 
+Sie haben mich bisschen an [klassische Testtheorie](https://dorsch.hogrefe.com/stichwort/klassische-testtheorie) erinnert. Für alle
+coolen IRT-Kids da draußen: Ja, ja, ich weiß es gibt noch was anderes als KTT.
+Also, was sagt die Klassische Testtheorie?
+Als Psychologe erhält man Messwerte von irgendeiner Testperson, die z. B. einen
+Raumvorstellungstest vorgegeben bekommt. Am Ende addiert man die Anzahl gelöster
+Aufgaben^[Wir diskutieren hier nicht, ob oder unter welchen Umständen man das 
+darf. KTT Menschen sind dreist und machen es einfach -- und wir zumindest hier 
+in unseren Gedanken]. Wir
+nehmen dabei an, dass die Person eine latente Fähigkeit hat, nennen wir sie,
+"Raumvorstellungsvermögen" bzw. "space", klingt cooler. Wir nehmen weiters
+an, dass wir mit diesem Test genau jene latente Fähigkeit messen, aber eben mit 
+einem bestimmten Messfehler, wodurch sich folgende Gleichung ergibt:
+
+\begin{align}
+X = \tau + \epsilon
+\end{align}
+
+Kurzum, wir haben etwas Latentes, das wir durch etwas Manifestes annähern wollen. 
+State Space Models versuchen etwas Ähnliches, sind aber deutlich komplizierter, 
+weil auch noch eine Zeitkomponente beteiligt ist und wir pro Zeitpunkt nur 
+eine Beobachtung haben.
+
+# Local Level Model 
+
+Ausgangslage ist eine Zeitreihe: Wir haben also metrische Beobachtungen in
+einer zeitlichen Abfolge. Wir nennen diesen Vektor: $y$ wobei $y_t$ ein einzelner
+Wert zum Zeitpunkt $t$ ist. Wenn man so einen Vektor an Messwerten sieht, kann
+man vielleicht nicht widerstehen und fittet ein Lineares Modell (`lm()`) um
+mal zu sehen, in welche Richtung es geht: bergauf oder bergab? Wenn man allerdings mit
+seinen Konfidenzintervallen am Ende des Tages auch irgendwas anfangen will, ist
+das keine so gute Idee. Warum? Weil in einer linearen Regression geht man 
+davon aus, dass die gemessenen Werte unabhängig von einander gezogen wurden.
+Wenn wir wissen, dass es sich um eine Zeitreihe handelt, dann wissen wir auch,
+dass die Werte nicht wirklich unabhängig sind, sondern (höchstwahrscheinlich) 
+voneinander abhängen -- zumindest deutlich mehr als das bei einer Zufallsstichprobe
+von unabhängigen Messungen der Fall wäre. Wenn ich das ignoriere, dann
+sind meine Konfidenzintervalle nicht mehr als lustige Zahlen ohne Inhalt. 
+Daher brauchen wir ein Modell, das mit diesen Abhängigkeiten auch leicht
+umgehen kann, wie eben ein State Space Model.
+
+Die einfachste Form eines State Space Models stellt einen "Random Walk" dar und 
+sieht folgendermaßen aus [siehe z. B. @ssm-book-intro2007 pp. 9]:
+
+
+\begin{align}
+y_t &= \tau_t + \epsilon_t & \quad \text{measurement equation}\\
+\tau_{t} &= \tau_{t-1} + \xi_{t-1} & \quad \text{state/transition equation}
+\end{align}
+
+1. $y_t$ wird in einen wahren (latenten) State $\tau_t$ und einen Error
+$\epsilon_t$ zerlegt --- der den Measurement Error darstellt.
+2. Und jetzt wird es kompliziert: $\tau_{t}$ hängt von $\tau_{t-1}$ ab und das 
+eben nicht deterministisch, sondern hier ist auch wieder ein Error Term im Spiel: $\xi_{t-1}$.
+3. Und natürlich schauen die Verteilungen der Errorterme so aus: 
+$\epsilon_t \sim \mathcal{N}(0, \sigma_\epsilon)$ bzw. $\xi_t \sim \mathcal{N}(0, \sigma_\xi)$
+$\rightarrow$ wer hätte das gedacht, dass die Errors normalverteilt sind^[Die Errors 
+müssen nicht unbedingt normalverteilt angenommen werden. In unserem Stan Modell 
+später wäre es auch problemlos möglich, bspw. eine t-Verteilung anzunehmen!].
+
+Dieses Modell wird auch das **Local Level Model** genannt, weil man letztendlich
+zufällig von einem Punkt zum nächsten hüpft -- zumindest in der Simulation.
+Was mich auf den ersten Blick schwindlig werden lässt, sind diese beiden Error
+Terme. Wie zum Teufel sollen diese beiden auseinandergehalten werden, d. h. 
+schon einen Schritt weiter gedacht: Wie sollen diese denn geschätzt werden?
+
+Mache Leute sind ja eher visuelle Typen. Da ist die grafische Darstellung dieses
+Modells sicherlich eine Hilfe. @fig-lolemo-flow zeigt das Local Level Modell
+nochmal anschaulicher.
+Man sieht hier nochmal deutlich, dass die einzelnen $\tau$ voneinander
+abhängen -- wenn man diese aber kennt bzw. konstanthält, haben die Beobachtungen
+$y_t$ nichts mehr gemeinsam.
+
+
+```{tikz}
+#| echo: false
+#| fig-cap: "Local Level Model als Graph"
+#| label: "fig-lolemo-flow"
+#| fig-align: center
+#| fig-ext: svg
+#| out-width: 55%
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+
+\begin{tikzpicture}[node distance=1.5cm and 2cm,
+    state/.style={circle, draw, minimum size=1.25cm},
+    observation/.style={rectangle, draw, minimum size=1cm},
+    ]
+
+    % States
+    \node[state] (s1) {$\tau_{t-1}$};
+    \node[state, right=of s1] (s2) {$\tau_t$};
+    \node[state, right=of s2] (s3) {$\tau_{t+1}$};
+
+    % Observations
+    \node[observation, below=of s1] (y1) {$y_{t-1}$};
+    \node[observation, below=of s2] (y2) {$y_t$};
+    \node[observation, below=of s3] (y3) {$y_{t+1}$};
+
+    % Arrows without labels
+    \draw[->] (s1) -- (s2);
+    \draw[->] (s2) -- (s3);
+    \draw[->] (s1) -- (y1);
+    \draw[->] (s2) -- (y2);
+    \draw[->] (s3) -- (y3);
+
+\end{tikzpicture}
+```
+
+
+
+
+::: {.callout-tip}
+## $\sigma_\xi = 0$
+Als kleine Hilfe kann man sich mal vorstellen dass $\sigma_\xi$ immer kleiner
+wird bzw. einmal genau 0 erreicht. Dann wäre $\tau_{t} = \tau_{t-1}$. Immer.
+$\tau_{t}$ wäre also eine Konstante -- eine horizontale Linie. Sobald $\sigma_\xi$
+größer als 0 wird 'bewegt' sich der Intercept quasi von Zeitpunkt zu Zeitpunkt.
+:::
+
+![](media/xi_epsilon.jpg){width=65% fig-align="center"}
+
+
+So, jetzt wird mal was in R gemacht. Also los geht's!
+
+
+
+
+```{r load-anything}
+#| eval: true
+#| include: false
+library(data.table)
+library(purrr)
+library(magrittr)
+library(parallel)
+
+library(rstan)
+library(tidybayes)
+library(statespacer)
+
+library(ggplot2)
+library(paletteer)
+library(plotly)
+library(ggrepel)
+library(ggforce)
+library(showtext)
+library(dygraphs)
+
+library(gt)
+library(gtExtras)
+
+
+source("../R/sim_ssm_lolemo.R") # r functions
+
+## Loading Google fonts (https://fonts.google.com/)
+font_add_google("Barlow Semi Condensed", "barr")
+#showtext_auto()
+```
+
+```{r load-anything-show}
+#| eval: false
+#| include: true
+#| code-fold: true
+#| code-summary: "Code: Alle packages die geladen werden müssen"
+
+# Zum installieren:
+
+if(FALSE){ # beim ersten Mal ausführen - dann hat man alle Pakete
+    if (!requireNamespace("pak", quietly = TRUE)) {
+      install.packages("pak")
+    }
+    
+    library(pak)
+    
+    # Installation erfolgt mit pak weil
+    ##1: schneller
+    ##2: problemloser
+    pak::pkg_install(c(
+      "data.table",
+      "purrr",
+      "magrittr",
+      "parallel",
+      "rstan",
+      "tidybayes",
+      "statespacer",
+      "ggplot2",
+      "paletteer",
+      "plotly",
+      "ggrepel",
+      "ggforce",
+      "showtext",
+      "dygraphs",
+      "gt",
+      "gtExtras"
+    ))
+}
+
+library(data.table)
+library(purrr)
+library(magrittr)
+library(parallel)
+
+library(rstan)
+library(tidybayes)
+library(statespacer)
+
+library(ggplot2)
+library(paletteer)
+library(plotly)
+library(ggrepel)
+library(ggforce)
+library(showtext)
+library(dygraphs)
+
+library(gt)
+library(gtExtras)
+
+
+source("../R/sim_ssm_lolemo.R") # r functions
+
+## Loading Google fonts (https://fonts.google.com/)
+font_add_google("Manrope", "manrope")
+font_add_google("Maven Pro", "maven")
+font_add_google("Barlow Semi Condensed", "barr")
+
+```
+
+```{r theme}
+#| eval: true
+#| include: true
+#| code-fold: true
+#| code-summary: "Code: Theme"
+
+ssm_theme <- function(){
+    
+    theme_bw() + 
+    theme(panel.grid.minor = element_blank(),
+          plot.title = element_text(family = "barr", face = "plain",size = rel(1.65)),
+          plot.subtitle = element_text(family = "barr", face = "plain"),
+          axis.title = element_text(family = "barr", face = "plain"),
+          text = element_text(family = "barr", face = "plain"),
+          panel.grid.major.x = element_blank(),
+          panel.border = element_rect(color = "lightgrey"),
+          legend.position='bottom')
+    
+}
+```
+
+
+
+
+## Simulation
+
+
+```{r ssm-sim-function1}
+#| echo: true
+#| eval: true
+#| code-fold: true
+#| code-summary: "Code: Funktion zur Simulation eines Local Level Models"
+#| file: ../R/sim_ssm_lolemo.R
+```
+
+
+Um sich mal besser vorstellen zu können wie solche Daten aussehen, näheren wir uns
+dem Ganzen via Simulation. In der unten stehenden Shiny-App kann man sich 
+mit den einzelnen Parametern "spielen", um zu sehen was passiert wenn man 
+die Werte verändert. Zusätzlich kann man auch mehr oder weniger Beobachtungen
+simulieren.
+
+
+<iframe src="https://snofru.shinyapps.io/ssm1_app/?showcase=0" width="100%" height="580px" data-external="1"></iframe>
+
+
+Ok -- jetzt simulieren wir uns mal einen Datensatz, mit dem wir später ein Modell 
+aufbauen können, das genau unsere simulierten Daten fittet. Damit können wir sowohl 
+das Modell als auch die Simulationsfunktion überprüfen. Wenn die vom Modell 
+geschätzten Parameter den simulierten Parametern entsprechen, kann man davon 
+ausgehen, dass alles hinreichend gut funktioniert hat!
+
+@fig-sim-lolemo zeigt die simulierten Daten, 
+mit denen wir jetzt den restlichen Post verbringen werden. 
+Als Parameter wurden $\xi = 1$ und $\epsilon = 2$ fixiert. 
+Dadurch ergeben sich sowohl die Punkte als Scatterplot, sowie die verbundenen 
+$\tau$ also stufenförmige Linie, die das jeweilige Niveau des Intercepts anzeigt 
+(die latente Variable). Zusätzlich ist darunter noch ein Ausschnitt genauer 
+dargestellt. Die Beschriftungen verdeutlichen nochmal den Unterschied zwischen 
+den latenten $\tau$ und den $y$. Die stufenförmige Linie stellt den wahren (latenten) 
+Zustand dar, den wir in der Realität nie beobachten können. 
+Die Punkte sind die beobachteten Werte. Das alles ist das Ergebnis unserer 
+Simulation^[Simulieren wir mehrfach mit denselben Parametern, erhalten wir jedes 
+Mal andere Ergebnisse! Das liegt natürlich an den beiden Varianzen $\xi$ und 
+$\epsilon$ – man weiß nie, wo sie hinspringen – daher ist das Ganze auch ein 
+'random walk'.].
+
+
+
+```{r sim-ssm1}
+#| echo: true
+#| eval: true
+
+set.seed(111)
+
+dat1 = sim_state_space(100, xi = 1, epsilon = 2)
+```
+
+```{r ssm1-plt1-zoom}
+#| echo: true
+#| eval: true
+#| fig-width: 9 
+#| fig-height: 8
+#| code-fold: true
+#| fig-showtext: true
+#| fig-cap: "Simulierte 'Local Level Model' Daten"
+#| label: fig-sim-lolemo
+#| code-summary: "Code: Grafik mit simulierten Daten"
+
+dat1_filtered = dat1[14:17] %>% 
+    .[, label_tau := paste0("tau", time)] %>% 
+    .[, label_y := paste0("y", time)] %>% 
+    .[, zoom := TRUE]
+
+p = ggplot(data = dat1, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), color = paletteer_d("trekcolors::starfleet")[1]) + 
+    labs(title = "Local Level Model zu simuliertem Datensatz", 
+         subtitle = "Gesamter Verlauf und detallierte Betrachtung eines spezifischen Ausschnitts") +
+    facet_zoom(xy = time %in% 14:17, zoom.data=zoom, zoom.size = 1, ylim = c(-10,0), horizontal = FALSE) + 
+    geom_point(data = dat1_filtered, aes(y = true_values), 
+               shape = 8, alpha = 0.8, 
+               color = "red", size = 3) +
+    geom_label_repel(data = dat1_filtered, 
+                     aes(label = label_y), 
+                     nudge_x = -0.2, 
+                     nudge_y = -0.2, 
+                     fill = paletteer_d("trekcolors::starfleet")[1], 
+                     color = "white", segment.color = "black") +
+    geom_label_repel(data = dat1_filtered, 
+                     aes(y = true_values, 
+                         label = label_tau), 
+                     nudge_x = 0.2,
+                     nudge_y = c(1, -0.8, 0.9, -0.8), 
+                     fill = paletteer_d("trekcolors::starfleet")[2], 
+                     color = "white", segment.color = "black") +
+    scale_x_continuous(expand = c(0, 0)) +
+    ssm_theme() +
+    theme(panel.border = element_rect(color = "#777777")) + 
+    theme(zoom.x = element_rect(fill = paletteer_d("trekcolors::starfleet")[2]), 
+          zoom.y = element_rect(fill = paletteer_d("trekcolors::starfleet")[2]))
+
+p
+```
+
+
+
+## `stan` zum Fitten
+
+Nun kommt der lustige Teil. Wir wollen nun ein Modell schreiben, das unsere 
+ganz frisch simulierten Daten fittet. Wir wissen ja, wie die Daten entstanden sind.
+Wir haben sie nach einem "Local Level Model" simuliert. Jetzt muss man 
+ein dementsprechendes Modell schreiben. Dazu verwenden wir zuerst einmal 
+[stan](https://mc-stan.org/)^[`stan` ist mein go-to Zugang zu Statistik, und 
+ich würde es am liebsten immer verwenden -- allerdings hab ich hier noch viel dazuzulernen.].
+Stan ist eine "Probabilistic Programming Language" und macht Bayesian Inference
+für fast alles was im Statistik Universum so kreucht und fleucht. Warum ist es geil?
+Weil wir unsere Modell direkt formulieren können -- quasi den "data generating 
+process" hinschreiben -- und weil wir flexibel modellieren
+können. Das sind für dieses Projekt zumindest meine Gründe. Insbesondere, wenn
+man nicht weiß, wohin einen die Neugier treiben wird, ist `stan` eine 
+gute Software^[Alle die noch mehr über `stan` wissen wollen können das Manual lesen.].
+Es gibt schon Projekte die State Space Models in `stan` umgesetzt haben, wie z. B. 
+[dieses](https://jrnold.github.io/ssmodels-in-stan/). Hier sind viele Funktionen
+umgesetzt die es ermöglichen ein verallgemeinertes State Space Modell 
+zu definieren. Wir greifen allerdings nicht auf diese Funktionen zurück -- wir wollen
+es möglich selbst implementieren -- quasi: Lerneffekt maximieren!
+In weiterer Folge werden wir auch noch ein anderes Software package verwenden.
+
+Der nächste Codeblock zeigt uns wunderschönen `stan` Code. Es ist mehr Schreibarbeit 
+im Vergeich zu einem Softwarepaket das genau auf solche Probleme zugeschnitten wäre.
+Aber gut -- man lernt deutlich mehr, wenn man die Probleme auch ausformuliert.
+Wenn man Zeile für Zeile durchschaut,
+sieht man, dass hier mehr oder weniger das datengenerierende Modell
+hingeschrieben wurde. zusätzlich sind noch ein paar Priors für die Parameter 
+reingestreut. Wenn wir den Code auf unsere künstlichen Daten loslassen, erwarten wir uns,
+dass Parameter resultieren, die ähnlich sind wie jene, nach denen wir die Daten 
+simuliert haben. Das ist die Mindestanforderung für eine funktionierendes Modell.
+`stan` schätzt im übrigen nicht einfach Punktschätzer (langweilig), sondern der
+Return der Funktion sind Ziehungen aus der sogenannten [Posterior Verteilung](https://vasishth.github.io/bayescogsci/book/ch-introBDA.html#sec-analytical). 
+D. h. wir
+haben pro Parameter nicht nur einen Wert, sondern **viele** plausible Werte mit denen
+wir dann anstellen können, was wir wollen. {{< bi emoji-heart-eyes >}}
+
+```{.stan include="stan/01_local_level_model.stan"}
+
+```
+
+### `stan` Modell mit Datensatz 1
+
+
+```{r fit-stan-ssm1}
+#| code-fold: true
+#| code-summary: "Code: Stan Model wird gefittet"
+
+if(!file.exists("stan/01_local_level_model.rds")){ #<1>
+# compiles and writes rds in same dir
+ssm1 = stan_model("stan/01_local_level_model.stan", 
+                  model_name = "ssm1",
+                  auto_write = TRUE)
+} else {
+    ssm1 = readRDS("stan/01_local_level_model.rds")
+}
+
+# daten liste erstellen
+data_list1 = list(y = dat1$y, #<2>
+                 time = dat1$time, 
+                 N = length(dat1$y))
+
+fit_ssm1 = sampling(object = ssm1, 
+                data = data_list1, 
+                iter = 4000, #<3>
+                cores = 4, #<4>
+                chains = 4)
+```
+
+1. Da Modelle in `stan` erst kompiliert werden müssen und das etwas Zeit in 
+Anspruch nimmt, ist es klug, das kompilierte Modell zu speichern, wenn man es 
+nochmal verwenden will (z. B. mit anderen Daten). Es wird gecheckt, ob das File
+existiert $\rightarrow$ falls ja, wird es eingelesen.
+2. Die Daten müssen als Liste übergeben werden
+3. Für solche Modelle braucht man eine ganze Menge Iterationen!
+4. Für jede `chain` sollte auch ein eigener Core verwendet werden, wenn möglich.
+Parallelisieren ist immer gut, dann geht es schneller!
+
+
+
+::: {.callout-tip collapse="true" icon=false}
+## Stan Convergence Diagnostics
+
+Wer sich hierher verirrt hat, will vielleicht Genaueres wissen zur Konvergenz
+der Markov Chains unseres Modells. Falls die Chains nicht konvergiert wären,
+(was sie allerdings sind), müsste man die Parameter in die Tonne treten.
+Das hat jetzt mit State Space Models im 
+Speziellen nichts zu tun, sondern muss immer dann kontrolliert werden,
+wenn Markov Chains aus der Posterior sampeln.
+Gerade bei State Space Models ist es aber so, dass es regelmäßig zu 
+Konvergenzproblemen kommt. Es sind auch richtig viele Parameter zu schätzen!
+Wenn euch das jetzt aber nicht interessiert, dann klappt es wieder zu. Wenn schon,
+dann schaut weiter -- ich gehe aber jetzt nicht im Detail auf die Grafiken ein!
+
+<br>
+
+**TL;DR: Die Chains sind konvergiert. Alles ist gut!**
+
+<br>
+
+
+```{r stan-convergence-diag1}
+#| message: false
+#| warning: false
+#| error: false
+splitt_indices = parallel::splitIndices(102, 10)
+all_variables_mod1 = tidybayes::get_variables(fit_ssm1)[1:102]
+
+COLS = paletteer_d("trekcolors::starfleet") %>% rev
+COLS = c(paletteer_d("trekcolors::lcars_2357")[2], COLS)
+
+for(i in 1:length(splitt_indices)){
+      my_vars = all_variables_mod1[splitt_indices[[i]]]
+        plt = rstan::traceplot(fit_ssm1, pars = my_vars, alpha = 1) + 
+            scale_color_manual(values = COLS)
+        plot(plt)
+}
+```
+
+```{r stan-convergence-diag-rhat}
+#| message: false
+#| warning: false
+#| error: false
+rstan::stan_rhat(fit_ssm1, 
+                 fill = paletteer_d("trekcolors::starfleet")[1]) 
+```
+
+
+:::
+
+
+
+
+
+
+
+```{r extract-samples-ssm1}
+#| code-fold: true
+#| code-summary: "Code: Extrahieren von Samples"
+
+# Extrahieren und verarbeiten der Draws
+extract_draws_ssm <- function(FIT){ #<1>
+    drws1 = tidybayes::gather_draws(model = FIT, tau[i], regex = F)  %>% 
+        data.table %>% 
+        .[, .(mean_tau = mean(.value), 
+              lower = quantile(.value, 0.025), 
+              upper = quantile(.value, 0.975)) , keyby = c(".variable", "i")]
+    
+    sigmas = tidybayes::gather_draws(model = FIT, `(xi|epsilon)`, regex = TRUE) %>% #<2>
+        data.table
+    list(drws1 = drws1, sigmas = sigmas)
+}
+
+draws_ssm1 = extract_draws_ssm(fit_ssm1)
+dat1[, est_tau1 := draws_ssm1$drws1[, mean_tau]] #<3>
+dat1[, lower1 := draws_ssm1$drws1[, lower]]
+dat1[, upper1 := draws_ssm1$drws1[, upper]]
+```
+
+1. Eine Funktion um die Samples aus der Posterior zu extrahieren und zu aggregieren: `mean()`.
+2. Hier werden die samples zu den geschätzten Varianzen rausgeholt.
+3. Hier werden die Draws als Spalte hinzugefügt.
+
+
+
+Nach dem fitten kann man die Parameter extrahieren.
+Ich verwende hier das [`tidybayes`](https://mjskay.github.io/tidybayes/) 
+Package -- es geht aber auch anders.
+Das sind die 100 $\tau$ bzw. die zwei geschätzten Standardabweichungen 
+(Spalte 'Estimate'). 
+Egal ob man die Parameter mittels Grafik oder Tabelle darstellen will -- die 
+$\tau$ sind schwierig unterzukriegen (es sind viele!). Daher
+hier in @tbl-dat1-sigmas nur die Schätzungen der beiden 
+Standardabweichungen -- die $\tau$ sehen wir ohnehin in der Abbildung unten[^10].
+Der Densityplot in der Tabelle,  stellt jeweils die Posterior Samples der
+Parameter dar und zwar so skaliert, dass auch 0 immer inkludiert und als 
+rote vertikale Linie zu sehen ist! Wie oben gezeigt, sind die simulierten Parameter:
+$\xi = 1$ und $\epsilon = 2$. Das treffen wir (nona) nicht genau, aber die Richtung stimmt!
+Insbesondere sieht man, dass die Parameter sehr deutlich größer als 0 sind. 
+Wären sie, z. B. bei einem 'echten' Datensatz aus der Welt da draußen, 
+nahe bei 0, könnte man sich überlegen ob man diese Parameter nicht überhaupt
+aus dem Modell entfernt (sie 0 setzt).
+
+
+
+[^10]: Dank an Albert Rapp für die [detallierten Beschreibungen zur Erstellung von eigenen Grafiken](https://gt.albert-rapp.de/fancy_stuff) in `gt`.
+
+
+```{r}
+#| output: asis
+#| code-fold: true
+#| code-summary: "Code: Parameter Tabelle"
+#| label: tbl-dat1-sigmas
+#| tbl-cap: "Parameterschätzungen der Standardabweichungen"
+
+# help from here:
+## https://gt.albert-rapp.de/fancy_stuff
+
+sigmas_ssm1 = draws_ssm1$sigmas %>% copy
+
+density_with0 <- function(input_var, dataset){
+  
+    fullrange_data = dataset[,.value %>% range]
+    fullrange = c(min(-0.1,fullrange_data[1]), max(0.1,fullrange_data))
+    
+    teilx = dataset[.variable == input_var,]
+    median_dt = teilx[, .(med_val = median(.value))]
+    
+    p = ggplot(data = teilx, aes(x = .value))  +
+        geom_density(fill = paletteer_d("trekcolors::starfleet")[1], alpha = 1) + 
+        #geom_point(data = median_dt, aes(x = med_val, y = 0), color = "blue", shape = 4, size = 3) + 
+        geom_vline(xintercept = 0, linetype = 2, color = paletteer_d("trekcolors::starfleet")[3], linewidth = 2) + 
+        coord_cartesian(xlim = fullrange) + 
+        #labs(x = element_blank(), y = element_blank()) +
+        theme_void()
+    
+    p
+}
+
+sigma_compact = sigmas_ssm1[, .(mean = mean(.value), Density = list(.value)), keyby = .variable] %>% 
+    .[, Density := .variable] %>% 
+    setnames(c(".variable", "mean"), c("Variable", "Estimate"))
+
+sigma_compact %>% 
+    gt() %>% 
+  tab_header(
+    title = "Parametertabelle",
+    subtitle = "Geschätzte Standardabweichungen der 'measurement equation' und der 'state equation'"
+  ) %>% 
+    cols_align(align = c("center"), columns = 3) %>% 
+    fmt_number(Estimate) %>% 
+     text_transform(
+    locations = cells_body(columns = 'Density'),
+    fn = function(column) {
+      map(column, density_with0, dataset = sigmas_ssm1) %>% 
+        ggplot_image(height = px(50), aspect_ratio = 3)
+    } 
+  ) %>% 
+        tab_style(
+                style = cell_text(weight = "bold", color = "white"),
+                locations = cells_column_labels()
+        ) %>% 
+        tab_style(
+                style = cell_fill(color =  paletteer_d("trekcolors::starfleet")[1]),
+                locations = cells_column_labels()
+        ) %>% 
+        tab_style(
+                style = cell_fill(color =  paletteer_d("trekcolors::starfleet")[1]),
+                locations = cells_column_labels()
+        )#%>% 
+#as_raw_html()
+
+```
+
+
+
+Jetzt kann man das Ganze auch schön grafisch darstellen. @fig-dat1-fitted zeigt
+den Vergleich zwischen den wahren Werten und den durch das Modell geschätzten.
+Das sieht eigentlich ganz gut aus.
+
+Was ist konkret in @fig-dat1-fitted zu sehen?
+
+1. Die wahren Werte nach denen simuliert wurde (siehe Legende)
+2. Die von `stan` geschätzten latenten Parameter $\tau$ (orange/hellere Linie)
+3. Das 95\ % CI ([Credible Interval](https://easystats.github.io/bayestestR/articles/credible_interval.html#:~:text=What%20is%20a%20Credible%20Interval,you%20are%20trying%20to%20estimate.)) (als farbige Band um die orange/hellere Linie)
+4. Die Punkte, als die tatsächlichen (simulierten) Beobachtungen
+
+
+
+```{r plt1-ssm1}
+#| fig-width: 9
+#| code-fold: true
+#| label: "fig-dat1-fitted"
+#| fig-cap: "Local Level zu Datensatz 1"
+#| code-summary: "Code: Grafik zum Fit"
+#| fig-showtext: true
+
+dat1m = dat1[,.SD,.SDcols = c("y", "time", "lower1", "upper1", "true_values", "est_tau1")] %>%
+    melt(id.vars = c("y", "time", "lower1", "upper1")) %>% 
+    .[, variable := factor(variable, levels = c("true_values", "est_tau1"), 
+                           labels = c("true", "estimated"))] %>% 
+    setnames("variable", "true/est")
+
+p = ggplot(data = dat1m, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = value, color = `true/est`)) + 
+    geom_ribbon(data = dat1, aes(ymin = lower1, ymax = upper1), 
+                fill = paletteer_d("trekcolors::starfleet")[2], 
+                alpha = 0.4, color = "grey") +
+    labs(title = "Stan Fit vs. True Values") + 
+    scale_color_paletteer_d("trekcolors::starfleet") + 
+    scale_x_continuous(expand = c(0, 0)) +
+    ssm_theme()
+
+p
+```
+
+
+
+
+Man kann natürlich auch andere Packages zum fitten verwenden wenn man etwas 
+schreibfaul ist oder nicht die Zeit hat auf das konvergieren der Markov Chains zu warten.
+Alternativen wären z. B.
+
+1. Das [walker](https://github.com/helske/walker) package setzt auf 
+[stan](https://mc-stan.org/) auf und fittet die Modelle nicht auf so eine naive 
+Weise wie wir das oben angeschrieben haben -- sondern der Code wurden 
+genau für solche Probleme optimiert.
+2. Das [bsts](https://cran.r-project.org/web/packages/bsts/index.html) package verfolgt
+ebenso einen Bayesianischen Ansatz, setzt aber nicht auf `stan` auf. 
+3. Das [statespacer](https://github.com/DylanB95/statespacer) package modelliert
+ebenfalls Time Series und hat ein recht angenehmes Interface. Zusätzlich ist es
+auch problemlos möglich dass die Beobachtungen multivariat sind, also y nicht 
+nur eine Vektor sondern eine Matrix ist. Spoiler: Das verwenden wir jetzt gleich noch!
+
+
+
+## Forecasting mit dem Local Level Model
+
+Wir könnten noch Stundem rumpimmeln indem wir Datensätze simulieren
+und Modelle fitten und schöne Grafiken machen. Wir wollen aber auch einen Forcast.
+Man will doch in die Zukunft blicken. Man will
+ja wissen was auf einen wartet. Das verdirbt vielleicht die Überraschung, aber auch
+nur wenn Prognosen mit Glaskugeln und nicht mit statistischen Modellen
+angefertigt werden. Denn wie wenige Eingeweihte wissen: Statistiker kennen die
+Zukunft gar nicht (so genau). However -- wie machen wir also einen Forecast?
+Wenn wir uns das State Space Model in der obigen Formulierung ansehen, kann der
+Forecast wohl nicht irrsinnig komplex sein. Wir haben außer einem Random Walk
+und einer Prise Varianzen ja nichts Substanzielles das man guten Gewissens in
+die Zukunft ziehen könnte. Wir können ja schlecht
+sagen, dass es irgendwie "random" wird in Zukunft -- "random" ist nicht gut, 
+"random" ist, zumindest für einen Forecast, kein Kompliment, ähnlich wie es 
+ für [Egg Fried Rice](https://youtu.be/t_KdbASIkB8?si=gS0LXRIF6rxClm4k&t=454) 
+ kein Kompliment ist.
+ 
+[![](media/uncle_roger_meme.jpg)](https://youtu.be/t_KdbASIkB8?si=gS0LXRIF6rxClm4k&t=454)
+
+
+
+### Forecasts mit `stan` und `statespacer`
+
+Also hier ganz konkret der `stan` Code zum forecasten. Der obere Teil ist ident zu vorher.
+Unten kommt ein neuer Block dazu: `generated quantities`. In diesem Block
+werden die jeweils aktuellen Estimates genommen und verarbeitet.
+In diesem Fall wird ein Forecast gemacht, weil die Zeitachse um 25 erweitert wird.
+Warum die Länge des Zeithorizonts ziemlich wurscht ist in diesem Fall sehen 
+wir gleich in @fig-dat1-fitted-fc-dy.
+
+```{.stan}
+//--> STAN: local_level_model
+data {
+  int<lower=0> N; // Anzahl der Beobachtungen
+  int<lower=0> NPRED; // Anzahl Predictions #<1>
+  vector[N] y; // Beobachtungen
+}
+
+parameters {
+  vector[N] tau; // latenter Status 
+  real<lower=0> xi; // Sd - je nachdem wie sich tau 'bewegt'
+  real<lower=0> epsilon; // Error Term für die Obs
+}
+
+model {
+  tau[1] ~ normal(0, 10); // Prior für ersten latenten Status
+  
+  // state equation
+  for (p in 2:N)
+    tau[p] ~ normal(tau[p-1], xi);
+  
+  // measurement equations
+  for (n in 1:N)
+    y[n] ~ normal(tau[n], epsilon);
+    
+ // Priors fuer die Varianzen     
+  xi ~ student_t(2, 0, 3); 
+  epsilon ~ student_t(2, 0, 3);
+}
+
+generated quantities{ #<2>
+   vector[NPRED+1] pred; #<3>
+   pred[1] = tau[N];
+    for (fc in 2:(NPRED+1))
+        pred[fc] = pred[fc-1];
+}
+```
+1. Anzahl Zeitpunkte in der Zukunft für die der Forecast gemacht werden soll
+2. Ein ganz neuer Block, der in jedem Durchgang die NPRED zukünftigen Zeitpunkte predicted
+3. Das letzte $\tau$ wird ganz vorne hingehängt
+
+
+Es ist einerseits erstaunlich, andererseits halt auch kein
+Wunder: Wenn man wenig Info reinpackt, also dem Modell quasi sagt, dass es in der Gegend
+herummeandern kann wie es will, lässt sich kaum ein nicht-trivialer Forecast machen.
+Man muss schon mehr Info reinstecken wenn man substanziellere Predictions will!
+
+
+```{r fit-stan-ssm1-fc}
+#| code-fold: true
+#| code-summary: "Code: Stan Forecast Fit"
+
+if(!file.exists("stan/01_local_level_model_fc.rds")){ #<1>
+# compiles and writes rds in same dir
+ssm1fc = stan_model("stan/01_local_level_model_fc.stan", 
+                  model_name = "ssm1fc",
+                  auto_write = TRUE)
+} else {
+    ssm1fc = readRDS("stan/01_local_level_model_fc.rds")
+}
+
+# daten liste erstellen
+data_list1fc = list(y = dat1$y, #<2>
+                    time = dat1$time, 
+                    N = length(dat1$y),
+                    NPRED = 25) 
+
+fit_ssm1fc = sampling(object = ssm1fc, 
+                data = data_list1fc, 
+                iter = 4000, #<3>
+                cores = 4, #<4>
+                chains = 4)
+
+#tidybayes::get_variables(fit_ssm1fc)
+
+fc_stan_dat1 = tidybayes::gather_draws(model = fit_ssm1fc, pred[i], regex = TRUE) %>% 
+    data.table() %>% 
+    .[, .(mean_pred = mean(.value),
+          lower = quantile(.value, 0.025),
+          upper = quantile(.value, 0.975)), keyby = c(".variable", "i")] %>% 
+    .[-1,] %>% 
+    .[, time := 100 + (i-1)]
+```
+
+```{r ssm1-statespace-fit}
+#| code-fold: true
+#| message: false
+#| code-summary: "Code: Statespacer fit"
+
+y_spacer = dat1[, .(y)] %>% as.matrix()
+
+spacer_res = statespacer::statespacer(y = y_spacer, local_level_ind = TRUE)
+spacer_pred = predict(spacer_res, forecast_period = 25)
+
+spacer_dt = data.table(spacer_res$predicted$yfit, time = 1:100) %>% 
+    setnames("V1", "y_pred")
+
+dat1[, spacer_tau := spacer_dt$y_pred]
+
+spacer_pred_dt = data.table(y = spacer_pred$y_fc[,1], time = 100 + (1:25) )
+
+```
+
+
+
+Im ersten Moment ist es allerdings doch überraschend, dass der Predict tatsächlich eine
+Konstante ist. Man rechnet also nicht unkomplexe Modelle für SO einen Forecast?
+Ja darf er das denn der `stan`?
+Da fällt mir einer meiner lieben Statistik Professoren ein der im 
+Zusammenhang mit Zeitreihen immer meinte, dass der 0 Schätzer 
+(also einfach eine horizontale Linie) überraschend oft kein so schlechter 
+Schätzer ist. Das finden `stan` und `statespacer` auch. Letzteres package durfte 
+auch noch die Daten bekommen, um den doch etwas primitiv wirkenden Output nochmal
+zu validieren.
+
+@fig-dat1-fitted-fc-dy zeigt nicht nur den Forecast, sondern auch die fitted-values
+von `stan` und `statespacer` im Zeitraum mit vorhandenen Daten. 
+Tatsächlich unterscheiden sich die Modelle in den im Beobachtungszeitraum
+sichtbar voneinander. Umso interessanter ist, dass sie sich im Prognosezeitraum
+überraschend einig sind.
+
+Beide wissen, dass sie nichts wissen -- oder zumindest sehr wenig.
+
+
+
+```{r plt1-ssm1fc2}
+#| fig-width: 9
+#| fig-height: 6
+#| code-fold: true
+#| label: "fig-dat1-fitted-fc"
+#| fig-cap: "Local Level zu Datensatz 1 inkl. Forecasts (Modelle von: Stan und Statespacer)"
+#| code-summary: "Code: Forecast Grafik"
+#| fig-showtext: true
+#| eval: false
+#| include: false
+
+recti = data.frame(xmin = 100, xmax = Inf, ymin = -Inf, ymax = Inf)
+
+fc_stan_dat1[, Modell := "stan"]
+spacer_pred_dt[, Modell := "statespacer"]
+
+dat1_melted = dat1[, .(true_values, y, time, est_tau1, spacer_tau)] %>% 
+    melt(id.vars = c("time", "y")) %>% 
+    .[variable == "est_tau1", Modell := "stan"] %>% 
+    .[variable == "spacer_tau", Modell := "statespacer"] %>% 
+    .[variable == "true_values", Modell := "true value"]
+
+
+t <- list(
+  family = "barr",
+  size = 14)
+    
+p = ggplot(data = dat1_melted, aes(x = time, y = y)) + 
+    geom_rect(data = recti, aes(xmin = xmin, 
+                                xmax = xmax, 
+                                ymin = ymin, 
+                                ymax = ymax), 
+              alpha = 0.2, fill = "lightgrey", inherit.aes = FALSE) + 
+    geom_vline(xintercept = 100, linetype = 2, alpha = 0.2) +
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = value, color = Modell), alpha = 0.6) + 
+    geom_line(data = fc_stan_dat1, aes(y = mean_pred, color = Modell), linetype = 2) +
+    geom_line(data = spacer_pred_dt, aes(y = y, color = Modell), linetype = 2) +
+    labs(title = "Local Level Model Predicts", subtitle = "2 Modelle 2 Predicts + True Values") + 
+    scale_color_paletteer_d("trekcolors::starfleet") + 
+    coord_cartesian(xlim = c(0,125)) + 
+    scale_x_continuous(expand = c(0, 0)) +
+    ssm_theme()
+
+print(p)
+#ggplotly(p) %>% plotly::layout(font=t)
+
+```
+
+```{r plt1-ssm1fc3}
+#| fig-width: 9
+#| fig-height: 6
+#| code-fold: true
+#| label: "fig-dat1-fitted-fc-dy"
+#| fig-cap: "Local Level zu Datensatz 1 inkl. Forecasts (Modelle von: Stan und Statespacer)"
+#| code-summary: "Code: Forecast Grafik"
+#| fig-showtext: true
+
+dat_dy = dat1[, .(time, true_values, est_tau1, spacer_tau)] %>% 
+    setnames(old = c("true_values", "est_tau1", "spacer_tau"),
+             new = c("true", "stan", "statespace"))
+
+stan_pred   = fc_stan_dat1[,.(time, stan = mean_pred)]
+spacer_pred = spacer_pred_dt[,.(time, statespace = y)]
+
+spacer_pred[stan_pred, stan := i.stan, on = "time"]
+
+dat_dy1 = rbind(dat_dy, spacer_pred, fill = TRUE)
+
+dygraph(dat_dy1, main = "Local Level Model Predicts", height = 660) %>% 
+    dySeries(step = TRUE, name = c("true")) %>% 
+     dySeries(step = TRUE, name = c("stan")) %>% 
+     dySeries(step = TRUE, name = c("statespace")) %>% 
+    dyHighlight(highlightSeriesOpts = list(strokeWidth = 1.5)) %>% 
+    dyEvent("100", "Prognose", labelLoc = "bottom") %>% 
+    dyRangeSelector(dateWindow = c(1, 125), 
+                    fillColor = paletteer_d("trekcolors::starfleet")[1],
+                    strokeColor = paletteer_d("trekcolors::starfleet")[1]) %>% 
+    dyOptions(colors = paletteer_d("trekcolors::starfleet"), 
+              drawGrid = TRUE, 
+              axisLineColor = "grey",
+              gridLineColor = "lightgray") %>% 
+    dyCSS(css = "../dygraph_css.css")
+
+
+```
+
+
+
+
+
+# Ausblick
+
+Tja, ein komplexes Modell liefert eine fast triviale Vorhersage? Können wir
+das Modell noch komplexer machen und die Vorhersage vielleicht weniger trivial?
+Müssen dazu unsere Notebooks noch mehr glühen? Kann man diese Modelle auch
+für echte Daten verwenden, oder muss ich mir immer alles selbst simulieren?
+
+In Teil 2 werden wir dann unser aktuelles Modell noch weiter ausbauen.
+Ob uns die Grafikkarte dabei abbrennt -- wir werden es sehen. Wenn wir Glück haben,
+bleibt uns vielleicht ein bisschen mehr übrig als eine horizontale Linie.
+
+<br>
+
+::: {style='text-align:center;'}
+
+
+{{< bi rocket-takeoff size=66px color=#5B1414FF >}}
+
+
+
+:::
+
+
+
+

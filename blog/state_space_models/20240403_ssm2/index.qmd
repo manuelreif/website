@@ -1,0 +1,884 @@
+---
+title: "State Space Models - Teil 2"
+description: "Es geht weiter in der Space Saga. Wir callen nicht nur die Anzahl der bisherigen Parameter von zuletzt, wir raisen sogar. Das bringt Turbulenzen in den Alltag so mancher Algorithmen. Soviel kann ebenfalls noch verraten: Wir müssen einen Slope finden und es gibt wieder nice Grafiken zum watchen!"
+author: Manuel Reif 
+date: 2024-05-20
+lang: de
+categories: [R, stan, state-space-models]
+draft: false 
+highlight-style: monokai
+image: media/startbild2.png
+format:
+  html:
+    css: ssm2.css
+execute:
+    eval: false
+    message: false
+    echo: false
+    warning: false
+bibliography: ../texts.bib
+filters:
+   - include-code-files
+---
+
+# Local Linear Trend Model
+
+```{r load-anything}
+#| eval: true
+#| include: false
+library(data.table)
+library(magrittr)
+library(parallel)
+library(glue)
+
+library(rstan)
+library(tidybayes)
+library(statespacer)
+library(KFAS)
+library(MARSS)
+
+library(ggplot2)
+library(geomtextpath)
+library(patchwork)
+library(paletteer)
+library(latex2exp)
+library(ggrepel)
+library(dygraphs)
+library(showtext)
+
+library(gt)
+library(gtExtras)
+
+
+source("../R/sim_ssm_lolemo.R") # r functions
+source("../R/sim_ssm_drift.R") # r functions
+source("../R/plot_functions.R") # graph and sim functions
+
+## Loading Google fonts (https://fonts.google.com/)
+font_add_google("Barlow Semi Condensed", "barr")
+```
+
+```{r theme}
+#| eval: true
+#| include: true
+#| code-fold: true
+#| code-summary: "Code: Theme"
+
+ssm_theme <- function(){
+    
+    theme_bw() + 
+    theme(panel.grid.minor = element_blank(),
+          plot.title = element_text(family = "barr", face = "plain",size = rel(1.65)),
+          plot.subtitle = element_text(family = "barr", face = "plain"),
+          axis.title = element_text(family = "barr", face = "plain"),
+          text = element_text(family = "barr", face = "plain"),
+          panel.grid.major.x = element_blank(),
+          panel.border = element_rect(color = "lightgrey"),
+          legend.position='bottom')
+    
+}
+
+ssm_theme2 <- function(){
+    
+    theme_bw() + 
+    theme(panel.grid.minor = element_blank(),
+          plot.title = element_text(family = "barr", face = "plain",size = rel(1.65)),
+          #plot.subtitle = element_text(family = "barr", face = "plain"),
+          axis.title.y = element_text(family = "barr", face = "plain"),
+          axis.text = element_text(family = "barr", face = "plain"),
+          panel.grid.major.x = element_blank(),
+          panel.border = element_rect(color = "lightgrey"),
+          legend.position='bottom')
+    
+}
+```
+
+<img src="media/more_parameters.gif" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Ok, bisher hatten wir nur einen Intercept in unserem State Space Model
+der sich je nach Daten "random" bewegt. Zusätzlich nimmt man an, dass man einen 
+Measurement Error hat ([siehe dazu auch Teil 1 zu den State-Space Models](../20240303_ssm1)).
+Das Ganze schaut ziemlich spektakulär aus, endete aber
+damit, dass die Forecasts Konstanten sind. Wenn wir aber davon ausgehen,
+dass sich bestehende Trends in die Zukunft fortsetzen können, ist das sicher 
+kein ideales Modell. Es ist zu naiv und zu einfach gestrickt. Wir wollen 
+aber nicht judgy sein -- jeder von uns ist mal naiv -- das macht uns alle zu 
+Modellen.
+
+Hier wird es jetzt richtig abgestatespaced, denn wir wollen viel mehr als
+wir bisher von diesen Modellen bekommen haben!
+Und das bekommen wir nur wenn wir **noch mehr Parameter** an diese Modelle 
+verfüttern!
+Also droppen wir einfach einen Parameter rein -- oder vielleicht nicht nur einen alleine
+sondern wir klotzen einfach analog zum Style des bisherigen State Space Models
+für jeden Zeitpunkt einen eigenen Parameter dazu! Der Slope soll sich also je 
+nach Zeitpunkt ändern können. Das klingt extrem wild weil es extrem wild ist.
+
+## Was ist neu?
+
+Bevor wir aber die Anzahl der Parameter radikal erhöhen, gehen wir einen Schritt 
+zurück und betrachten ein Modell das angenhem wenig Parameter hat und stellen uns
+die Frage:
+Wie schaut denn eigentlich ein Slope in einem einfachen linearen Modell 
+(Einfachregression) aus? Unten
+ist eben dieses Modell dargestellt. 
+Der Slope ($\beta_1$) gibt die Veränderung von y an, wenn x um **eine Einheit** 
+größer wird. Also konkret: wenn $\beta_1 = 2$ ist, dann erhöht sich y um 2 wenn 
+x sich um 1 erhöht.
+That's it. 
+
+```{=tex}
+\begin{align}
+y &= \alpha + \beta_1\,x + \epsilon & |  \quad \alpha = Intercept,\,\beta_1 = Slope
+\end{align}
+```
+
+
+<img src="media/where_slope_pic.jpg" alt="State Space Model" style="float: left; width: 28%; margin-right: 20px; margin-bottom: 10px;"/>
+
+Mit diesem Wissen im Hinterkopf schauen wir uns nun das erweiterte State-Space Model wie es 
+hier unten angeführt ist. Es gibt einen neuen Parameter $\nu$ und schon wieder 
+einen Error $\zeta$, den wir mal wieder als normalverteilt annehmen. Laut Lehrbuch
+sind die drei Gleichungen dann das State-Space Model mit Slope. Die
+Frage die sich aufdrängt ist: Wo ist hier denn eigentlich jetzt der Slope? Und als
+ergänzende Frage: In einem linearen Modell hab ich eine Variable x die y 
+erklären soll. Also z. B. soll die Körpermasse durch die Körperhöhe erklärt oder
+vorhergesagt werden -- d. h. es gibt 2 Variablen. In unserem State Space Model haben
+wir (bis jetzt) nur eine einzige Variable -- nämlich die Werte die y in der
+Zeitreihe annimmt.
+
+
+
+```{=tex}
+\begin{align}
+y_t &= \tau_t + \epsilon_t  & \epsilon_t &\sim \mathcal{N}(0, \sigma_{\epsilon}) \label{eq:ssm2-slope1}\\
+\tau_{t+1} &= \tau_{t} + \nu_{t} + \xi_{t} & \xi_{t}&\sim \mathcal{N}(0, \sigma_{\xi})\\
+\nu_{t+1} &= \nu_{t} + \zeta_{t} & \zeta_{t}&\sim \mathcal{N}(0, \sigma_{\zeta})
+\end{align}
+```
+
+
+Also schauen wir uns das mal genauer an. Wir gehen genauso vor wie
+in @ssm-book-intro2007 dargestellt und nehmen an, dass $\xi_1 = 0$ und $\zeta_1 = 0$.
+Das machen wir um uns die lästigen Random Effects Terme in weiterer Folge zu ersparen, also 
+um das Ganze einfacher zu gestalten. Wenn wir diese Terme 0 setzen, fällt es deutlich leichter
+herauszufinden wo denn nun eigentlich der Slope und das x versteckt sind.
+Also wir beginnen bei $t = 1$, also der ersten Beobachtung. 
+
+
+::: {.callout-tip icon="false"}
+## $t = 1$
+
+```{=tex}
+\begin{align}
+y_1 &= \tau_1 + \epsilon_1\\
+\tau_{2} &= \tau_{1} + \nu_{1} + \xi_{1} \quad \rightarrow \quad \xi_{1} = 0 \quad \rightarrow \quad \tau_{2} = \tau_{1} + \nu_{1} \\
+\nu_{2} &= \nu_{1} + \zeta_{t} \quad \quad \quad \, \rightarrow  \quad \zeta_{t} = 0 \quad \rightarrow \quad  \nu_{2} = \nu_{1}\\
+&\text{das heisst:}\\
+\tau_{2} &= \tau_{1} + \nu_{1} &\\
+\nu_{2} &= \nu_{1} &
+\end{align}
+```
+:::
+
+
+Die wesentlichste Erkenntnis bei  $t = 1$ ist, dass $\nu_{2} = \nu_{1}$ 
+(weil $\zeta_{t} = 0$).
+Wir bewegen uns in weiterer Folge die Timeline nach vorne. Wir rattern (fast)
+alle Zeitpunkte (t) durch, und versuchen alle Terme die uns bekannt vorkommen
+geschickt zu substituieren und zusammenzufassen. 
+Dabei sammeln wir immer mehr $\nu$s zusammen, die ja alle gleich zu sein scheinen.
+Daher fassen wir sie als ein Vielfaches von $\nu_1$ kompakt zusammen.
+
+
+::: {.callout-tip icon="false"}
+## $t = 2$
+```{=tex}
+\begin{align}
+y_2 &= \tau_2 + \epsilon_2\\
+y_2 &= \underbrace{\tau_{1} + \nu_{1}}_{\tau_2} + \epsilon_2 \quad | \quad \tau_2 \text{ eingesetzt von t = 1}\\
+\\
+\hline \\
+\tau_{3} &= \tau_{2} + \nu_{2} \\
+\tau_{3} &= \underbrace{\tau_{1} + \nu_{1}}_{\tau_2} + \nu_{2} \quad | \quad \tau_2 \text{ eingesetzt von t = 1} \\
+\tau_{3} &= \tau_{1} + \nu_{1} + \nu_{1} \quad | \quad \nu_2 = \nu_1 \text{ eingesetzt von t = 1}\\
+\tau_{3} &= \tau_{1} + 2\,\nu_{1} \\
+\\
+\hline \\
+\nu_{3} &= \nu_{2}
+\end{align}
+```
+:::
+
+
+::: {.callout-tip icon="false"}
+## $t = 3$
+```{=tex}
+\begin{align}
+y_3 &= \tau_3 + \epsilon_3\\
+y_3 &= \tau_{1} + 2\,\nu_{1} + \epsilon_3\\
+\\
+\hline \\
+\tau_{4} &= \tau_{3} + \nu_{3} \\
+\tau_{4} &= \underbrace{\tau_{1} + 2\,\nu_{1}}_{\tau_3} + \nu_{3} \quad | \quad \tau_3 \text{ eingesetzt von t = 2} \\
+\tau_{4} &= \tau_{1} + 2\,\nu_{1} + \nu_{1} \quad | \quad \nu_2 = \nu_1 \text{ und } \nu_3 = \nu_2 \,\text{ daher: } \nu_3 = \nu_1 \\
+\tau_{4} &= \tau_{1} + 3\,\nu_{1} \\
+\\
+\hline \\
+\nu_{4} &= \nu_{3}
+\end{align}
+```
+:::
+
+Ok, nach $t = 3$ ist das Prinzip halbwegs klar geworden und wir können mit länger
+draufschauen ein allgemeines Prinzip herleiten.
+Damit sehen wir **warum** $\nu$ 
+der Slope ist und dass alles an **t** hängt.
+Denn wenn die Zeit um eine Einheit fortschreitet, wird immer genau $\nu$ dazuaddiert.
+In unserem Fall sind alle $\nu$s ident, also wird immer dieselbe Konstante
+dazuaddiert. Das entspricht genau der Definition eines Slopes wie wir es oben 
+im einfachen linearen Modell gesehen haben.
+
+Kurz: Wenn man also den Random Term $\zeta$
+weglässt, ist $\nu$ der Slope der den globalen Anstieg darstellt, quasi
+wie stark y steigt wenn die Zeit um eine Einheit steigt!
+Tbh: Ohne den ganzen Random-Terms ist das auch wirklich einfacher zu erkennen. 
+
+
+::: {.callout-tip icon="false"}
+## state equations allgemein
+```{=tex}
+\begin{align}
+y_t &= \tau_t + \epsilon_t\\
+y_t &= \tau_1 + \nu_1\,g_t + \epsilon_t \quad \text{wobei:} \quad g_t = t - 1
+\end{align}
+```
+:::
+
+
+Jetzt kennen wir den Sinn der neuen Parameter. Allerdings ist die Frage wie denn
+nun die Parameter zusammenspielen? Kann man diese auch genügend gut auseinanderhalten?
+Wenn ich eine lineare Regression ansehe, kann ich vielleicht den Slope erraten.
+Kann ich das hier auch? Wie schauen Daten aus die mit einer bestimmten Parameterkombination
+simuliert werden?
+
+
+## Simulation
+
+Interessant ist: Mit den selben Parametern kann der Verlauf völlig unterschiedlich aussehen
+wie man in Abbildung @fig-sim-slope1 und @fig-sim-slope2 sehen kann! Das 
+ist insofern nicht verwunderlich, als ja nur die Standardabweichungen
+definiert sind und somit ein "rauf" oder "runter" sich im Wesentlichen
+durch Zufall ergibt!
+Es wäre jedenfalls interessant zu sehen und verstehen wie "random" diese
+Verläufe nun wirklich sind. Dafür reichen 2 Simulationen nicht -- wir brauchen
+mehr simulierte Zeitreihen.
+
+::: {.panel-tabset}
+
+## Erste Simulation
+
+```{r sim-ssm2-1}
+#| eval: true
+set.seed(112)
+dat1_drift = sim_state_space_d(time_points = 100,
+                               slope = 0,
+                               sd_xi = 1, 
+                               sd_zeta = 0.1, 
+                               sd_epsilon = 2) %>% 
+    .[, resid := y - true_values] 
+
+
+```
+
+
+
+```{r sim-ssm2-1-plot}
+#| echo: true
+#| eval: true
+#| fig-width: 9 
+#| fig-height: 5
+#| code-fold: true
+#| fig-showtext: true
+#| fig-cap: "Simulierte Daten 1"
+#| label: fig-sim-slope1
+#| code-summary: "Code: Grafik mit simulierten Daten"
+
+subtxt = "$\\sigma_{\\xi} = [sd_xi];
+\\phantom{x} sigma_{\\epsilon} = [sd_epsilon];
+\\phantom{x}  sigma_{\\zeta} = [sd_zeta]$"  
+
+subtxt_glued = glue(subtxt, .open = "[", .close = "]", 
+                    sd_zeta = 0.1, 
+                    sd_epsilon = 2, 
+                    sd_xi = 1,
+                    slope = 0)
+
+p1 = ggplot(data = dat1_drift, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), color = paletteer_d("trekcolors::starfleet")[2]) +
+    labs(title = "Simulation 1 - State Space Model", subtitle = latex2exp::TeX(subtxt_glued)) +
+    ssm_theme2() +
+    theme(axis.text.x =  element_text(family = "barr", face = "plain"))
+
+p1
+```
+
+## Zweite Simulation
+
+
+```{r sim-ssm2-2}
+#| eval: true
+set.seed(113)
+dat1_drift2 = sim_state_space_d(time_points = 100,
+                               slope = 0,
+                               sd_xi = 1, 
+                               sd_zeta = 0.1, 
+                               sd_epsilon = 2) %>% 
+    .[, resid := y - true_values] 
+```
+
+
+
+```{r sim-ssm2-2-plot}
+#| echo: true
+#| eval: true
+#| fig-width: 9 
+#| fig-height: 5
+#| code-fold: true
+#| fig-showtext: true
+#| fig-cap: "Simulierte Daten 2"
+#| label: fig-sim-slope2
+#| code-summary: "Code: Grafik mit simulierten Daten"
+p1 = ggplot(data = dat1_drift2, aes(x = time, y = y)) + 
+    geom_point(shape = 1, alpha = 0.8) + 
+    geom_step(aes(y = true_values), color = paletteer_d("trekcolors::starfleet")[2]) +
+    labs(title = "Simulation 2 - State Space Model", subtitle = latex2exp::TeX(subtxt_glued)) +
+    ssm_theme2() + 
+    theme(axis.text.x =  element_text(family = "barr", face = "plain"))
+
+p1
+
+```
+
+:::
+
+
+Wir betrachten hier also gleich 1000 Simulationen gleichzeitig, um zu sehen, 
+inwiefern sich die Verläufe voneinander
+unterscheiden und auch wie die unterschiedlichen Parameter des State Space Models 
+ineinander greifen.
+Also: Was für einen Unterschied macht es eigentlich, wenn die Parameter sich ändern?
+
+Um auch einen fixen Trend in der Simulation einbauen zu können, wurde hier
+das State Space Model um einen Parameter $\beta$ erweitert, der den langfristigen,
+zeitunabhängigen overall Trend der Zeitreihe angibt.
+
+```{=tex}
+\begin{align}
+y_t &= \tau_t + \epsilon_t  & \epsilon_t &\sim \mathcal{N}(0, \sigma_{\epsilon})\\
+\tau_{t+1} &= \tau_{t} + \beta + \nu_{t} + \xi_{t} & \xi_{t}&\sim \mathcal{N}(0, \sigma_{\xi})\\
+\nu_{t+1} &= \nu_{t} + \zeta_{t} & \zeta_{t}&\sim \mathcal{N}(0, \sigma_{\zeta})
+\end{align}
+```
+
+Anhand der bloßen Verläufe kann man die Ausprägungen der Parameter kaum abschätzen 
+(siehe jeweils das oberste Panel z. B. in @fig-sim1000-1 ff.). Die 1000 simulierten Zeitreihen 
+starten an der selben Position und ergeben zusammengenommen einen 
+trichterartigen Verlauf. Wie weit die Linien auseinandergehen hängt von den
+Parametern ab. Das Auge erkennt aber nicht welcher Parameter nun welche Ausprägung
+hat.
+
+
+<img src="media/autoreg.jpg" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Dabei hilft uns der Density Plot, der immer im 2. Panel zu sehen ist.
+Die Density beschreibt die Häufigkeit, wie oft der nachfolgende True Value größer ist
+als der aktuelle True Value. Sammelt sich die meiste Masse in der Mitte, bedeutet das,
+dass es ein Coinflip ist ob der nächste Wert höher ist oder nicht. Sammelt sich
+die Masse an den Enden, bedeutet das, dass die Zeitreihe eine eindeutige "Meinung" 
+bezüglich des nachfolgenden Werts hat. Entweder ist die Wahrscheinlichkeit deutlich
+zugunsten eines höheren oder eines niedrigeren Werts.
+Wenn $\sigma_{\zeta}$ klein ist, sammelt sich die Masse in der Mitte. Dann 
+stehen die Chancen eben Fifty Fifty ob der nächste Wert höher ist oder nicht.
+Wenn $\sigma_{\zeta}$ im Verhältnis größer wird, dann gibt es eindeutige Häufigungen
+an den Rändern. Dann bleibt der Wert quasi hoch, wenn er zuvor hoch war,
+oder niedrig wenn er zuvor niedrig war.
+
+In Panel 3 wird die Autokorrelation mit den letzten 15 Werten dargestellt. 
+Die senkrechte strichlierte Linie reicht bis
+zum Median der Korrelation über die 1000 Simulationen, während die Box den Abstand zwischen
+dem 25\ % Percentil und dem 75\ % Percentil darstellen -- also im Wesentlichen
+die Box eines Boxplots darstellt. In allen Zeitreihen ist die mittlere
+Autokorrelation vergleichbar groß -- allerdings ist die Schwankung bei $\beta = 0$ und 
+niedrigem $\sigma_{\zeta}$ am höchsten.
+
+
+Meine Conclusio aus diesen Simulationen ist:
+
+1. Aus einer Zeitreihe die jweiligen Parameter intuitiv zu schätzen scheint 
+unmöglich (für mich)
+2. Weil alle Zeitreihen irgendwie gleich aussehen
+3. Die Unterschiede zeigen sich, wenn man sich 2 aufeinanderfolgende Werte ansehen.
+
+
+
+::: {.panel-tabset}
+
+## Sim 1
+
+```{r ssm2-double-plot-sim1}
+#| fig-width: 9
+#| fig-height: 9.5
+#| fig-showtext: true
+#| eval: true
+#| fig-cap: "1000 Mal Daten simuliert ohne fixen Trend. Hohe Varianz bei \u03BE, niedrige bei \u03B6."
+#| label: fig-sim1000-1
+
+set.seed(443)
+musi1 = multi_sim_ssm2(time_points = 100, 
+                       slope = 0, 
+                       sd_xi = 1, 
+                       sd_zeta = 0.1, 
+                       sd_epsilon = 2)
+
+pp1 = multi_sim_plot(musi1)
+pp2 = multi_plot_density(musi1)
+pp3 = multi_plot_acf(musi1)
+pp1 + pp2 + pp3 + plot_layout(axes = "collect", ncol = 1, heights = c(3,2,2))
+```
+
+## Sim 2
+
+```{r ssm2-double-plot-sim2}
+#| fig-width: 9
+#| fig-height: 9.5
+#| fig-showtext: true
+#| eval: true
+#| fig-cap: "1000 Mal Daten simuliert ohne fixen Trend. Varianz bei \u03BE und \u03B6 gleich hoch."
+#| label: fig-sim1000-2
+#| 
+set.seed(444)
+musi2 = multi_sim_ssm2(time_points = 100, 
+                       slope = 0, 
+                       sd_xi = 1, 
+                       sd_zeta = 1, 
+                       sd_epsilon = 2)
+
+pp1 = multi_sim_plot(musi2)
+pp2 = multi_plot_density(musi2)
+pp3 = multi_plot_acf(musi2)
+pp1 + pp2 + pp3 + plot_layout(axes = "collect", ncol = 1)
+```
+
+## Sim 3
+
+```{r ssm2-double-plot-sim3}
+#| fig-width: 9
+#| fig-height: 9.5
+#| fig-showtext: true
+#| eval: true
+#| fig-cap: "1000 Mal Daten simuliert ohne fixen Trend. Niedrige Varianz bei \u03BE, hohe bei \u03B6."
+#| label: fig-sim1000-3
+
+set.seed(445)
+musi3 = multi_sim_ssm2(time_points = 100, 
+                       slope = 0, 
+                       sd_xi = 0.1, 
+                       sd_zeta = 1, 
+                       sd_epsilon = 2)
+
+pp1 = multi_sim_plot(musi3)
+pp2 = multi_plot_density(musi3)
+pp3 = multi_plot_acf(musi3)
+pp1 + pp2 + pp3 + plot_layout(axes = "collect", ncol = 1)
+```
+
+## Sim 4
+
+```{r ssm2-double-plot-sim4}
+#| fig-width: 9
+#| fig-height: 9.5
+#| fig-showtext: true
+#| eval: true
+#| fig-cap: "1000 Mal Daten simuliert mit fixem Trend. Hohe Varianz bei \u03BE, niedrige bei \u03B6."
+#| label: fig-sim1000-4
+
+set.seed(446)
+musi4 = multi_sim_ssm2(time_points = 100, 
+                       slope = 1, 
+                       sd_xi = 1, 
+                       sd_zeta = 0.1, 
+                       sd_epsilon = 2)
+
+pp1 = multi_sim_plot(musi4)
+pp2 = multi_plot_density(musi4)
+pp3 = multi_plot_acf(musi4)
+pp1 + pp2 + pp3 + plot_layout(axes = "collect", ncol = 1)
+```
+
+## Sim 5
+
+```{r ssm2-double-plot-sim5}
+#| fig-width: 9
+#| fig-height: 9.5
+#| fig-showtext: true
+#| eval: true
+#| fig-cap: "1000 Mal Daten simuliert mit fixem Trend. Gleich hohe Varianz bei \u03BE und \u03B6."
+#| label: fig-sim1000-5
+
+set.seed(446)
+musi4 = multi_sim_ssm2(time_points = 100, 
+                       slope = 1, 
+                       sd_xi = 0.2, 
+                       sd_zeta = 0.2, 
+                       sd_epsilon = 2)
+
+pp1 = multi_sim_plot(musi4)
+pp2 = multi_plot_density(musi4)
+pp3 = multi_plot_acf(musi4)
+pp1 + pp2 + pp3 + plot_layout(axes = "collect", ncol = 1)
+```
+
+:::
+
+
+
+## `stan` konvergiert nicht
+
+Ich mache es kurz. Es ist viel Zeit draufgegangen um diese Modelle in Stan laufen zu lassen.
+Auch mit $> 10 000$ Samples konvergierten die Modelle nicht wenn man sie so
+simpel implementiert wie ich das geplant hatte.
+Daher wurden für diese Modelle andere Packages verwendet.
+
+
+```{.stan include="stan/02_drift_model.stan"}
+
+```
+
+
+```{r fit-stan-ssm1}
+#| code-fold: true
+#| code-summary: "Code: Stan Model wird gefittet"
+
+if(!file.exists("stan/02_drift_model.rds")){
+# compiles and writes rds in same dir
+ssm2 = stan_model("stan/02_drift_model.stan", 
+                  model_name = "ssm2",
+                  auto_write = TRUE)
+} else {
+    ssm2 = readRDS("stan/02_drift_model.rds")
+}
+
+# daten liste erstellen
+data_list1 = list(y = dat1_drift$y,
+                 N = length(dat1_drift$y),
+                 NPRED = 10)
+
+fit_ssm2 = sampling(object = ssm2, 
+                data = data_list1, 
+                iter = 8000,
+                cores = 6,
+                chains = 6)
+
+print(fit_ssm2, pars = c("sd_epsilon", "sd_zeta", "sd_xi"))
+```
+
+## `statespacer`, `KFAS` und `MARSS` springen ein
+
+Die gefailte ad-hoc Implementierung des State-Space Models in `stan`
+löst unmittelbar roten Alarm aus.
+Nun darf nicht an der falschen Stelle gespart werden. Als Ersatz werden
+3 großartige andere R packages nominiert um den Tag zu retten.
+`statespacer` is kein Neuling hier, denn es kam auch schon in 
+[Teil 1](../20240303_ssm1) zum Einsatz. Es bringt auch noch seine Freunde
+[KFAS](https://cran.r-project.org/web/packages/KFAS/index.html) und [MARSS](https://atsa-es.github.io/MARSS/) mit. 
+Mit der Hoffnung, dass nicht wie im alten Sprichwort viele R-Packages 
+das State-Space Kontinuum verzerren.
+
+<img src="media/three_pack.jpg" alt="State Space Model" style="float: left; width: 34%; margin-right: 20px; margin-bottom: 10px;"/>
+
+Die 3 sollen nun die erste Simulation, die in @fig-sim-slope2 
+zu sehen ist, fitten! Die gefitteten Zeitreihen samt Forecast für die nächsten 
+25 Zeitpunkte ist in @fig-ssm2-statespacer-dygraph1 zu sehen!
+Das Ergebnis ist nun etwas spannender als zuletzt, denn wir haben jetzt
+keine langweilige horizontale Linie mehr, sondern der Predict ist bei allen 
+unseren Modellen eine Gerade mit positiven Slope.
+Intuitiv passt das auch wenn man die Zeitreihe betrachtet, denn sie steigt ja
+sichtlich auch über die Zeit. Tatsächlich wurde die Zeitreihe aber ohne 'stabilen'
+Slope simuliert und trotzdem wird ein weiter steigender Trend vorhergesagt. 
+Alle 3 Modelle 'erkennen' offensichtlich diesen 'Trend' und setzen ihn auch fort.
+Während bei `statespacer` und `KFAS` bezüglich des Slopes weitgehend Einigkeit besteht,
+wird `MARSS` seinem Ruf als Kriegsplanet gerecht und streut etwas Zwietracht 
+in der angenehmen Gleichförmigkeit der steigendes Slopes.
+Die `MARSS` Verläufe steigen nicht ganz so stark^[Dies ist keineswegs ein horoskopisches Statement. Ich würde Ihnen aber trotzdem empfehlen in nächster Zeit keine großen Investitionen zu tätigen, denn für ihre im übernächsten Monat nun nicht mehr überraschend auf Sie zukommende Liebe, sollten Sie nicht nur finanziell unabhängig wirken, sondern dies auch sein!]. 
+Noch dazu darf
+`MARSS` gleich 2 Linien in der Abbildung beitragen, weil offensichtlich
+die gewählte Art der Optimierung (BFGS vs. KEM) wesentlich den Verlauf des 
+predicts beeinflusst^[Insbesondere konvergierte `MARSS` erst nach Erhöhung der Iterationen. Bevor der Algorithmus konvergierte, war der Slope negativ! Also achten Sie auf die Warnings!].
+Wir versuchen es positiv zu sehen: Wir haben nun eine Auswahl!
+
+
+<img src="media/smoothed_predicts.jpg" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Die Frage ist nur: Wie kommt das Modell zu **diesem** Slope, wenn doch im Modell
+eigentlich kein fixer Slope definiert wurde? Betrachten wir das exemplarisch beim `statespacer` package. Die Frage lautet: Wie wird die Steigung festgelegt?
+Wenn in R Werte vorhergesagt werden sollen, wird typischerweise die 
+Funktion `predict` verwendet.
+Wenn man `predict` auf ein `statespacer` Modell Objekt anwendet, wird für den
+Forecast der zuletzt geschätzte Slope herangezogen -- denn es werden ja 
+unterschiedliche Slopes für jeden Zeitpunkt geschätzt!
+Genauer gesagt wird nicht der
+gefilterte sondern der **gesmoothte** letzte Slope verwendet. 
+Dieser wird stabil in
+die Zukunft fortgeschrieben, was genau diese Linie ergibt!
+
+So was ist **Smoothing** jetzt eigentlich? Kurz gesagt: Beim Smoothing wird
+die gesamte Zeitreihe verwendet. Zuerst wird **gefiltert**, dabei 'schaut' die
+Zeitreihe quasi nur nach vorne. Am Ende des Filtern, wird mittels Smoothing die gesamte
+Zeitreihe berücksichtigt und nachträglich geglättet und optimiert.
+Damit sollten die Forecasts noch stabiler sein!
+
+
+::: {.panel-tabset}
+
+## `statespacer`
+
+```{r}
+#| eval: true
+#| echo: true
+y_spacer = dat1_drift[, .(y)] %>% as.matrix()
+
+spacer_res = statespacer::statespacer(y = y_spacer, 
+                                      local_level_ind = TRUE, 
+                                      slope_ind = TRUE)
+
+spacer_pred = predict(spacer_res, forecast_period = 25)
+
+forecast_dat = data.table(time = 100 + 1:25, 
+                          y = spacer_pred$y_fc[,1], 
+                          prediction = "pred")
+
+statespacer_fullpred = c(spacer_res$smoothed$a[,1], 
+spacer_pred$y_fc[,1])
+
+statespacer_all = data.table(time = 1:125, 
+                             statespacer = statespacer_fullpred)
+```
+
+```{r}
+if(FALSE){
+# spacer_res$system_matrices$Q
+# spacer_res$system_matrices$H
+spacer_res$system_matrices
+spacer_res$predicted
+
+#diff(spacer_pred$y_fc[,1])
+
+#spacer_res$predicted$a_fc
+spacer_res$system_matrices$T
+spacer_res$system_matrices$R
+
+diff(dat1_drift$y)
+
+spacer_res$predicted$a
+spacer_res$smoothed$a
+spacer_res$filtered$level
+}
+```
+
+## `kfas`
+
+```{r}
+#| eval: true
+#| echo: true
+kfas_mod <- SSModel(y ~ SSMtrend(2, 
+                                 Q = list(matrix(NA), matrix(NA))), 
+                    H = matrix(NA),data = dat1_drift)
+kfas_fit <- fitSSM(kfas_mod, inits = c(1, 1, 1), method = "BFGS")
+
+kfas_pred0 = predict(kfas_fit$model) %>% unclass
+kfas_pred = predict(kfas_fit$model, n.ahead = 25)
+
+kfas_all = data.table(rbind(kfas_pred0, kfas_pred), time = 1:(100 + nrow(kfas_pred))) %>% 
+    setnames(old = "fit", new = "kfas") 
+```
+
+## `MARSS`
+
+```{r}
+#| eval: true
+#| echo: true
+#| 
+Z <- matrix(c(1, 0), nrow = 1)
+B <- matrix(c(1, 1, 0, 1), nrow = 2, byrow = TRUE)
+U <- matrix(0, nrow = 2, ncol = 1)
+A <- matrix(0, nrow = 1, ncol = 1)
+Q <- matrix(list("q11", "q12", "q12", "q22"), nrow = 2, byrow = TRUE) # CV
+R <- matrix("r", nrow = 1)
+x0 <- matrix(c(dat1_drift$y[1], 0), nrow = 2) # start
+
+V0 <- matrix(c(0, 0, 0, 0), nrow = 2, byrow = TRUE)
+diag(V0) <- c(0.01, 0.01)
+
+model_list <- list(
+  Z = Z,
+  B = B,
+  U = U,
+  Q = Q,
+  R = R,
+  A = A,
+  x0 = x0,
+  V0 = V0)
+
+# fit
+fit_marss_bfgs <- MARSS(dat1_drift$y, model = model_list, method = "BFGS")
+fit_marss_kem  <- MARSS(dat1_drift$y, model = model_list, method = "kem", control=list(maxit=10000))
+# predict
+marss_pred_bfgs = predict(fit_marss_bfgs, n.ahead = 25)$pred %>% data.table
+marss_pred_kem  = predict(fit_marss_kem, n.ahead = 25)$pred %>% data.table
+# zamhaengen
+marss_all = marss_pred_bfgs[marss_pred_kem, marss_kem := i.estimate, on = "t"]
+setnames(marss_all, old = c("t","estimate"), new = c("time","marss_bfgs"))
+```
+
+:::
+
+
+```{r}
+#| eval: true
+#| label: "fig-ssm2-statespacer-dygraph1"
+#| fig-cap: "Beobachtete Forecast mit statspacer, KFAS und MARSS."
+#| code-fold: true
+#| code-summary: "Dygraph Code (Achtung lang!)"
+#| echo: true
+#dat_true = dat1_drift[, .(time, y, prediction = "true")]
+
+dat_fin = marss_all %>% copy
+dat_fin[statespacer_all, statespacer := i.statespacer, on = "time"]
+dat_fin[kfas_all, kfas := i.kfas, on = "time"]
+dat_fin[dat1_drift, true_values := i.true_values ,on = "time"]
+
+
+dygraph(dat_fin[, !c(".rownames", "y")], 
+main = "Forecast mit State-Space Model with Slope", height = 660) %>% 
+    #dySeries(name = "y", color = "black", strokeWidth = 0, pointSize = 2, drawPoints = TRUE) %>% 
+    dySeries(step = TRUE, name = "true_values", color = "black") %>% 
+    dySeries(step = FALSE, name = "statespacer") %>% 
+    dySeries(step = FALSE, name = "kfas") %>% 
+    dySeries(step = FALSE, name = "marss_bfgs") %>% 
+    dySeries(step = FALSE, name = "marss_kem") %>% 
+    dyHighlight(highlightSeriesOpts = list(strokeWidth = 1.5)) %>% 
+    dyEvent("100", "Daten / Prognose", labelLoc = "bottom") %>% 
+    dyRangeSelector(dateWindow = c(1, 125), 
+                    fillColor = paletteer_d("trekcolors::starfleet")[2],
+                    strokeColor = paletteer_d("trekcolors::starfleet")[2]) %>% 
+    dyOptions(colors = paletteer_d("trekcolors::starfleet2"), 
+              drawGrid = TRUE, 
+              axisLineColor = "grey",
+              gridLineColor = "lightgray") %>% 
+    dyCSS(css = "../dygraph_css.css") %>% 
+  dyCallbacks(
+      highlightCallback = "function(event, x, points, row, seriesName) {
+        var point = points[0];
+        var content = 'Series: ' + seriesName;
+        var hoverDiv = document.getElementById('hover-info');
+        if (!hoverDiv) {
+          hoverDiv = document.createElement('div');
+          hoverDiv.id = 'hover-info';
+          hoverDiv.className = 'hover-info'; // Apply CSS class
+          document.body.appendChild(hoverDiv);
+        }
+        hoverDiv.innerHTML = content;
+        hoverDiv.style.left = event.clientX + 20 + 'px';
+        hoverDiv.style.top = event.clientY + 20 + 'px';
+        hoverDiv.style.display = 'block';
+      }",
+      unhighlightCallback = "function(event) {
+        var hoverDiv = document.getElementById('hover-info');
+        if (hoverDiv) {
+          hoverDiv.style.display = 'none';
+        }
+      }"
+    )
+```
+
+
+
+
+```{r}
+#| eval: false
+# Load required libraries
+library(dygraphs)
+library(paletteer)
+
+# Assuming dat_fin is your data frame containing the time series data
+dygraph(dat_fin[,-1], 
+main = "Forecast mit State-Space Model with Slope", height = 660) %>% 
+    dySeries(step = TRUE, name = "y", color = "black") %>% 
+    dySeries(step = FALSE, name = "statespacer") %>% 
+    dySeries(step = FALSE, name = "kfas") %>% 
+    dySeries(step = FALSE, name = "marss_bfgs") %>% 
+    dySeries(step = FALSE, name = "marss_kem") %>% 
+    dyHighlight(highlightSeriesOpts = list(strokeWidth = 1.5)) %>% 
+    dyEvent("100", "Daten / Prognose", labelLoc = "bottom") %>% 
+    dyRangeSelector(dateWindow = c(1, 125), 
+                    fillColor = paletteer_d("trekcolors::starfleet")[2],
+                    strokeColor = paletteer_d("trekcolors::starfleet")[2]) %>% 
+    dyOptions(colors = paletteer_d("trekcolors::starfleet2"), 
+              drawGrid = TRUE, 
+              axisLineColor = "grey",
+              gridLineColor = "lightgray") %>% 
+    dyCSS(css = "../dygraph_css.css") %>% 
+    dyCallbacks(
+      highlightCallback = "function(event, x, points, row, seriesName) {
+        console.log('Highlight callback triggered'); // Debugging log
+        var point = points[0];
+        var content = 'Series: ' + seriesName;
+        var hoverDiv = document.getElementById('hover-info');
+        if (!hoverDiv) {
+          hoverDiv = document.createElement('div');
+          hoverDiv.id = 'hover-info';
+          hoverDiv.className = 'hover-info'; // Apply CSS class
+          document.body.appendChild(hoverDiv);
+        }
+        hoverDiv.innerHTML = content;
+        hoverDiv.style.left = event.clientX + 20 + 'px';
+        hoverDiv.style.top = event.clientY + 20 + 'px';
+        hoverDiv.style.display = 'block';
+      }",
+      unhighlightCallback = "function(event) {
+        console.log('Unhighlight callback triggered'); // Debugging log
+        var hoverDiv = document.getElementById('hover-info');
+        if (hoverDiv) {
+          hoverDiv.style.display = 'none';
+        }
+      }"
+    )
+
+```
+
+
+Was haben wir nun am Ende des Tages?
+Ein Modell mit dem wir einen Slope, zwecks predict, aus der Zeitreihe extrahieren können.
+Wir nutzen also die Komplexität des Modells um einen Slope zu schätzen 
+mit dem wir die Zukunft beschreiben können, natürlich mit allen Vorbehalten
+die man (immer) haben sollte wenn man mit Daten und mit Modellen arbeitet. 
+
+
+
+<br>
+
+::: {style='text-align:center;'}
+
+{{< bi cpu-fill size=66px color=#AD722CFF >}}
+
+:::
+
+
+
+
+
+
+
+
