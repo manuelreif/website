@@ -1,0 +1,32 @@
+---
+title: "State Space Models - Teil 3"
+description: "Teil 3! Wir sind am Mars!"
+author: Manuel Reif 
+date: 2024-06-20
+lang: de
+categories: [R, MARSS, polls, state-space-models]
+draft: false 
+highlight-style: monokai
+image: media/mars_rover1.png
+format:
+  html:
+    css: ssm2.css
+execute:
+    eval: false
+    message: false
+    echo: false
+    warning: false
+bibliography: ../texts.bib
+filters:
+   - include-code-files
+---
+
+# `MARSS` unser bester Freund
+
+
+
+
+
+
+
+
