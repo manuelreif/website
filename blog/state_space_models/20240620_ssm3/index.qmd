@@ -1,8 +1,8 @@
 ---
 title: "State Space Models - Teil 3"
-description: "Teil 3! Wir sind am Mars!"
+description: "Wir sind am Mars. Wir betreten den Mars. Wir setzen die Maschine in Gang. Wir estimaten und predicten und machen alles was wir schon die ganze Zeit machen wollten. Wir formen die Curves. Wir playen die Cards. Wir sind gekommen um zu bleiben. MARSS ist die Zukunft."
 author: Manuel Reif 
-date: 2024-06-20
+date: 2024-08-18
 lang: de
 categories: [R, MARSS, polls, state-space-models]
 draft: false 
@@ -21,12 +21,884 @@ filters:
    - include-code-files
 ---
 
-# `MARSS` unser bester Freund
+# `MARSS` und die echten Daten
+
+```{r load-anything}
+#| eval: true
+#| include: false
+library(data.table)
+library(magrittr)
+library(parallel)
+library(glue)
+library(forcats)
+
+library(rstan)
+library(tidybayes)
+library(statespacer)
+library(KFAS)
+library(MARSS)
+
+library(ggplot2)
+library(plotly)
+library(geomtextpath)
+library(patchwork)
+library(paletteer)
+library(latex2exp)
+library(ggrepel)
+library(dygraphs)
+library(showtext)
+
+library(gt)
+library(gtExtras)
+
+library(lubridate)
+
+## Loading Google fonts (https://fonts.google.com/)
+font_add_google("Barlow Semi Condensed", "barr")
+
+## daten
+data_list     = readRDS("data/dat_list.rds") # data prepared
+forecast_list = readRDS("data/marss_fits.rds") # data fitted
+
+source("functions/functions_MARSS.R")
+
+```
+
+
+```{r}
+model_weights <- function(ABIC) {
+  
+    deltac <- ABIC - min(ABIC)
+    
+    weights <- exp(-0.5 * deltac)
+    weights <- weights / sum(weights)
+    
+    weights
+}
+```
 
 
 
 
+```{r theme}
+#| eval: true
+#| include: true
+#| code-fold: true
+#| code-summary: "Code: Theme"
+
+ssm_theme <- function(){
+    
+    theme_bw() + 
+    theme(panel.grid.minor = element_blank(),
+          plot.title = element_text(family = "barr", face = "plain",size = rel(1.65)),
+          plot.subtitle = element_text(family = "barr", face = "plain"),
+          axis.title = element_text(family = "barr", face = "plain"),
+          text = element_text(family = "barr", face = "plain"),
+          panel.grid.major.x = element_blank(),
+          panel.border = element_rect(color = "lightgrey"),
+          legend.position='bottom',
+          strip.background = element_rect(fill = "white"))
+    
+}
+
+ssm_theme2 <- function(){
+    
+    theme_bw() + 
+    theme(panel.grid.minor = element_blank(),
+          plot.title = element_text(family = "barr", face = "plain",size = rel(1.65)),
+          #plot.subtitle = element_text(family = "barr", face = "plain"),
+          axis.title.y = element_text(family = "barr", face = "plain"),
+          axis.text = element_text(family = "barr", face = "plain"),
+          panel.grid.major.x = element_blank(),
+          panel.border = element_rect(color = "lightgrey"),
+          legend.position='bottom')
+    
+}
+```
+
+
+<img src="media/TFM_box.png" alt="MARSS" style="float: right; width: 32%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Alles was wir bis jetzt mit `MARSS` gemacht haben, war eher eine Fingerübung,
+ein vorsichtiges rantasten. Jetzt wollen wir die Estimation-Bestie entfesseln 
+und auf echte Daten loslassen. Bisher haben wir nur "Terra" geformt,
+also das was am naheliegensten ist: selbst simulierte Daten.
+Wer kennt es nicht: Man kann sich ja andere Daten gerne anschauen, aber simuliert
+wird immer noch zuhause.
+Im nächsten Schritt wollen wir uns aber hinauswagen -- etwas neues probieren.
+Wir wollen "State" und "Space" formen als wäre es ein Spiel. Als spielten
+wir "STATE N' SPACE FORMING `MARSS`"!
+
+Welche Daten entsprechen unserem Geschmack?
+Wir wählen in Österreich am [29. September](https://de.wikipedia.org/wiki/Nationalratswahl_in_%C3%96sterreich_2024)
+den Nationalrat. Zur Wahl stehen offensichtlich 9 Parteien 
+(ÖVP, SPÖ, FPÖ, GRÜNE, NEOS, KPÖ, BIER, Keine, Madeleine Petrovic).
+Jeder möchte schon vorher wissen wie die Wahl ausgeht, denn je präziser die Vorhersage,
+desto unwichtiger scheint die eigene Stimme zu sein und desto weniger das schlechte
+Gewissen seine Stimme nicht abgegeben zu haben.
+["Trendprognosen"](https://wien.orf.at/stories/3260429/),
+wie zuletzt bei der EU-Wahl, sind derzeit hoch im Kurs und `MARSS` öffnet uns
+die Türe diese Daten zu bändigen und ordentliche Forecasts zu machen.
+
+Allerdings stellen uns diese Daten vor einige Herausforderungen:
+
+
+1. Wir haben nun eine **multivariate** Zeitreihe (es gibt ja den Verlauf mehrerer 
+Parteien und nicht bloß eine Zeitreihe wie in den bisherigen 2 Blogpsts -- Danke Demokratie)
+2. Wir haben es hier mit **Anteilen** zu tun. Eine Partei kann nicht über 100\ %, oder 
+unter 0\ % der Stimmen haben. Auch die Summe der Anteile aller Parteien kann
+nicht über 100\ % liegen. Wir müssen die Daten also irgendwie geschickt transformieren.
+3. Die Daten der Umfragen sind **nicht äquidistant**. In den bisherigen 2 Blogposts
+sind wir implizit davon
+ausgegangen, dass ein Sprung von Zeitpunkt 1 zu 2 genauso groß ist wie von 2 zu 3.
+Alle Abstände wurden als gleich weit voneinander entfernt angenommen. 
+Umfragedaten sind mal dichter gestaffelt,
+mal ist der Abstand zwischen den Umfragen größer. Das macht uns keine Freude und
+wir müssen mit diesem Umstand irgendwie konstruktiv umgehen.
+
+
+Also starten wir: STATE N' SPACE FORMING `MARSS`, kaufen geeignete Karten und spielen
+sie zum richtigen Zeitpunkt aus!
+
+
+# Multivariate Zeitreihe
+
+
+<img src="media/multivariat_event.png" alt="TFM card event multivariat" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+
+Unsere Daten sind multivariat -- man kann es drehen und wenden wie man will.
+Niemand mag multivariate Daten, niemand mag Methoden zu multivariaten Daten,
+jeder wünscht sich sein y rank und schlank wie einen Vektor.
+Das `MARSS` package kann glücklicherweise out of the box mit multivariaten 
+Zeitreihen umgehen -- die Dinge werden trotzdem komplizierter.
+**y** wird also vom Zeitreihenvektor zur Zeitreihen**matrix**. 
+Damit ist es aber nicht getan. Das ganze Modell wird deutlich
+komplexer, d. h. wir müssen uns auch mit (fast) allen Komponenten des Modells
+ auseinandersetzen wie sie in @eq-MARSS-basic dargestellt sind. Warum?
+Wir müssen `MARSS` direkt die jeweiligen Matrizen übergeben und so unser
+maßgeschneidertes Modell zu definieren.
+
+Zeile 1 von @eq-MARSS-basic zeigt die Modellierung der "True Values" --
+also der wahren Werte des Modells, quasi die state equation. In Zeile 2 kommen
+die Beobachtungen ins Spiel! Zeile 3 sagt nur etwas über den Startzustand 
+der ersten Beobachtungen aus. Was steckt sonst noch drinnen?
+
+1. $x_{m \times T}$ $\,\,\rightarrow$ hier stecken die states drinnen, also unsere 
+True Values.
+2. $B_{m \times m}$ $\,\,\rightarrow$ Diese Matrix kombiniert die states vom Zeitpunkt
+t-1 und erklärt damit den aktuellen, latenten state vom Zeitpunkt t!
+3. $Q_{m \times m}$  $\,\,\rightarrow$ Kovarianzmatrix der einzelnen Zustände. In
+unseren bisherigen Modellen, wäre diese Matrix einfach eine Diagnoalmatrix gewesen.
+In einem multivarianten Modell ist die Vorstellung, dass die Zeitreihen sich nicht
+unanbhängig voneinander entwickeln, ja naheliegend. Dementsprechend sollten
+wir die Q-Matrix im Auge behalten.
+4. $R_{n \times n}$  $\,\,\rightarrow$ Diese Matrix ist Teil der Beobachtungsgleichung
+und stellt den "klassischen" Fehlerterm dar, also das "weiße Rauschen", das
+dem systematischen Verlauf der True Values hinzugefügt wird. Hier ist es auch
+möglich Kovarianzen zu formulieren.
+5. $y_{n \times T}$ $\,\,\rightarrow$ Das ist unsere Zeitreihe -- also die Daten
+die uns vorliegen und die wir fitten wollen!
+6. $Z_{m \times n}$ $\,\,\rightarrow$ Definiert die Beziehung der states zu 
+den Beobachtungen.
+7. $u, a$ sind typischerweise 0, aber das wissen wir ohnehin schon von Teil 1 und 2,
+und stellen die Erwartungswerte der multivariaten Normalverteilungen dar, die quasi
+den Möglichkeitsrahmen des Measurement Errors vorgeben.
+ 
+ [Hier](https://atsa-es.r-universe.dev/MARSS/doc/UserGuide.pdf) ist eine
+ detaillierte Darstellung des `MARSS` Modells samt Beispielen.
+
+
+$$
+\begin{aligned}
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_t
+&= \begin{bmatrix}b_{11}&b_{12}\\b_{21}&b_{22}\end{bmatrix}
+\begin{bmatrix}x_1\\x_2\end{bmatrix}_{t-1}
++ \begin{bmatrix}w_1\\ w_2\end{bmatrix}_t,\quad 
+\begin{bmatrix}w_1\\ w_2\end{bmatrix}_t \sim \textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}u_1\\u_2\end{bmatrix},\begin{bmatrix}q_{11}&q_{12}\\q_{21}&q_{22}\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}y_1\\ y_2\\ y_3\end{bmatrix}_t
+&= \begin{bmatrix}z_{11}&z_{12}\\ z_{21}&z_{22}\\ z_{31}&z_{32}\end{bmatrix}
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_t
++ \begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t,
+\begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t \sim \textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}a_1\\ a_2\\ a_3\end{bmatrix},
+ \begin{bmatrix}r_{11}&r_{12}&r_{13}\\r_{21}&r_{22}&r_{23}\\r_{31}&r_{32}&r_{33}\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_0 &\sim \textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}\pi_1\\ \pi_2\end{bmatrix},\begin{bmatrix}\nu_{11}&\nu_{12}\\ \nu_{21}&\nu_{22}\end{bmatrix} \end{pmatrix} \quad 
+or\quad 
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_1 \sim \textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}\pi_1\\ \pi_2\end{bmatrix},\begin{bmatrix}\nu_{11}&\nu_{12}\\ \nu_{21}&\nu_{22}\end{bmatrix} \end{pmatrix} 
+\end{aligned}
+$${#eq-MARSS-basic}
+
+```{r}
+#| eval: true
+# pfad ändern!
+marss_rds_pfad = "/home/manuel/Dokumente/Statistik/blogideen/polls_einlesen/marss_fits.rds"
+model_list = readRDS(marss_rds_pfad)
+
+#model_list$result_list[[1]][[1]] %>% tidy
+
+```
+
+Aber um zu wissen wie wir die Modelle aufbauen muss man zuerst wissen wie die
+Daten nun tatsächlich aussehen.
+
+
+# Daten
+
+Um eine Vorhersage für die Nationalratswahlen zu machen brauchen wir österreichische 
+Umfragedaten, die im wesentlichen abfragen:
+"Wen würden Sie wählen wenn kommenden Sonntag Nationalratswahl wäre?"
+Wir finden [hier](https://storage.googleapis.com/asapop-website-20220812/csv.html)
+Umfragedaten aus unterschiedlichsten Ländern.
+Im folgenden werden die österreichischen Daten (at.csv) runtergeladen und 
+direkt weiterverarbeitet und umfassend aufbereitet.
+
+Was bedeutet "aufbereiten"? Wie soll das Endprodukt aussehen?
+Unsere Daten brauchen:
+
+1. **Datum**: wann fand die Erhebung statt? Unterscheidet man nicht zwischen
+den Umfrageinstituten im Modell, so kann es vorkommen, dass Umfragen zur selben Zeit
+stattfinden. `MARSS` kann mit dieser Gleichzeitigkeit nicht umgehen, daher wurden
+die Daten modifiziert. Es wurde ein Datum gewählt, das zwischen Start- bis Endedatum
+liegt und das nur ein einziges Mal im gesamten Datensatz vorkommt, also unique ist.
+2. **Anteile je Partei**: Wie hoch ist der Anteil jener Leute, die diese Partei
+wählen würden? Diese müssen sich auf 1 summieren (Achtung Rundungsfehler). 
+
+Eine grobe Übersicht bietet @fig-raw-data. Hier wird der Verlauf der Anteile
+jeder Partei nach Umfrageinstitut getrennt dargestellt.
+
+Eine sehr übersichtliche Anzahl an Merkmalen. Allerdings müssen hier noch 2 weiter
+Schritte durchgeführt werden. Es muss Äquidistanz hergestellt, und die Daten
+transformiert werden.
+
+
+```{r data-glance}
+#| eval: true
+#| fig-height: 8
+#| fig-width: 9
+#| label: fig-raw-data
+#| fig-cap: Rohdaten der einzelnen Parteien dargestellt, getrennt nach Umfrageinstituten. 
+#| 
+d = data_list$data_plot
+
+keep_columns1 = c("Polling_Firm", "Commissioners", "Start", "Start_unique", "Scope", "Samplesize", 
+  "Samplesize_Qualification", "Precision", "ÖVP", "SPÖ", "FPÖ", 
+  "NEOS", "GRÜNE", "KPÖ", "BIER","Other", "end_year", "laufnummer", "next_sundayEND"
+)
+
+
+data_plt1 = d[Scope == "National", .SD, .SDcols = keep_columns1] %>% 
+  melt(id.vars = c("Polling_Firm", "Commissioners", "Start", "Start_unique", "Scope", "Samplesize", 
+                   "Samplesize_Qualification", "Precision","end_year", "laufnummer", "next_sundayEND"),
+       variable.name = "Partei", value.name = "Anteil") %>% 
+  .[, Polling_FirmC := fct_collapse(Polling_Firm, "Rest" = c("Ipsos", "Triple M", "Peter Hajek"))]
+  
+
+p = ggplot(data = data_plt1[Polling_FirmC != "Demox Research"], 
+           aes(x = Start, y = Anteil, linetype = Polling_FirmC)) + 
+    geom_line(color = paletteer_d("trekcolors::starfleet")[3]) + 
+    facet_wrap(~ Partei) +
+    scale_linetype_discrete("Polling\nFirm") + 
+    ssm_theme()
+
+p
+```
 
 
 
+## Äquidistanz
+
+In den meisten state-space-model-packages wird davon ausgegangen, dass die 
+Zeitabstände zwischen den Beobachtungen gleich sind.
+Bei unseren Daten ist das nicht der Fall, da die einzelnen Umfragen 
+bei Bedarf durchgeführt werden.  `MARSS` kann zwar nicht mit unterschiedlichen
+Zeitabständen umgehen, dafür machen dem package Missing Values keine 
+Kopfzerbrechen. Diese Stärke können wir für uns nutzen. 
+Wir erstellen eine Datenmatrix die **alle** 
+Tage zwischen Anfang und Ende
+der Zeitreihe beinhaltet. Da wir an den meisten Tagen keine Beobachtung haben, 
+ergibt eine Menge Missing Values. Das löst unser Problem mehr oder weniger elegant.
+Denn nun sind alle Zeitpunkte gleichabständig -- auch wenn nicht alle Zeitpunkte
+Beobachtungen ausweisen!
+
+
+## Transformation
+
+<img src="media/transform_card.png" alt="TFM card event multivariat" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+
+Die Anteile bereiten uns a-priori auch mal keine Freude. 
+Es gibt 2 Möglichkeiten wenn wir die Anteile direkt modelliern wollten:
+
+1. Die falsche Methode: Wir modellieren mittels linearen Modelles ohne 
+Transformation. Problem: Es können (und werden) Werte >\ 1 und <\ 0 resultieren.
+Meh!
+2. Die richtige Methode 1: Wir modellieren die Anteile direkt z. B. mittels einer
+Dirichlet Verteilung und modellieren dessen Parameter über die Zeit mittels eines
+State Space Models. Spoiler: Ich habe dazu kein R-Package gefunden.
+3. Die richtige Methode 2: Transformieren! Wir transformieren bei k Parteien
+diese k Zeitreihen so, dass k-1 Zeitreihen resultieren
+ deren mögliche Ausprägungen zwischen
+-Inf und Inf liegen. Dafür müssen wir uns nichts selbst ausdenken oder herleiten,
+sondern dafür gibt es packages und Lösungen die uns mit diesem Problem helfen, wie
+z. B. das [compositions](https://cran.r-project.org/web/packages/compositions/index.html)
+package.
+
+
+
+# Unser Modell
+
+Die wesentlichen Komponenten die man im Modell verstehen muss sind:
+    
+    1. Q-Matrix
+    2. B-Matrix
+    3. Z-Matrix
+
+
+
+
+## Q Matrix
+
+<img src="media/q_matrix_enhancer.png" alt="Q-Matrix" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+
+Die Matrix ist so aufgebaut, dass sie sowohl die Varianzen als auch Kovarianzen 
+zwischen verschiedenen Elementen (Levels und Slopes) der Zustandsvariablen 
+beinhaltet. Wenn ein Parametername übergeben wird, werden diese Parameter
+geschätzt, wenn eine Zelle 0 enthält wird kein entsprechender Parameter gesetzt.
+Die einfachste Variante wäre eine Diagonalmatrix -- aber wir powern den
+Q-Matrix Enhancer und iterieren uns bis zur Konvergenz (hoffentlich).
+
+Die Diagonalelemente der Matrix, wie etwa `Q.var_lvl1` oder 
+`Q.var_slp1`, stehen für die Varianz der jeweiligen Zustandsvariablen. 
+Die Nicht-Diagonalelemente wie z. B. `Q.cov_lvl1_lvl2` oder `Q.cov_slp1_slp2`, 
+repräsentieren die Kovarianzen zwischen den verschiedenen Variablen.
+Wie in der Matrix zu sehen ist 
+werden nur Kovarianzen zwischen allen Tupels von Slopes und Levels
+angenommen. 
+Intuitiv könnte man sagen: Wenn eine Partei Zugewinne verzeichnet,
+der Slope also positiv ist, muss zumindest eine andere Partei verlieren.
+Tatsächlich können auch 2 oder alle anderen Parteien verlieren.
+Diese Kovarianzen versuchen diese Information aus den Daten zu extrahieren.
+Man nimmt also an, dass wenn ein slope steigt nicht alle
+anderen beliebig sinken oder sich dieses sinken. Daher werden Abhängigkeiten
+zwischen den geschätzt und ebenso zwischen den Levels, aber eben nicht 
+zwischen Levels und Slopes. Inhaltlich sehe ich hier keine passende 
+Interpretation zu diesem Parametern.
+
+
+
+\begin{gather*}
+\small
+\begin{bmatrix}
+Q.var\_lvl1&0&Q.cov\_lvl1\_lvl2&0& \ldots\\
+0&Q.var\_slp1&0&Q.cov\_slp1\_slp2&  \ldots\\
+Q.cov\_lvl1\_lvl2&0&Q.var\_lvl2&0& \ldots\\
+0&Q.cov\_slp1\_slp2&0&Q.var\_slp2& \ldots\\
+\vdots & \vdots & \vdots &  \vdots
+\end{bmatrix}
+\end{gather*}
+
+
+## B - Matrix
+
+<img src="media/chase_card.png" alt="MARSS" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+
+
+Über die B-Matrix muss man nicht so viel erzählen, weil sie im Wesentlichen
+aus Blöcken von identen 2x2 Matrizen aufgebaut ist -- und zwar genau aus jenen
+2x2 Matrizen die wir in den beiden vorigen Blogposts schon gesehen haben.
+Diese Matrix ist dafür zuständig, die x der Vergangenheit (t-1) zu den x der
+Zukunft zu kombinieren.
+
+\begin{gather*}
+\begin{bmatrix}
+x_{X1}\\
+x_{X2}\\
+x_{X3}\\
+x_{X4}\\
+x_{X5}\\
+x_{X6}\\
+x_{X7}\\
+x_{X8}\\
+x_{X9}\\
+x_{X10}
+\end{bmatrix}_{t}=
+\begin{bmatrix}
+1&1&0&0&0&0&0&0&0&0\\
+0&1&0&0&0&0&0&0&0&0\\
+0&0&1&1&0&0&0&0&0&0\\
+0&0&0&1&0&0&0&0&0&0\\
+0&0&0&0&1&1&0&0&0&0\\
+0&0&0&0&0&1&0&0&0&0\\
+0&0&0&0&0&0&1&1&0&0\\
+0&0&0&0&0&0&0&1&0&0\\
+0&0&0&0&0&0&0&0&1&1\\
+0&0&0&0&0&0&0&0&0&1
+\end{bmatrix}
+\begin{bmatrix}
+x_{X1}\\
+x_{X2}\\
+x_{X3}\\
+x_{X4}\\
+x_{X5}\\
+x_{X6}\\
+x_{X7}\\
+x_{X8}\\
+x_{X9}\\
+x_{X10}
+\end{bmatrix}_{t-1}
+\end{gather*}
+
+## Z-Matrix
+
+Diese Matrix ist dafür verantwortlich, die Beziehung zwischen den beobachteten 
+Daten und den zugrunde liegenden latenten Zustandsvariablen herzustellen,
+d. h. die Zustandsvariablen werden gruppiert. 
+Jede beobachtete Variable (`y_transf1` bis `y_transf5`) wird als lineare 
+Kombination von Paaren von Zustandsvariablen (`x_X1` bis `x_X10`) dargestellt. 
+Das bedeutet, dass jede beobachtete Zeitreihe von zwei Zustandsvariablen 
+beschrieben wird -- diese sollen zusammen die beobachtete Dynamik beschreiben.
+
+\begin{gather*}
+\begin{bmatrix}
+y_{transf1}\\
+y_{transf2}\\
+y_{transf3}\\
+y_{transf4}\\
+y_{transf5}
+\end{bmatrix}_{t}=
+\begin{bmatrix}
+1&1&0&0&0&0&0&0&0&0\\
+0&0&1&1&0&0&0&0&0&0\\
+0&0&0&0&1&1&0&0&0&0\\
+0&0&0&0&0&0&1&1&0&0\\
+0&0&0&0&0&0&0&0&1&1
+\end{bmatrix}
+\begin{bmatrix}
+x_{X1}\\
+x_{X2}\\
+x_{X3}\\
+x_{X4}\\
+x_{X5}\\
+x_{X6}\\
+x_{X7}\\
+x_{X8}\\
+x_{X9}\\
+x_{X10}
+\end{bmatrix}_{t}
+\end{gather*}
+
+
+## Ergebnisse und Forecasts
+
+<img src="media/model_results.jpg" alt="MARSS" style="float: left; width: 36%; margin-right: 30px; margin-bottom: 10px;"/>
+
+
+Nachdem wir nun lange auf Matrizen geschaut haben (oder auch nicht) wird es
+endlich noch spannender, denn wir wollen wissen wie die jeweiligen Parteien
+abschneiden. Für alle Leser:innen die gespannt auf die Ergebnisse von 
+"Liste Petrovic" und "Keine" warten: Diese beiden Parteien gehen
+in der Kategorie "Other" auf. Als vorsichtige Prognose gleich vorweg:
+Hoch werden die beiden Parteien das Match nicht gewinnen. 
+
+@fig-ssm3-dygraph1 zeigt einen gemittelten Forecast aus 3 unterschiedlichen Modellen,
+unser Model Ensamble (**ME**):
+
+1. Das Modell mit der "Enhanced" Q-Matrix
+2. Ein Modell das als Q-Matrix eine Diagonalmatrix annimmt, aber für jede Partei
+wird eine eigene Varianz geschätzt
+3. Ein noch sparsameres Modell: Gleiche Varianz für alle Parteien in der Q-Matrix
+
+@fig-ssm3-dygraph2 zeigt unser Best Fitting Modell (**BFM**) mit den extra
+steilen und kurvigen Slopes für den Sensation-Seeker unter den Politik-Insider.
+
+<img src="media/bfm.jpg" alt="MARSS" style="float: right; width: 40%; margin-left: 30px; margin-bottom: 10px;"/>
+
+Warum ist es prinzipiell klug Forecast Ergebnisse zu mitteln? 
+Weil die Annahmen von Modellen
+typischerweise nie ganz richtig sind (Achtung: Euphemismus) und sich durch 
+die Kombination von unterschiedlichen Modellen die typischerweise unterschiedliche Annahmen haben,
+im günstigsten Fall alle diese kleinen Sonderbarkeiten, Vereinfachungen oder Überkomplexitäten
+der einzelnen Modelle rausmitteln würden. 
+Oft wird bei einem derartigen Ensamble beim Mitteln anhand von 
+AIC oder BIC gewichtet. In unserem Fall ist das etwas witzlos, denn
+das Modell mit der Enhanced Q-Matrix laut AIC und BIC
+*deutlich* besser performt also die anderen beiden Modelle -- daher natürlich 
+auch: Best Fitting Modell (**BFM**). Damit wäre die Gewichtung zu 100 % auf dem BFM,
+was das Ensamble ad absurdum führt.
+Also gehen in diesem Fall alle Modelle gleichermaßen stark in das Ensamble ein.
+
+Warum?
+
+Weil die Verläufe des BFM einfach sehr sehr unrealistisch aussehen.
+Jeder der schon einmal etwas mit Statistik zu tun hat weiß dass das wirklich
+zu viel des Guten ist. Das Modell overacted und überinterpretiert wohl
+die gefundenen Effekte.
+
+
+
+```{r}
+
+models_aic = sapply(forecast_list$result_list, function(x) AIC(x$fit1))
+models_bic = sapply(forecast_list$result_list, function(x) BIC(x$fit1))
+
+aic_weights = model_weights(models_aic)
+bic_weights = model_weights(models_bic)
+```
+
+
+
+::: {.panel-tabset}
+
+### ME
+
+```{r}
+#| eval: true
+#| fig-height: 9
+#| fig-width: 9
+#| label: fig-ssm3-dygraph1
+#| fig-cap: Forecast des Model Ensambles aus 3 Modellen 1) eigene Q-Matrix, 2) Q-Matrix diagonal mit unterschiedlichen Varianzen, 3) Q-Matrix diagonal mit gleichen Varianzen
+
+
+# TODO: Farben umstellen 
+
+time2date = data_list$data_full[, .(time, Start_unique)]
+
+pred_dt = forecast_list$preds_dt %>% copy
+
+recode1 = forecast_list$real_ratio_m %>% 
+    unique(by = "variable") %>% 
+    .[, .(variable)] %>% 
+    .[, varnum := factor(1:.N)]
+
+real_data = forecast_list$real_ratio_m %>% copy
+real_data[recode1, varnum := i.varnum, on = "variable"] %>% 
+    setnames("variable", "Partei")
+real_data[time2date, date := i.Start_unique, on = "time"]
+
+pred_dt[recode1, Partei := i.variable, on = c("variable" = "varnum")]
+
+# averaging
+pred_model_avg = pred_dt[, .(mv = mean(value)), by = c("time", "Partei")]
+pred_model_avg[real_data, pred := FALSE, on = "time"]
+pred_model_avg[is.na(pred), pred := TRUE]
+
+
+pred_model_avg[time2date, date := i.Start_unique, on = "time"]
+mxdate = pred_model_avg[, max(date, na.rm = TRUE)]
+
+pred_model_avg[is.na(date), counti := 1:.N, by = "Partei"]
+pred_model_avg[!is.na(counti), date := mxdate + lubridate::days(counti), by = "Partei"]
+pred_model_avg[, counti := NULL]
+
+
+pred_model_avg[, Prozent := paste(round(mv * 100, 1), "%")]
+
+## ausrechenen wann die wahl ist
+wahldatum = lubridate::ymd("20240928")
+newest_date = data_list$data_all[, max(Start_unique)]
+day_diff = as.integer(wahldatum - newest_date)
+wahltag = pred_model_avg[pred == FALSE, max(time) + day_diff]
+
+## 4 text
+mark_wahltag = pred_model_avg[date == ymd("20240928")]
+
+last_umfragetag = real_data[time == max(time)] %>% 
+    .[, Prozent := paste(round(value * 100, 1), "%")] %>% 
+    setnames("value", "mv")
+
+text_dt = rbind(last_umfragetag, mark_wahltag, fill = TRUE)
+
+
+p = ggplot(pred_model_avg, aes(x = date, y = mv, color = Partei)) +
+    geom_line(linetype = 1, aes(alpha = pred), linewidth = 0.3) + 
+    geom_step(data = real_data[!is.na(value)],
+              aes(x = date, y = value, color = Partei), alpha = 0.4) +
+    geom_point(data = text_dt, shape = 1, size = 1, aes(text = Prozent)) +
+    scale_alpha_manual(values = c(0.9, 1)) + 
+    labs(y = "Anteil", x = "Zeit") +
+    guides(alpha = "none") + 
+    scale_color_paletteer_d("trekcolors::breen") +
+    ssm_theme()
+ 
+ggplotly(p, tooltip = "text")
+
+```
+
+
+```{r}
+#| eval: true
+#| label: tbl-avg-model
+#| tbl-cap: "Forecast des Model Ensambles"
+
+# Benötigte Pakete laden
+library(gt)
+library(data.table)
+
+text_dt[, Category := ifelse(is.na(pred), "Last Polls", "Wahlergebnis")]
+
+# Weitformat erstellen
+text_dtw <- dcast(text_dt, Partei ~ Category, value.var = c("mv", "Prozent")) %>% 
+  .[, Change := ifelse(`mv_Last Polls` < mv_Wahlergebnis, "circle-arrow-up", ifelse(`mv_Last Polls` > mv_Wahlergebnis, "circle-arrow-down", "circle-arrow-left"))] %>% 
+    setorder(-mv_Wahlergebnis) %>% 
+    .[, !c("mv_Last Polls", "mv_Wahlergebnis")]
+
+check_colours <- c(
+    "circle-arrow-down" = "#A31111",
+    "circle-arrow-up" = "#056206"
+)
+
+
+gt_table <- gt(text_dtw) %>%
+  cols_label(
+    Partei = "Partei",
+    `Prozent_Last Polls` = "Last Polls",
+    `Prozent_Wahlergebnis` = "Forecast",
+    Change = "Trend"
+  ) %>%
+  fmt_icon(
+    columns = Change,
+    height = "1.5em",
+    fill_color = check_colours
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(`Prozent_Last Polls`, `Prozent_Wahlergebnis`, Change)
+  ) %>%
+  tab_options(
+    table.width = px(600),
+    table.font.size = px(18)
+  ) %>%
+  tab_style(
+    style = cell_fill(color = paletteer_d("trekcolors::starfleet")[3], alpha = 0.5),
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", align = "center", size = px(20)), 
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_style(
+    style = cell_borders(sides = "bottom", color = paletteer_d("trekcolors::starfleet")[3], weight = px(2)),
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_options(
+    column_labels.padding = px(10)
+  )
+
+
+
+# Tabelle anzeigen
+gt_table
+
+```
+
+
+
+### BFM
+
+
+```{r}
+#| eval: true
+#| fig-height: 9
+#| fig-width: 9
+#| label: fig-ssm3-dygraph2
+#| fig-cap: Forecast des Best Fitting Model (eigene Q-Matrix)
+
+
+# TODO: Farben umstellen 
+
+time2date = data_list$data_full[, .(time, Start_unique)]
+
+pred_dt = forecast_list$preds_dt %>% copy
+
+recode1 = forecast_list$real_ratio_m %>% 
+    unique(by = "variable") %>% 
+    .[, .(variable)] %>% 
+    .[, varnum := factor(1:.N)]
+
+real_data = forecast_list$real_ratio_m %>% copy
+real_data[recode1, varnum := i.varnum, on = "variable"] %>% 
+    setnames("variable", "Partei")
+real_data[time2date, date := i.Start_unique, on = "time"]
+
+pred_dt[recode1, Partei := i.variable, on = c("variable" = "varnum")]
+
+# NO averaging
+pred_model_avg = pred_dt[model == 1, ] %>% 
+.[, mv := value]
+pred_model_avg[real_data, pred := FALSE, on = "time"]
+pred_model_avg[is.na(pred), pred := TRUE]
+
+
+pred_model_avg[time2date, date := i.Start_unique, on = "time"]
+mxdate = pred_model_avg[, max(date, na.rm = TRUE)]
+
+pred_model_avg[is.na(date), counti := 1:.N, by = "Partei"]
+pred_model_avg[!is.na(counti), date := mxdate + lubridate::days(counti), by = "Partei"]
+pred_model_avg[, counti := NULL]
+
+
+pred_model_avg[, Prozent := paste(round(mv * 100, 1), "%")]
+
+## ausrechenen wann die wahl ist
+wahldatum = lubridate::ymd("20240928")
+newest_date = data_list$data_all[, max(Start_unique)]
+day_diff = as.integer(wahldatum - newest_date)
+wahltag = pred_model_avg[pred == FALSE, max(time) + day_diff]
+
+## 4 text
+mark_wahltag = pred_model_avg[date == ymd("20240928")]
+
+last_umfragetag = real_data[time == max(time)] %>% 
+    .[, Prozent := paste(round(value * 100, 1), "%")] %>% 
+    setnames("value", "mv")
+
+text_dt = rbind(last_umfragetag, mark_wahltag, fill = TRUE)
+
+
+p = ggplot(pred_model_avg, aes(x = date, y = mv, color = Partei)) +
+    geom_line(linetype = 1, aes(alpha = pred), linewidth = 0.3) + 
+    geom_step(data = real_data[!is.na(value)],
+              aes(x = date, y = value, color = Partei), alpha = 0.4) +
+    geom_point(data = text_dt, shape = 1, size = 1, aes(text = Prozent)) +
+    scale_alpha_manual(values = c(0.9, 1)) + 
+    labs(y = "Anteil", x = "Zeit") +
+    guides(alpha = "none") + 
+    scale_color_paletteer_d("trekcolors::breen") +
+    ssm_theme()
+ 
+ggplotly(p, tooltip = "text")
+
+```
+
+
+```{r}
+#| eval: true
+#| fig-height: 9
+#| fig-width: 9
+#| label: tbl-best-model
+#| tbl-cap: "Wahlprognose des Best Fitting Model"
+
+# Benötigte Pakete laden
+library(gt)
+library(data.table)
+
+text_dt[, Category := ifelse(is.na(pred), "Last Polls", "Wahlergebnis")]
+
+# Weitformat erstellen
+text_dtw <- dcast(text_dt, Partei ~ Category, value.var = c("mv", "Prozent")) %>% 
+  .[, Change := ifelse(`mv_Last Polls` < mv_Wahlergebnis, "circle-arrow-up", ifelse(`mv_Last Polls` > mv_Wahlergebnis, "circle-arrow-down", "circle-arrow-left"))] %>% 
+    setorder(-mv_Wahlergebnis) %>% 
+    .[, !c("mv_Last Polls", "mv_Wahlergebnis")]
+
+check_colours <- c(
+    "circle-arrow-down" = "#A31111",
+    "circle-arrow-up" = "#056206"
+)
+
+
+gt_table <- gt(text_dtw) %>%
+  cols_label(
+    Partei = "Partei",
+    `Prozent_Last Polls` = "Last Polls",
+    `Prozent_Wahlergebnis` = "Forecast",
+    Change = "Trend"
+  ) %>%
+  fmt_icon(
+    columns = Change,
+    height = "1.5em",
+    fill_color = check_colours
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(`Prozent_Last Polls`, `Prozent_Wahlergebnis`, Change)
+  ) %>%
+  tab_options(
+    table.width = px(600),
+    table.font.size = px(18)
+  ) %>%
+  tab_style(
+    style = cell_fill(color = paletteer_d("trekcolors::starfleet")[3], alpha = 0.5),
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", align = "center", size = px(20)), 
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_style(
+    style = cell_borders(sides = "bottom", color = paletteer_d("trekcolors::starfleet")[3], weight = px(2)),
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_options(
+    column_labels.padding = px(10)
+  )
+
+
+
+# Tabelle anzeigen
+gt_table
+
+```
+:::
+
+<img src="media/bran_dyl_90210.jpg" alt="MARSS" style="float: right; width: 36%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Unsere Modelle unterscheiden sich primär anhand ihrer Q-Matrizen.
+Also betrachten wir die Q-Matrix unseres BFM um vielleicht so diese predicts 
+einigermaßen erklären zu können. Dazu müssen wir die Kovarianzen die uns 
+`MARSS` zurückgibt in Korrelationen umwandeln. Das Ergebnis ist in
+@fig-bubble-plot-Q zu sehen.
+Achtung! Die Slopes und Levels sind keiner einzelnen Partei zuzuordnen,
+da es sich um die transformierten Werte handelt^[Werden k Variablen transformiert, resultieren nach der Transformation k-1 Variablen!]!
+Zu sehen sind einige kleine und moderate Korrelationen, allerdings auch einige 
+sehr hohe/niedrige Korrelationen --
+Slope 1 und Slope 3 sind zu 0.99 miteinander korreliert, lvl 2 und 3 zu -0.93!
+Diese Werte sind wohl ähnlich unrealistisch hoch wie die daraus resultierenden 
+Predicts.
+Da aber die Annahme dass die Slopes und Levels völlig unkorreliert sind auch
+unrealistisch scheinen, ist eine Enesamle von Modellen vermutlich eine 
+gerechte und praktikable Lösung.
+
+
+```{r}
+#| eval: true
+#| fig-height: 8
+#| fig-width: 9
+#| label: fig-bubble-plot-Q
+#| fig-cap: Q-Matrix des BFM
+
+
+q_korr = q_corr(forecast_list$result_list[[1]]$fit1$par$Q)
+
+q_korr[, row := paste0(leslo1, term1)]
+q_korr[, col := paste0(leslo2, term2)]
+
+q_korr_dc = dcast(q_korr, formula = row ~ col, value.var = "corr") 
+
+q_korr_mat = q_korr_dc[,!"row"] %>% as.matrix
+rownames(q_korr_mat) <- q_korr_dc$row
+
+library(ggcorrplot)
+
+
+p_corr = ggcorrplot(q_korr_mat, 
+method = "circle", 
+outline.color = "white") 
+
+ggplotly(p_corr)
+
+
+```
+
+Das war der dritte und letzte Teil zu den State Space Models.
+[Hier](https://drive.google.com/file/d/1B95BWKu_AzYN4aT6b-wLEW4n-nWP9JfB/view?usp=drive_link) 
+sind alle Daten des dritten Teils zum Download bereit, wer Lust hat selbst noch weiter
+Modelle zu rechnen oder Grafiken zu erstellen.
+
+<br>
+
+::: {style='text-align:center;'}
+
+{{< bi bullseye size=66px color=#1A6384FF >}}
+
+:::
 
