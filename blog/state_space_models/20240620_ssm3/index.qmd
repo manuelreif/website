@@ -121,8 +121,8 @@ ssm_theme2 <- function(){
 
 <img src="media/TFM_box.png" alt="MARSS" style="float: right; width: 32%; margin-left: 20px; margin-bottom: 10px;"/>
 
-Alles was wir bis jetzt mit `MARSS` gemacht haben, war eher eine Fingerübung,
-ein vorsichtiges rantasten. Jetzt wollen wir die Estimation-Bestie entfesseln 
+Alles was wir bis jetzt mit `MARSS` gemacht haben, war eher eine [Fingerübung](../20240303_ssm1),
+ein vorsichtiges [rantasten](../20240520_ssm2). Jetzt wollen wir die Estimation-Bestie entfesseln 
 und auf echte Daten loslassen. Bisher haben wir nur "Terra" geformt,
 also das was am naheliegensten ist: selbst simulierte Daten.
 Wer kennt es nicht: Man kann sich ja andere Daten gerne anschauen, aber simuliert
@@ -155,12 +155,13 @@ sind wir implizit davon
 ausgegangen, dass ein Sprung von Zeitpunkt 1 zu 2 genauso groß ist wie von 2 zu 3.
 Alle Abstände wurden als gleich weit voneinander entfernt angenommen. 
 Umfragedaten sind mal dichter gestaffelt,
-mal ist der Abstand zwischen den Umfragen größer. Das macht uns keine Freude und
+mal ist der Abstand zwischen den Umfragen größer. Das macht uns keine Freude aber
 wir müssen mit diesem Umstand irgendwie konstruktiv umgehen.
 
 
-Also starten wir: STATE N' SPACE FORMING `MARSS`, kaufen geeignete Karten und spielen
-sie zum richtigen Zeitpunkt aus!
+Ok, die Fronten sind geklärt. **STATE N' SPACE FORMING `MARSS`** kann beginnen!
+Wir versuchen aus unserer Statistik-Kartenhand die passenden und natürlich hochpotentesten 
+Karten zum richtigen Zeitpunkt zu spielen!
 
 
 # Multivariate Zeitreihe
@@ -241,7 +242,7 @@ model_list = readRDS(marss_rds_pfad)
 
 ```
 
-Aber um zu wissen wie wir die Modelle aufbauen muss man zuerst wissen wie die
+Aber um zu wissen wie wir die Modelle aufbauen, muss man zuerst wissen wie die
 Daten nun tatsächlich aussehen.
 
 
@@ -249,25 +250,30 @@ Daten nun tatsächlich aussehen.
 
 Um eine Vorhersage für die Nationalratswahlen zu machen brauchen wir österreichische 
 Umfragedaten, die im wesentlichen abfragen:
-"Wen würden Sie wählen wenn kommenden Sonntag Nationalratswahl wäre?"
+"Wen würden Sie wählen wenn kommenden Sonntag Nationalratswahl wäre?".
 Wir finden [hier](https://storage.googleapis.com/asapop-website-20220812/csv.html)
 Umfragedaten aus unterschiedlichsten Ländern.
 Im folgenden werden die österreichischen Daten (at.csv) runtergeladen und 
-direkt weiterverarbeitet und umfassend aufbereitet.
+direkt weiterverarbeitet und umfassend aufbereitet. Eine grobe Übersicht bietet 
+@fig-raw-data. Hier wird der Verlauf der Anteile
+jeder Partei nach Umfrageinstitut getrennt dargestellt.
 
-Was bedeutet "aufbereiten"? Wie soll das Endprodukt aussehen?
+Was bedeutet aber "aufbereiten"? Wie soll das Endprodukt aussehen?
 Unsere Daten brauchen:
 
-1. **Datum**: wann fand die Erhebung statt? Unterscheidet man nicht zwischen
+1. **Datum**: Wann fand die Erhebung statt? 
+Umfragen finden typischerweise nicht an einem einzelnen Tag statt, sondern in
+einem Zeitraum von mehreren Tagen. Um jeder Umfrage ein konkretes Datum zuzuordnen
+wurde das Datum des Umfragestarts gewählt.
+Unterscheidet man allerings nicht zwischen
 den Umfrageinstituten im Modell, so kann es vorkommen, dass Umfragen zur selben Zeit
-stattfinden. `MARSS` kann mit dieser Gleichzeitigkeit nicht umgehen, daher wurden
-die Daten modifiziert. Es wurde ein Datum gewählt, das zwischen Start- bis Endedatum
-liegt und das nur ein einziges Mal im gesamten Datensatz vorkommt, also unique ist.
+stattfinden -- also das selbe Start-Datum aufweisen.
+`MARSS` kann mit dieser etwaigen Gleichzeitigkeit nicht umgehen.
+Daher wurde in solchen Fällen ein passendes Datum zwischen Start und Enddatum der Umfrage gewählt,
+so dass es zu keinen Überschneidungen kommt.
+Damit sind alle Zeitpunkte unique!
 2. **Anteile je Partei**: Wie hoch ist der Anteil jener Leute, die diese Partei
 wählen würden? Diese müssen sich auf 1 summieren (Achtung Rundungsfehler). 
-
-Eine grobe Übersicht bietet @fig-raw-data. Hier wird der Verlauf der Anteile
-jeder Partei nach Umfrageinstitut getrennt dargestellt.
 
 Eine sehr übersichtliche Anzahl an Merkmalen. Allerdings müssen hier noch 2 weiter
 Schritte durchgeführt werden. Es muss Äquidistanz hergestellt, und die Daten
@@ -317,46 +323,61 @@ p
 
 ## Äquidistanz
 
-In den meisten state-space-model-packages wird davon ausgegangen, dass die 
+<img src="media/aequidistant_card.png" alt="TFM card Equidistant" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+
+
+
+In den meisten State-Space Model packages wird davon ausgegangen, dass die 
 Zeitabstände zwischen den Beobachtungen gleich sind.
 Bei unseren Daten ist das nicht der Fall, da die einzelnen Umfragen 
-bei Bedarf durchgeführt werden.  `MARSS` kann zwar nicht mit unterschiedlichen
+bei Bedarf durchgeführt werden und üblicherweise nicht in fixen Abständen.
+`MARSS` kann zwar nicht mit unterschiedlichen
 Zeitabständen umgehen, dafür machen dem package Missing Values keine 
 Kopfzerbrechen. Diese Stärke können wir für uns nutzen. 
 Wir erstellen eine Datenmatrix die **alle** 
 Tage zwischen Anfang und Ende
 der Zeitreihe beinhaltet. Da wir an den meisten Tagen keine Beobachtung haben, 
-ergibt eine Menge Missing Values. Das löst unser Problem mehr oder weniger elegant.
-Denn nun sind alle Zeitpunkte gleichabständig -- auch wenn nicht alle Zeitpunkte
-Beobachtungen ausweisen!
+ergibt das eine Menge Missing Values. Das löst unser Problem mehr oder weniger elegant,
+denn nun sind alle Zeitpunkte gleichabständig -- auch wenn nicht alle Zeitpunkte
+Beobachtungen ausweisen! Die meisten Zeitpunkte weisen tatsächlich Missing Values
+auf!
+
+<br>
 
 
 ## Transformation
 
 <img src="media/transform_card.png" alt="TFM card event multivariat" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
 
-Die Anteile bereiten uns a-priori auch mal keine Freude. 
-Es gibt 2 Möglichkeiten wenn wir die Anteile direkt modelliern wollten:
+Im Fall von Umfragedaten wie unseren, müssen wir mit Anteile umgehen und der Tatsache zurechtkommen,
+dass unsere Variablen auf Zahlen zwischen 0 und 1 festgelegt sind, es sich 
+also nicht überall zwischen $(-\infty,\infty)$ 
+gemütlich machen können. Das betrachten wir natürlich mit großer Sorge.
+Es gibt 3 Möglichkeiten mit dieser Unannehmlichkeit umzugehen:
 
-1. Die falsche Methode: Wir modellieren mittels linearen Modelles ohne 
+1. Die falsche Methode: Wir modellieren mittels linearen Modells ohne 
 Transformation. Problem: Es können (und werden) Werte >\ 1 und <\ 0 resultieren.
-Meh!
+"No, no, no, no, nooo! Don't do that to me!" Ist das Originalzitat von gleichartigen Daten
+die mit solchen Methoden traktiert wurden.
 2. Die richtige Methode 1: Wir modellieren die Anteile direkt z. B. mittels einer
 Dirichlet Verteilung und modellieren dessen Parameter über die Zeit mittels eines
-State Space Models. Spoiler: Ich habe dazu kein R-Package gefunden.
+State-Space Models. Spoiler: Ich habe dazu kein R-Package gefunden.
 3. Die richtige Methode 2: Transformieren! Wir transformieren bei k Parteien
 diese k Zeitreihen so, dass k-1 Zeitreihen resultieren
  deren mögliche Ausprägungen zwischen
--Inf und Inf liegen. Dafür müssen wir uns nichts selbst ausdenken oder herleiten,
-sondern dafür gibt es packages und Lösungen die uns mit diesem Problem helfen, wie
-z. B. das [compositions](https://cran.r-project.org/web/packages/compositions/index.html)
+$-\infty$ und $\infty$ liegen. 
+Dafür müssen wir uns nichts selbst ausdenken oder herleiten {{< bi emoji-wink size=20px >}},
+sondern dafür gibt es packages und Lösungen die uns mit diesem Problem helfen, wie z. B. das [compositions](https://cran.r-project.org/web/packages/compositions/index.html)
 package.
 
 
 
 # Unser Modell
 
-Die wesentlichen Komponenten die man im Modell verstehen muss sind:
+Um einen groben Überblick über das Modell zu bekommen: Was sind die wesentlichsten
+Komponenten? Insbesondere jene, die wegen des multivariaten Charakters der Daten
+anders aussehen als in [Teil 1](../20240303_ssm1) und [Teil 2](../20240520_ssm2)
+dargestellt:
     
     1. Q-Matrix
     2. B-Matrix
@@ -370,9 +391,9 @@ Die wesentlichen Komponenten die man im Modell verstehen muss sind:
 <img src="media/q_matrix_enhancer.png" alt="Q-Matrix" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
 
 Die Matrix ist so aufgebaut, dass sie sowohl die Varianzen als auch Kovarianzen 
-zwischen verschiedenen Elementen (Levels und Slopes) der Zustandsvariablen 
+zwischen verschiedenen Elementen (Levels und Slopes) der (latenten) Zustandsvariablen 
 beinhaltet. Wenn ein Parametername übergeben wird, werden diese Parameter
-geschätzt, wenn eine Zelle 0 enthält wird kein entsprechender Parameter gesetzt.
+geschätzt, wenn eine Zelle 0 enthält wird kein entsprechender Parameter geschätzt.
 Die einfachste Variante wäre eine Diagonalmatrix -- aber wir powern den
 Q-Matrix Enhancer und iterieren uns bis zur Konvergenz (hoffentlich).
 
@@ -386,12 +407,13 @@ angenommen.
 Intuitiv könnte man sagen: Wenn eine Partei Zugewinne verzeichnet,
 der Slope also positiv ist, muss zumindest eine andere Partei verlieren.
 Tatsächlich können auch 2 oder alle anderen Parteien verlieren.
-Diese Kovarianzen versuchen diese Information aus den Daten zu extrahieren.
-Man nimmt also an, dass wenn ein slope steigt nicht alle
-anderen beliebig sinken oder sich dieses sinken. Daher werden Abhängigkeiten
-zwischen den geschätzt und ebenso zwischen den Levels, aber eben nicht 
-zwischen Levels und Slopes. Inhaltlich sehe ich hier keine passende 
-Interpretation zu diesem Parametern.
+Diese Kovarianzparameter versuchen diese Information aus den Daten zu extrahieren.
+Man nimmt also an, dass im Falle eines steigenden Slopes nicht alle
+anderen beliebig sinken. Daher werden Abhängigkeiten
+zwischen den Slopes, und ebenso zwischen den Levels geschätzt, aber eben nicht 
+zwischen Levels und Slopes. Dies ist sowohl eine inhaltliche Entscheidung (was wäre die Interpretation?)
+als auch eine Frage der Sparsamkeit. Abbildung @fig-bubble-plot-Q zeigt später 
+die Struktur dieser Matrix nochmal auf eine andere Weise.
 
 
 
@@ -412,11 +434,12 @@ Q.cov\_lvl1\_lvl2&0&Q.var\_lvl2&0& \ldots\\
 <img src="media/chase_card.png" alt="MARSS" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
 
 
-Über die B-Matrix muss man nicht so viel erzählen, weil sie im Wesentlichen
-aus Blöcken von identen 2x2 Matrizen aufgebaut ist -- und zwar genau aus jenen
-2x2 Matrizen die wir in den beiden vorigen Blogposts schon gesehen haben.
-Diese Matrix ist dafür zuständig, die x der Vergangenheit (t-1) zu den x der
-Zukunft zu kombinieren.
+Die B-Matrix enthält ebenfalls selbst keine Parameter. Sie ist im Wesentlichen
+aus Blöcken von identen $2 \times 2$ Matrizen aufgebaut ist. Und zwar genau aus jenen
+$2 \times 2$ Matrizen, die die Parameter (x) zu den beiden aus Teil 1 und 2 bekannten 
+Zustandsgleichungen kombinieren und aus ihnen unser bekanntes
+Local-Linear Trend Model machen. Die x der Vergangenheit (t-1) werden zu den x der
+Zukunft zu kombiniert.
 
 \begin{gather*}
 \begin{bmatrix}
@@ -507,15 +530,17 @@ endlich noch spannender, denn wir wollen wissen wie die jeweiligen Parteien
 abschneiden. Für alle Leser:innen die gespannt auf die Ergebnisse von 
 "Liste Petrovic" und "Keine" warten: Diese beiden Parteien gehen
 in der Kategorie "Other" auf. Als vorsichtige Prognose gleich vorweg:
-Hoch werden die beiden Parteien das Match nicht gewinnen. 
+Hoch werden die beiden Parteien das Match [nicht gewinnen](https://youtu.be/lXicnEYDZsY?si=paOg-N7igIL_5HhF&t=40). 
 
 @fig-ssm3-dygraph1 zeigt einen gemittelten Forecast aus 3 unterschiedlichen Modellen,
 unser Model Ensamble (**ME**):
 
-1. Das Modell mit der "Enhanced" Q-Matrix
+
+
+1. {{< bi trophy >}} Das Modell mit der "Enhanced" Q-Matrix, also mit der Extraportion Parameter (unser Best Fitting Model **BFM**) 
 2. Ein Modell das als Q-Matrix eine Diagonalmatrix annimmt, aber für jede Partei
-wird eine eigene Varianz geschätzt
-3. Ein noch sparsameres Modell: Gleiche Varianz für alle Parteien in der Q-Matrix
+wird eine eigene Varianz geschätzt (sehr einfaches Modell)
+3. Ein noch sparsameres Modell: Gleiche Varianz für alle Parteien in der Q-Matrix (noch viel einfacheres Modell)
 
 @fig-ssm3-dygraph2 zeigt unser Best Fitting Modell (**BFM**) mit den extra
 steilen und kurvigen Slopes für den Sensation-Seeker unter den Politik-Insider.
@@ -539,7 +564,7 @@ Also gehen in diesem Fall alle Modelle gleichermaßen stark in das Ensamble ein.
 Warum?
 
 Weil die Verläufe des BFM einfach sehr sehr unrealistisch aussehen.
-Jeder der schon einmal etwas mit Statistik zu tun hat weiß dass das wirklich
+Jeder der schon einmal etwas mit Statistik zu tun hat weiß, dass das wirklich
 zu viel des Guten ist. Das Modell overacted und überinterpretiert wohl
 die gefundenen Effekte.
 
@@ -852,7 +877,7 @@ gt_table
 <img src="media/bran_dyl_90210.jpg" alt="MARSS" style="float: right; width: 36%; margin-left: 20px; margin-bottom: 10px;"/>
 
 Unsere Modelle unterscheiden sich primär anhand ihrer Q-Matrizen.
-Also betrachten wir die Q-Matrix unseres BFM um vielleicht so diese predicts 
+Also betrachten wir die Q-Matrix unseres BFM um vielleicht so diese rasanten predicts 
 einigermaßen erklären zu können. Dazu müssen wir die Kovarianzen die uns 
 `MARSS` zurückgibt in Korrelationen umwandeln. Das Ergebnis ist in
 @fig-bubble-plot-Q zu sehen.
@@ -860,12 +885,13 @@ Achtung! Die Slopes und Levels sind keiner einzelnen Partei zuzuordnen,
 da es sich um die transformierten Werte handelt^[Werden k Variablen transformiert, resultieren nach der Transformation k-1 Variablen!]!
 Zu sehen sind einige kleine und moderate Korrelationen, allerdings auch einige 
 sehr hohe/niedrige Korrelationen --
-Slope 1 und Slope 3 sind zu 0.99 miteinander korreliert, lvl 2 und 3 zu -0.93!
+Slope 1 und Slope 3 sind zu 0.99 {{< bi emoji-dizzy >}} miteinander korreliert, lvl 2 und 3 zu -0.93!
 Diese Werte sind wohl ähnlich unrealistisch hoch wie die daraus resultierenden 
 Predicts.
 Da aber die Annahme dass die Slopes und Levels völlig unkorreliert sind auch
 unrealistisch scheinen, ist eine Enesamle von Modellen vermutlich eine 
 gerechte und praktikable Lösung.
+
 
 
 ```{r}
