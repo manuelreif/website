@@ -629,13 +629,13 @@ pred_model_avg[, counti := NULL]
 pred_model_avg[, Prozent := paste(round(mv * 100, 1), "%")]
 
 ## ausrechenen wann die wahl ist
-wahldatum = lubridate::ymd("20240928")
+wahldatum = lubridate::ymd("20240929")
 newest_date = data_list$data_all[, max(Start_unique)]
 day_diff = as.integer(wahldatum - newest_date)
 wahltag = pred_model_avg[pred == FALSE, max(time) + day_diff]
 
 ## 4 text
-mark_wahltag = pred_model_avg[date == ymd("20240928")]
+mark_wahltag = pred_model_avg[date == ymd("20240929")]
 
 last_umfragetag = real_data[time == max(time)] %>% 
     .[, Prozent := paste(round(value * 100, 1), "%")] %>% 
@@ -775,13 +775,13 @@ pred_model_avg[, counti := NULL]
 pred_model_avg[, Prozent := paste(round(mv * 100, 1), "%")]
 
 ## ausrechenen wann die wahl ist
-wahldatum = lubridate::ymd("20240928")
+wahldatum = lubridate::ymd("20240929")
 newest_date = data_list$data_all[, max(Start_unique)]
 day_diff = as.integer(wahldatum - newest_date)
 wahltag = pred_model_avg[pred == FALSE, max(time) + day_diff]
 
 ## 4 text
-mark_wahltag = pred_model_avg[date == ymd("20240928")]
+mark_wahltag = pred_model_avg[date == ymd("20240929")]
 
 last_umfragetag = real_data[time == max(time)] %>% 
     .[, Prozent := paste(round(value * 100, 1), "%")] %>% 
