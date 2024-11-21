@@ -1,0 +1,288 @@
+---
+title: "Shiny App in der Google Cloud"
+description: "Ich habe jetzt einen Google Cloud Computing Account und hab eine Shiny App drauf laufen"
+author: Manuel Reif 
+date: 2024-11-30
+lang: de
+categories: [shiny, R, google Cloud, docker, git]
+draft: false 
+highlight-style: monokai
+image: media/main_pic.webp
+execute:
+    eval: true
+    message: false
+    echo: false
+    warning: false
+    freeze: false
+filters:
+   - include-code-files
+---
+
+<img src="media/main_pic.webp" alt="State Space Model" style="float: right; width: 34%; margin-left: 20px; margin-bottom: 10px;"/>
+
+300$ darf man in den ersten 3 Monaten verbraten wenn man sich bei Google Cloud 
+anmeldet. Natürlich nur mit Diensten die Google auf seiner 7. Wolke jedes 
+Data Scientisten zur Verfügung stellt. Um ehrlich zu sein, da gibt es viele 
+Möglichkeiten sein Geld auszugeben. Manches klingt kompliziert, manches exotisch
+aber alles ist irgendwie so, dass man seine kleinen Code Snippets, die am eigenen 
+Rechner in irgendwelchen schlecht benamsten Ordnern rumdümpeln am liebsten 
+gleich hochladen würde.
+Als jemand der mit Daten arbeitet und zuhause nur ein 0815 Notebook als Arbeitsgerät
+zur Verfügung hat, könnte es sich schon auszahlen, hin und wieder die Cloud zu
+nutzen -- zumindest bin ich mal neugierig.
+Ich registriere mich also, schaue ein paar Videos dazu und überfliege ein
+paar Tutorials, Anwendungsberichte etc. und komme zu dem Schluss, dass ich 
+möglichst schnell mal was ausprobieren will, denn die 3 Monate scheinen
+schon in greifbarer Nähe wenn ich die Monate durchzähle. Also versuche ich
+mal eine Shiny-App zu deployen. 
+
+Warum?
+
+Es gibt einige Möglichkeiten Shiny Apps laufen zu lassen, die bekannteste 
+Möglichkeit ist sicher: [https://www.shinyapps.io/](https://www.shinyapps.io/) -- 
+ich hab selbst 2 Apps hier deployed. 
+Allerdings ist die Anzahl der Apps die man gratis hosten 
+kann begrenzt und der nächste Schritt ist gleich ein Abo mit 13$ im Monat.
+Obwohl meine Apps ziemlich fancy sind, sind die Zugriffszahlen nicht so üppig,
+dass ich so mir nichts dir nichts, 13$ mal fix einplanen müsste.
+Abeits davon wäre es auch mal interessant was anderes
+auszuprobieren.
+
+Will man also eine Shiny App in der Google Cloud laufen lassen, dann sind 
+folgende Schritte dafür notwendig:
+
+1. Zuerst mal registrieren: [https://cloud.google.com/](https://cloud.google.com/) 
+2. Erstelle eine Shiny App oder im Idealfall hat man schon eine!
+3. Packe diese Shiny App in einen [docker Container](https://www.docker.com/)
+4. Schiebe die Shiny App samt Dockerfile auf [github](https://github.com/)
+5. Verwende **Google Cloud Run** um die Shiny App für "die Menschen da draußen"
+laufen zu lassen!
+
+Hier ist auch ein gutes [Video](https://www.youtube.com/watch?v=M4hd5YN0yIQ&t=521s), das diesen Vorgang auch gut zusammenfasst.
+Wir starten jetzt jedenfalls mit dem 1. Schritt und hanteln uns Punkt für Punkt
+vorwärts, bis die Shiny App als Mahnmal für den guten Visualisierungsgeschmack
+im Internet thront!
+
+# Registrieren bei Google Cloud
+
+Ha ok, das ist der kürzeste Punkt. [Hier](https://cloud.google.com/) registrieren und
+GoGogo!
+
+
+# Shiny App
+
+Wenn man in der Psychologie mit statistischer Software in Berührung gekommen ist,
+dann war das Anfang der 2000er Jahre typischerweise SPSS. Das heißt man war es
+gewohnt zu klicken, Dropdown Menüs abzusuchen und Daten auf Plausibilität zu
+prüfen bestand oft darin, lange durch die Daten zu scrollen. Den Extra Kick
+Kompetenzgefühl holte man sich durch das Schreiben von eigener Syntax. 
+Als ich später angefangen hab R zu nutzen, fühlte ich mich dann und wann doch
+hingezogen zu GUIs und ich versuchte mich auch mal (kurz) daran selbst welche
+zu "programmieren" was tatsächlich nicht ansatzweise klappte. Ein eigenes GUI
+für ein Package oder eine Funktion zu haben, das hätte mir gut gefallen.
+Ein wenig Nostalgie, in gewohnten Dialogkästchen wäre dann und wann wohl
+ganz hilfreich gewesen. 
+Jahre später wurde dieses Problem mit [shiny](https://shiny.posit.co/) sehr
+elegant gelöst -- denn shiny macht es wirklich einfach ein gemütliches und 
+gut aussenhendes Interface zu basteln. Zwar war und ist es mir in der Zwischenzeit
+nicht mehr wichtig eigene Funktionen oder Packages zugänglicher zu machen,
+jedoch halte ich Shiny für hervorragend geeignet statistische Konzepte
+interaktiv zu vermitteln. Ob meine Studierenden diese Ansicht mit mir teilen
+weiß ich nicht. 
+Jedenfalls "leben" einige Shiny-Apps in meinen Lehrveranstaltungs-Ordnern und warten
+darauf ausgewildert zu werden. So wie eben diese, die allen interessierten Menschen
+das Prinzip der linearen Regression näherbringen soll. Ich erspare mir hier
+große Erklärungen zu der App, nur so viel: 
+
+
+- Klicken Sie Punkte auf die Abbildung (Achtung nicht zu weit links oder rechts)
+- Ab dem 2. Punkt entsteht eine Gerade
+- Ab dem 3. Punkt werden auch Residuen zu sehen sein und auch eine lineare
+Regression gefittet.
+
+Mit jedem hinzugefügten Punkt ändert sich die Gerade, die geschätzten Parameter
+und alles was zu einem schönen linearen Modell dazugehört.
+Das wäre also die App die im Laufe des Posts an genau jenen Ort geschoben wird,
+an dem Sie hier eingebettet schon zu sehen ist. Zugegebenermaßen profitiert
+das Erscheinungsbild der App nicht gerade durch die beschränkte Breite und Höhe.
+Daher ist meine Empfehlung: Direkt im Vollbildmodus auf einem gediegen-größeren
+Bildschirm ansehen!
+
+Jetzt haben wir die App. Jetzt müssen wir sie fertig für den Transport machen!
+
+
+<iframe 
+  src="https://linear-model-799476032711.europe-west4.run.app" 
+  width="100%" 
+  height="550px" 
+  style="border: none;">
+</iframe>
+<p>
+  <a href="https://linear-model-799476032711.europe-west4.run.app" target="_blank">
+    Öffne die App im Vollbildmodus
+  </a>
+</p>
+
+
+# Dockerize und github
+
+<img src="media/fremder_computer.jpg" alt="State Space Model" style="float: right; width: 55%; margin-left: 20px; margin-bottom: 10px;"/>
+
+"Never change a running Data Science Setup" ist nicht wirklich ein Sprichwort
+und trotzdem eine Prämisse nach der viele Menschen, nennen wir sie "Statistiker", 
+handeln die gerade mitten 
+in einem Daten Projekt stecken. Ein Update ist ja schön und gut, aber
+wer z. B. das tidyverse kennte, weiß, dass die Autor:innen gerne durch
+"innovative" Änderungen in packages, bestehenden Code gänzlich zum Stillstand bringen.
+Warning Messages lassen sich ja noch ganz gut ignorieren -- Errors dann meistens
+nicht mehr. Docker löst dieses Problem und auch noch andere, denn es schafft
+einen sicheren Raum in dem unser Code ewig leben kann. Das Betriebssystem, die 
+R Version samt allen packages -- alles bleibt gleich. 
+Es ändert sich nichts, wenn wir den jeweiligen Container so gestalten. 
+Man muss kein Konservativer
+sein um das gut zu finden -- schließlich will man dass sein Code auch noch in
+ein paar Jahren läuft, auch wenn man nach Beendigung eines Projekts hofft, nie 
+wieder seinen Code sehen zu müssen.
+Einen besonderen Schrecken verbreitet die Vorstellung, dass der eigene Code,
+perfekt abgestimmt auf die jeweiligen Software-Versionen, harmonisch 
+mit der jeweiligen Betriebssystemversion vor sich hinschwingend, auf einem
+fremden Rechner laufen soll. Da hilft das ambitionierteste Versionieren nichts.
+Denn gegen einen völlig fremden Rechner, kann auch das stärkste git Repo nichts
+ausrichten. Docker bietet hier insofern eine Lösung, als man sich
+zumindest diese Umgebung selbst auf den PC holen kann, um dort
+schon alle notwendige Software zu installieren. Man packt also den Code plus
+das **ganze Drumherum** (ja sogar das Betriebssystem) in einen Container und
+stellt folgendes sicher:
+Läuft der Container auf dem eigenen PC, läuft er wo anders; auch in der Cloud. 
+Umgelegt auf unser Problem heißt das: Läuft die Shiny App in Docker auf unserem
+lokalen Rechner, steht dem Laufen in Cloud nichts mehr im Wege.
+
+Einen Dockercontainer zu bauen ist tasächlich einfacher als man denkt. 
+Wir brauchen dazu ein Dockerfile, das in Wesentlichen ein Software-Rezept ist.
+"Installier mir dies. Kopier das." Besonders angenehm: Wir müssen nicht von 0 
+beginnen, wir können auf bereits bestehende Docker Images aufbauen!
+
+
+```dockerfile
+FROM rocker/shiny:latest #<1>
+
+RUN apt-get update && apt-get install -y \ #<2>
+    libcurl4-gnutls-dev \
+    libxml2-dev \
+    libssl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /srv/shiny-server #<3>
+RUN R -e "install.packages('pak', repos='https://cloud.r-project.org/')" #<4>
+
+RUN R -e "pak::pkg_install(c( \ #<5>
+    'shiny', \
+    'shinydashboard', \
+    'ggplot2', \
+    'data.table', \
+    'gt', \
+    'broom', \
+    'magrittr', \
+    'ggdark', \
+    'DT', \
+    'htmltools', \
+    'bslib',\
+    'shinythemes',\
+    'fresh' \
+))"
+
+COPY app.R /srv/shiny-server/ #<6>
+RUN chmod -R 755 /srv/shiny-server #<7>
+EXPOSE 3838 #<8>
+
+CMD ["/usr/bin/shiny-server"] #<9>
+```
+1. Das ist das Basis Image. Also zum Zeitpunkt des builds das aktuellste Shiny Image.
+Damit müssen wir uns nicht mehr darum kümmern Shiny Server etc. zu installieren! 'latest'
+bedeutet, dass wir uns nicht auf eine fixe Version festlegen sondern das neuste
+nehmen was vorliegt.
+2. Hier werden einige Linux Pakete nachinstalliert und aufgeräumt um das Image
+möglichst klein zu halten.
+3. Das Standardverzeichnis wird gesetzt.
+4. Hier wird das `pak` package installiert. Meine Nummer 1 beim Packages installieren!
+5. Jetzt kommen die R packages die wir brauchen für unsere Shiny App!
+6. Hier wird das `app.R` file (also die Shiny App an sich) 
+in den Container kopiert! 
+7. Berechtigungen werden gesetzt.
+8. Der Container soll Netzwerkport 3838 verwenden -- Shiny Server läuft standardmäßig auf Port 3838!
+9. Legt den Standardbefehl fest, der ausgeführt wird, wenn der Container gestartet wird -- d. h. es wird gleich der Shiny Server gestartet!
+
+
+Ist das Dockerfile fertig, ist das Image und der Container nicht mehr fern.
+
+```bash
+docker build -t NAMEDERAPP . #<1>
+docker run --rm -p 3838:3838 NAMEDERAPP #<2>
+```
+1. Es wird ein docker image erstellt aus dem Dockerfile das im Verzeichnis "." 
+liegt -- inklusive "tag" (also einfach einen sprechenden Namen wählen)
+2. Es wird ein Container gestartet, basierend auf dem Image das wir vorher 
+gerade erstellt haben. Shiny Apps wollen immer einen offenen Port 3838.
+Mit `--rm` wird der Container nachdem er benutzt wird auch gleich wieder
+gelöscht. In unserem Fall macht das Sinn, denn wir ändern nichts im Container
+das bis zu einer nächsten Session erhalten bleiben soll.
+
+
+Nachdem man den container mit `docker run` gestartet hat, kann man die 
+Shiny App im Browser unter `http://localhost:3838` erreichen. **Spätestens** wenn das geklappt hat, wird es Zeit das Ganze via 
+[git](https://git-scm.com/) zu versionieren und auf [github](https://github.com/)
+zu schieben um den Code für die Google Cloud zugänglich zu machen.
+
+
+# Zurück zur Google Cloud
+
+Jetzt wollen wir die Shiny App auch irgendwie an die Menschen bringen.
+Dazu verwenden wir [Cloud Run](https://cloud.google.com/run?hl=de).
+
+Der Klick auf "Container erstellen" beschert uns die erste Auswahl. 
+Soll ein Job erledigt werden oder ein Container erstellt? Wir wählen den Container
+wie in der Abbildung zu sehen ist. Meinen Job bekommt Google nicht.
+
+![Google Cloud - Teil 1](media/gc1.png)
+
+Die nächste Abbildung zeigt, dass wir unsere App **kontinuierlich** aus einem
+github Repo erstellen wollen. Das Repo das wir gerade vorher erstellt haben
+ist dazu die Quelle. Der Vorteil: Wird im Repo was verändert, sieht man die 
+Änderungen kurze Zeit später auch online in der App.
+
+Die nächsten Punkte sind:
+
+1. einen passenden Namen überlegen
+2. zwecks Nachhaltigkeit wählen wir ein Rechenzentrum aus der Region.
+3. "Nicht authentifizierte Aufrufe zulassen" wird gewählt $\rightarrow$ jeder der
+Spaß dran hat soll unsere App aufrufen können.
+
+
+![Google Cloud - Teil 2](media/gc2.png)
+
+Wichtig ist noch, dass der richtige Port eingegeben ist. Nach einigen Errors
+und Fehlversuchen stellte sich heraus dass der Port **3838** hier angegeben werden
+muss und **nicht** 8080 wie der default ist!
+
+
+
+
+![Google Cloud - Teil 3](media/gc3.png)
+
+
+Ja gut. Dann kann man sich noch mit RAM und CPUs spielen und sehen wohin 
+einen das bringt. Am Ende des Tages sollte man nach all der mühseligen
+Klickerei die App auch erstellen. Dann kann man ihr beim builden zusehen und später
+ist sie auch hervorragen via Internet erreichbar. 
+
+
+
+![Google Cloud - Teil 4](media/gc4.png)
+
+
+Das wars. Viel Spaß mit der Shiny App!
+
+
+
+
