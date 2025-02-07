@@ -1,0 +1,76 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usetikzlibrary{positioning,fit}
+\begin{document}
+\begin{tikzpicture}[node distance=1.2cm, auto,
+    box/.style={draw, rectangle, rounded corners, align=center, minimum width=2.5cm, minimum height=1cm, font=\small},
+    diamond/.style={draw, diamond, aspect=2, align=center, inner sep=2pt, font=\small},
+    ellipse/.style={draw, ellipse, align=center, minimum width=3cm, minimum height=1cm, font=\small},
+    arrow/.style={->, thick}]
+
+% --- Knoten ---
+
+% Obere Stufe
+\node[box, fill=lightblue] (robustify) {Robustify};
+
+\node[diamond, fill=lightgreen, below=of robustify] (branch) {gabelung\\(unknown\_as\_category / impute\_unknown)};
+
+% Linker Zweig
+\node[box, fill=orange, below left=of branch, xshift=-1cm] (imp_d_imp) {Impute (numeric)\\imp\_d};
+
+% Rechter Zweig
+\node[box, fill=orange, below right=of branch, xshift=1cm] (colapply) {Colapply\\unknown\_as\_na};
+\node[box, fill=orange, below=of colapply] (imp_f_uk) {Impute (factor)\\imp\_f\_uk};
+\node[box, fill=orange, below=of imp_f_uk] (imp_d_uk) {Impute (numeric)\\imp\_d\_uk};
+
+% Zusammenführung: Unbranch
+% Wir nutzen |- Pfeile, sodass der letzte Streckenabschnitt vertikal erfolgt.
+\node[box, fill=plum, below=of imp_d_uk, yshift=-0.5cm, minimum width=3cm] (unbranch) {Unbranch\\unbranch\_main};
+
+% --- Basis-Learner als separater Cluster ---
+% Die Basis-Learner werden horizontal angeordnet.
+\node[box, fill=yellow, below=of unbranch, xshift=-4cm] (nop) {nop\_original\\(Original)};
+\node[box, fill=yellow, right=of nop] (rf) {RF\\(cvrf)};
+\node[box, fill=yellow, right=of rf] (nb) {NB\\(cvnb)};
+\node[box, fill=yellow, right=of nb] (knn) {kNN\\(cvknn)};
+
+% Cluster um die Basis-Learner (dashed Rahmen)
+\node[draw, dashed, inner sep=5pt, fit=(nop) (rf) (nb) (knn), label=above:{Base Learners}] (cluster_base) {};
+
+% Feature Union
+\node[ellipse, fill=gray, below=of rf, yshift=-1cm] (base_union) {Feature Union\\base\_learners};
+
+% Encode und finaler Learner
+\node[box, fill=lightblue, below=of base_union] (encode) {Encode\\(One-Hot)\\encode\_super};
+\node[box, fill=red, below=of encode] (xgboost) {Learner\\XGBoost\\super};
+
+% --- Kanten (Pfeile) ---
+
+\draw[arrow] (robustify) -- (branch);
+
+\draw[arrow] (branch.south) -- (imp_d_imp.north);
+\draw[arrow] (branch.south) -- (colapply.north);
+
+\draw[arrow] (colapply.south) -- (imp_f_uk.north);
+\draw[arrow] (imp_f_uk.south) -- (imp_d_uk.north);
+
+% Pfeile von den Imputationsergebnissen zum Unbranch-Knoten:
+\draw[arrow] (imp_d_imp.south) |- (unbranch.west);
+\draw[arrow] (imp_d_uk.south)  |- (unbranch.east);
+
+% Verteilung von unbranch an alle Basis-Learner:
+\draw[arrow] (unbranch.south) -- (nop.north);
+\draw[arrow] (unbranch.south) -- (rf.north);
+\draw[arrow] (unbranch.south) -- (nb.north);
+\draw[arrow] (unbranch.south) -- (knn.north);
+
+% Pfeile von den Basis-Learnern in den Feature Union-Knoten:
+\draw[arrow] (nop.south) -- (base_union.north);
+\draw[arrow] (rf.south)  -- (base_union.north);
+\draw[arrow] (nb.south)  -- (base_union.north);
+\draw[arrow] (knn.south) -- (base_union.north);
+
+\draw[arrow] (base_union.south) -- (encode.north);
+\draw[arrow] (encode.south) -- (xgboost.north);
+
+\end{tikzpicture}
+\end{document}

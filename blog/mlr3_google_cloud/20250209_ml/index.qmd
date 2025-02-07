@@ -1,0 +1,636 @@
+---
+title: "Machine Learning in der Google Cloud"
+description: "Wenn man eine Maschine und 300$ hat, dann lässt man die Maschine auch was lernen, denn man kann es sich ja leisten."
+author: Manuel Reif 
+date: 2025-02-09
+lang: de
+categories: [R, google Cloud, mlr3, docker, git]
+draft: false 
+highlight-style: monokai
+image: media/main_pic.webp
+execute:
+    eval: true
+    message: false
+    echo: false
+    warning: false
+    freeze: false
+filters:
+   - include-code-files
+---
+<img src="media/christmas_docker.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
+
+`mlr3` ist ein package, das mich phasenweise leiden lässt. Jeder der das schon
+einmal gesehen hat, will es nicht nochmal erleben. Dennoch löst `mlr3` einige
+Probleme und wie jedes gute package, löst es mehr Probleme als es neue 
+Probleme schafft. Vielleicht nicht gerade für den 0815 R Anwender, der gerne einmal 
+ein Machine Learning Modell laufen lassen will, um zu sehen wie man sich
+als Data Scientist fühlt, sondern eher für jemanden, der sich dafür entscheidet
+heute, morgen und vermutlich auch übermorgen unterschiedliche Modelle anzuwenden
+und vor allem diese zu tunen. Denn so cool es auch ist, dass jeder User
+da draußen ein R-Package schreiben kann, so schwierig ist es, sich auf die Logik
+jeden Packages einzulassen. Heutzutage will man sich nicht die Zeit für sowas 
+nehmen. `mlr3` ist nicht das einzige package das dieses 
+Problem versucht zu lösen, aber das einzige das wir uns hier ansehen. Denn
+auf der useR! 2024 stolperte ich mehr oder weniger in ein Tutorial und einen
+Vortrag zu `mlr3`. Schicksalhafte Begegnungen, die nun in diesem Blogpost münden.
+Der stille Held dieser und allen weiteren Stories auf der Google Cloud,
+ist wieder der gute alte docker Container der wie ein gutes Elternteil alles 
+mit dabei hat was notwendig ist, um den Ausflug der R-Files in die Cloud 
+zu ermöglichen.
+
+
+
+## Der Datensatz
+
+Schlaganfälle sind eine ernste Sache. Um das Risiko eines Schlaganfalls
+vorhersagen zu können muss man Daten sammeln. In diesem Datensatz: https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset
+exisitieren 11 clinical features um Herzinfarkte vorherzusagen. 
+@tbl-data-desc-num und @tbl-data-desc-fct zeigen getrennt nach Skalenniveau
+die einzelnen Variablen. Die Variable die es vorherzusagen gilt ist `stroke` -- 
+codiert als 0/1. Die Angabe in der Tabelle ist etwas unintuitiv -- weist letztlich
+die Anzahl der Schlaganfälle aus (1) bzw. deren Anteil an den Gesamtbeobachtungen.
+Was auch immer die anderen Variablen genau bedeuten muss uns nicht interessieren.
+Wir wollen sie bloß verwenden um `stroke` möglichst gut zu erklären. 
+Die Bedeutung jeder einzelnen Variable zu verstehen ist für dieses Beispiel nicht
+wirklich notwendig.
+
+
+```{r}
+library(data.table)
+library(gt)
+library(gtsummary)
+library(gtExtras)
+library(bstfun)
+```
+
+```{r data}
+d = fread("data/healthcare-dataset-stroke-data.csv") %>% 
+    .[, bmi := as.numeric(bmi)]
+```
+
+
+```{r data4tabs}
+d_oid = d[,!"id"]
+num_cols = sapply(d_oid, class) %in% c("numeric", "integer")
+num_col_names = colnames(d_oid)[num_cols]
+d_numeric = d_oid[, .SD, .SDcols = num_col_names]
+d_factor = d_oid[, .SD, .SDcols = !num_col_names]
+
+
+```
+
+
+::::{.columns}
+
+:::{.column width="50%"}
+        
+```{r}
+#| output: asis
+#| code-fold: true
+#| code-summary: "Code: Tabellen metrisch"
+#| label: tbl-data-desc-num
+#| tbl-cap: "Beschreibung der metrischen Variablen"
+#| echo: true
+#| 
+
+summary_table_n <- tbl_summary(d_numeric) %>% 
+     add_n() %>% 
+    as_gt() %>% 
+      gt_theme_538()
+
+summary_table_n
+
+```
+:::
+
+:::{.column width="50%"}
+```{r}
+#| output: asis
+#| code-fold: true
+#| code-summary: "Code: Tabellen factor"
+#| label: tbl-data-desc-fct
+#| tbl-cap: "Beschreibung der kategorialen Variablen"
+#| echo: true
+#| 
+
+summary_table_n <- tbl_summary(d_factor) %>% 
+     add_n() %>% 
+    as_gt() %>% 
+      gt_theme_538()
+
+summary_table_n
+
+```
+:::
+::::
+
+
+## Das Package
+
+<a href="https://mlr3.mlr-org.com/">
+  <img src="media/mlr3verse.svg" alt="mlr3-ecosystem" style="float: right; width: 60%; margin-left: 20px; margin-bottom: 10px;"/>
+</a>
+
+
+
+Um alle Abläufe rund um ein Machine Learning Projekt nicht immer selbst 
+implementieren zu müssen, ist es klug auf ein Package zurückzugreifen, das 
+dem einfachen User die wesentlichsten Schritte schon mal abnimmmt.
+Sonst findet man sich in der ermüdenden Lage verschachtelte Schleifen
+zu schreiben und Funktionen zu definieren die man eigentlich noch viel
+allgemeiner formulieren könnte um sie einfacher wiederverwenden zu können.
+Aber will man schon so sehr in der Zukunft leben, dass man die gerade aktuelle
+Funktion so baut, dass sie nicht nur das aktuelle, sondern auch möglichst 
+alle zukünftigen Probleme gleicher oder ähnlicher Art löst? Manchmal will man das.
+Manchmal will man aber auch nur das aktuelle Problem lösen, ohne schon
+an morgen denken zu müssen, insbesondere wenn sich schon andere Menschen 
+ihren schönen Kopf über solche Funktionen zerbrochen haben und ein mutmaßlich
+benutzerfreundliches Funktionskonstrukt geschaffen haben, das uns viel
+Denkarbeit abnimmt. Man muss nur lernen mit dem Package umzugehen und sich
+daran gewöhnen. Also das package mit dem hier gearbeitet wird ist das [mlr3 package.](https://mlr3.mlr-org.com/)
+
+
+## Der Plan
+
+Ziel ist es einen Schlaganfall (stroke) möglichst gut vorherzusagen.
+Wie wir das machen, also mit welcher Methode, ist uns jetzt mal egal.
+Das konkrete Vorgehen soll also folgendes beinhalten:
+
+1. Wähle eine Methode mit der die Target Variable (`stroke`) vorhergesagt werden soll.
+2. Bereite den Datensatz so auf, wie es für die gewählte Methode notwendig ist.
+3. Splitte den Datensatz in Training und Testdatensatz. Der Testdatensatz kann
+dann dafür verwendet werden, unterschiedliche Methoden anhand deren Prognoseleistung 
+auf diesem zu vergleichen.
+4. Teile den Trainingsdatensatz wiederholt mittels Crossvalidation (CV) in Training und Testdatensatz 
+(z. B. klassische 5-fold CV). D. h. der Datensatz wird in 5 Teile geteilt.
+Auf 4/5 der Daten wird das Modell trainiert und auf dem restlichen 1/5 wird vorhergesagt.
+Dies wird 5 mal wiederholt.
+5. Fitte auf dem Trainingsdatensatz ein beliebiges Modell (z. B. Random Forest)
+mit einer bestimmten Parameterkonstellation.
+6. Sage mit dem trainierten Modell die Target Variable in den Testdaten vorher 
+und bestimme wie gut das gelungen ist (z. B. mittels `auc` Metrik).
+7. Tune die Parameter um die beste Parameterkombination zu ermitteln! 
+8. Am Ende versuchen wir mit dem getunten Modell unser target (`stroke`) am
+Testdatensatz vorherzusagen. Diese Performance gibt uns eine gute Einschätzung,
+wie gut das Modell in Zukunft performen wird!
+
+
+Dieser Plan findet bei mir üblicherweise als R Code seinen Niederschlag.
+Konkret sieht der Code so aus.
+
+
+
+```{r}
+#| code-fold: true
+#| echo: true
+#| eval: false
+#| code-summary: "Code: Random Forests mit mlr3"
+
+library(data.table) #<1>
+library(magrittr)
+library(mlr3)
+library(mlr3tuning)
+library(mlr3extralearners)
+library(mlr3learners)
+library(mlr3pipelines)
+library(paradox)
+library(bbotk)
+library(mlr3mbo)
+library(forcats)
+library(future)
+
+plan(multicore) #<2>
+
+## Argumente uebernehmen
+args <- commandArgs(trailingOnly = TRUE) #<3>
+
+# defaults
+default_evals    <- 20
+default_duration <- 2 * 60 * 60
+
+n_evals  <- ifelse(length(args) >= 1, as.integer(args[1]), default_evals)
+duration <- ifelse(length(args) >= 2, as.integer(args[2]), default_duration)
+
+cat("\n -------------------------------------------- \n")
+cat("Tuning Stoppt nach:\n")
+cat("  Evals:", n_evals, "\n")
+cat("  Zeit in Sekunden:", duration)
+cat("\n -------------------------------------------- \n\n")
+
+set.seed(42)
+
+# einlesen und modden
+d = fread("healthcare-dataset-stroke-data.csv") %>% 
+  .[, bmi := as.numeric(ifelse(bmi == "N/A", NA_character_, bmi))] %>% 
+  .[, id := as.character(id)]  %>% 
+  .[gender != "Other",]
+
+# id muss ein character sein, sonst bekomme ich unten bei der rollenzuteilung einen error
+# denn ein "name" spalte muss character oder factor sein, aber nie integer - whyever
+
+
+#### TASK ######################################################################
+
+# es ist etwas kompliziert eine variable den feature status zu entziehen.
+task_stroke = as_task_classif(d, target = "stroke") #<4>
+task_stroke$col_roles$feature <- setdiff(task_stroke$col_roles$feature, "id")
+task_stroke$col_roles$name <- "id"
+task_stroke$set_col_roles("stroke", c("target","stratum")) #<5>
+
+split = partition(task_stroke, ratio = 0.8) 
+
+### learner --------------------------------------------------------------------
+learner_rf = lrn("classif.ranger", #<6>
+                 predict_type = "prob",
+                 respect.unordered.factors = "partition",
+                 importance = "permutation",
+                 num.trees = 5000,
+                 id = "rf") # mit id = "rf" kann ich bei ps dann die präambel kuerzer schreiben
+
+# rf muss davor geschrieben werden, weil es sonst bei der pipe unklarheiten
+# bezueglich parameternamen gibt!
+param_set = ps( #<7>
+  rf.mtry.ratio = p_dbl(0.4, 1),
+  rf.min.node.size = p_int(20, 800) 
+)
+
+### resampling -----------------------------------------------------------------
+resampling_CV5 = rsmp("cv", folds = 5) #<8>
+measure_AUC    = msr("classif.auc")
+
+
+### tuner ----------------------------------------------------------------------
+tuner_bayes = tnr("mbo") #<9>
+
+### terminator -----------------------------------------------------------------
+terminator2 = trm("combo", #<10>
+                 list(
+                   trm("evals", n_evals = n_evals),
+                   trm("run_time", secs = duration)
+                 )
+)
+
+### pipeline -------------------------------------------------------------------
+po_impute_d_uk <- po("imputelearner", learner = lrn("regr.rpart"), 
+                     param_vals = list(
+                       affect_columns = selector_type("numeric")
+                     ), id = "imp_d_uk")
+
+pip_rob = pipeline_robustify(task = task_stroke, #<11>
+                             learner = learner_rf,
+                             character_action = "factor!",
+                             impute_missings = FALSE) %>>%
+  po_impute_d_uk %>>%
+  po("learner", 
+     learner = learner_rf) 
+  
+### autotune -------------------------------------------------------------------
+at = AutoTuner$new(
+  learner = pip_rob,
+  resampling = resampling_CV5,
+  measure = measure_AUC,
+  search_space = param_set,
+  terminator = terminator2,
+  tuner = tuner_bayes
+)
+
+at$train(task_stroke, row_ids = split$train)
+
+pred_res = at$predict(task_stroke, row_ids = split$test)
+auc_test = measure_AUC$score(pred_res)
+
+
+full_res = list(at = at, 
+                pred_res = pred_res, 
+                auc_test = auc_test,
+                split = split)
+
+saveRDS(full_res, "output/ranger_only.rds")  
+```
+1. Wir laden wirklich viele packages. Insbesondere `mlr3` und friends sind mit dabei.
+2. Wir wollen parallelisieren sonst dauert es zu lang. Mit dieser Einstellung 
+werden alle vorliegenden Kerne genommen. Als Argument kann man `multicore` verwenden
+oder `multisession`. `multicore` funktioniert nur unter Linux, aber Achtung: 
+ich hab damit Probleme beim Ausprobieren unterschiedlicher ML-Tools bekommen.
+Konkret lief `XGboost` nur mit `multisession`!
+3. Das braucht man, dass man später auch in der shell mittels Argumenten die
+Terminator Bedingungen modulieren kann!
+4. In `mlr3` muss man zuerst immer einen Task definieren. Achtung: Man kann ein
+`target` definieren, aber keine `features`.
+5. In diesem Schritt wird ein Stratum definiert, nämlich unser target. 
+In der nächsten Zeile wird der Datensatz geteilt (genauer gesagt Row-Ids bestimmt)
+in einen Trainings- und einen Testdatensatz. Der Testdatensatz wird quasi "zurückgehalten"
+um halbwegs objektiv die zukünftige Prognosegenauigkeit bestimmen zu können. 
+6. Hier wird der `learner` definiert. In unserem Fall ein Random Forest, der
+mithilfe des `ranger` packages gefittet werden soll.
+7. Wenn man Parameter tunen will, dannmuss man einen Range angeben in dem 
+der optimale Parameter gesucht werden soll.
+8. Hier wird die Art der Kreuzvalidierung festgelegt. In diesem Fall ist es
+eine 5-fold Cross Validation. 
+9. Das ist der Tuner und stammt aus dem [mlr3mbo](https://mlr3mbo.mlr-org.com/articles/mlr3mbo.html) package. 
+Wir haben in Punkt 6 den Range der Parameter angegeben. 
+Doch wir haben nicht festgelegt welche Parameterwerte konkret verwendet werden 
+sollen. Dieser Tuner verwendet Bayesian Optimization und versucht auf Basis der
+bisherigen Parameterkombinationen die vermutlich beste Kombination im nächsten
+Durchlauf zu finden.
+10. Der kombinierte Terminator. Denn irgendwann muss auch mal Schluss sein mit
+dem Machine Learning. Hier wird eine Kombi aus Anzahl der Durchläufe und 
+Dauer genommen. Das ist sehr praktisch, denn man kann einstellen, dass
+das Ganze z. B.  maximal 24 Stunden laufen soll.
+11. Hier ist jetzt eigentlich das Coolste: [mlr3pipelines](https://mlr3pipelines.mlr-org.com/)!
+Das wirkt hier jetzt noch unspektakulär. Was macht diese Pipeline? Sie imputiert 
+missing values mittels eines Regression Trees und macht den Datensatz
+robust, falls, vor allem beim splitten der Daten via CV, Unvorhergesehenes auftritt.
+
+
+Diesen Code packen wir in einen docker Container, schicken ihn auf die 
+Google Cloud um ihn dort "laufen zu lassen"! Der konkrete docker Container für
+dieses Projekt sieht so aus:
+
+```dockerfile
+FROM rocker/r-ver:4.3.1
+
+# Systemaktualisierungen und notwendige Linux-Pakete
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libgit2-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installieren von 'pak' von GitHub für die neueste Version
+RUN R -e "install.packages('pak', repos = 'https://r-lib.github.io/p/pak/dev/')"
+RUN R -e "pak::pkg_install('Rdatatable/data.table')"
+RUN R -e "pak::pkg_install(c('magrittr', 'future','mlr-org/mlr3', 'mlr-org/mlr3tuning', 'mlr-org/mlr3extralearners', 'mlr-org/mlr3learners', 'mlr-org/mlr3pipelines', 'mlr-org/paradox', 'mlr-org/bbotk', 'mlr-org/mlr3mbo', 'mlr-org/mlr3misc', 'mlr-org/mlr3measures','ranger', 'DiceKriging', 'rgenoud', 'forcats', 'future', 'kknn', 'e1071', 'xgboost'))"
+
+WORKDIR /tune
+
+COPY healthcare-dataset-stroke-data.csv /tune/healthcare-dataset-stroke-data.csv
+COPY *.R /tune/
+
+RUN mkdir /tune/output
+
+# Setzen des ENTRYPOINT auf Rscript
+ENTRYPOINT ["Rscript"]
+```
+
+Und das ist die konkrete Abfolge wie ich das Docker image auf die VM-Instanz von
+Google bekommen habe. Um eine VM-Instanz zu starten einfach herumprobieren und
+eine Maschine wählen, die zum eigenen Problem passt. In der Testphase ist man
+relativ limitiert, d. h. man keine beliebig großen Instanzen mieten. D. h. die 
+zu lösenden Machine Learning Probleme sollten nicht zu groß sein!
+
+
+
+## Random Forest (mbo) Ergebnisse 
+
+
+Am Ende des Tages wollen wir irgendetwas über die Daten erfahren.
+
+1. Welche Variablen sind wichtig?
+2. Wie genau können wir vorhersagen?
+3. Wie müssen die Parameter gewählt werden um möglichst genaue Vorhersagen zu
+treffen?
+
+
+```{r packages}
+library(data.table) #<1>
+library(magrittr)
+library(mlr3)
+library(mlr3tuning)
+library(mlr3extralearners)
+library(mlr3learners)
+library(mlr3pipelines)
+library(paradox)
+library(bbotk)
+library(mlr3mbo)
+library(forcats)
+library(mlr3viz)
+library(ggplot2)
+
+library(fields)
+
+library(DALEX)
+library(DALEXtra)
+
+source("functions/functions.R")
+```
+
+
+
+```{r model_data}
+erg_list_mbo = readRDS("data/ranger_only.rds")
+erg_list_rs  = readRDS("data/ranger_rs.rds")
+```
+
+
+### Parameter
+
+Wir haben das Modell mittels Bayesian Optimization getuned. Das heisst, es wird
+nicht per Zufall, oder deterministisch gesucht, sondern es wird dort gesucht 
+wo auf Basis der vorliegenden Daten ein möglichst hoher **auc** vermutet wird --
+das ist die Fläche unter eine ROC Kurve. Je größer die Fläche desto besser.
+Schauen wir uns also die Parameterkombination an, um zu sehen wo sich ein
+Maximum einstellt.
+
+Wir haben 2 Parameter getunded:
+
+1. `min.node.size`: Ist die minimal notwendige Anzahl bei der ein Node gerade 
+noch gesplittet werden darf. D. h. es wird auch Nodes geben mit einem geringeren
+N als `min.node.size` -- diese können aber nicht mehr gesplittet werden!
+2. `mtry.ratio`: Anteil, wieviele Variablen genutzt werden sollen.  
+
+@fig-hyper-param-tuning1 zeigt die Verteilung des auc je nach Parameterkombination. 
+Mit einem roten X ist die Parameterkombination mit dem höchsten auc gekennzeichnet.
+Diese liegt am Rande unseres Parameterraums. Betrachtet man den kompletten Raum
+wirkt es so, dass eigentlich alle Kombinationen zu recht guten Ergebnissen führen.
+Der gelbe Fleck am Rand suggeriert, dass eventuell noch bessere Ergebnisse 
+zu finden wären, wenn wir `min.node.size` noch weiter nach oben schrauben würden.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+#| label: fig-hyper-param-tuning1
+#| fig-cap: Verteilung der einzelnen auc Werte je Parameterkombination 
+
+twoD_parameter_gra(erg_list_mbo)
+```
+
+
+### Variable Importance
+
+Die Variable Importance gibt an, welche Variablen am wichtigsten für die Vorhersage
+sind. Das package `ranger`, auf das hier zurückgegriffen wurde, um die Random Forests
+laufen zu lassen, berechnet unter anderem, die "permutation" Variable Importance.
+Dabei wird für jeden Tree dessen "Accuracy" bezüglich des OOB Samples bestimmt,
+um dann im nächsten Schritt jeweils eine Variable zufällig zu permutieren um so
+den Rückgang der "Accuracy" zu messen. Je stärker der Rückgang, desto 
+"wichtiger" ist diese Variable. Offensichtlich ist die Variable `age` besonders
+wichtig. Inhaltlich hätte ich eher mit der Variable `heart disease` gerechnet,
+also interessant, dass `age` so deutlich dominiert. 
+
+
+```{r}
+#| fig-width: 6
+#| fig-height: 5
+#| label: fig-varimp
+#| fig-cap: Variable Importance 
+#| 
+vi_mbo = erg_list_mbo$at$importance()
+
+vi_dt = data.table(Variable = factor(names(vi_mbo)), importance = vi_mbo)
+vi_dt[, Variable := forcats::fct_reorder(Variable, -importance)]
+
+p = ggplot(data = vi_dt, aes(Variable, y = importance)) +
+    geom_bar(stat = "identity") + 
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+p
+```
+
+
+Wenn man nicht nur einem einzelnen Wert vertrauen will, sondern sich auch die
+Erklärungskraft jeder einzelnen Variable und deren funktionalen
+Zusammenhang ansehen möchte, kann mittels `DALEX` und `DALEXtra` package
+ansprechende "partial dependency plots" anfertigen!
+In @fig-pdp-age sieht man den Zusammenhang der Variable Alter mit der
+Wahrscheinlichkeit einen `stroke` zu erleiden. Wie zu erwarten war: je älter
+desto eher droht die Gefahr eines Schlaganfalls.
+Dass das Vorliegen einer `heart disease` sich auch förderlich
+auf einen Schlaganfall auswirkt zeigt @fig-pdp-agehd.
+
+![Partial-Dependence Plot der Variable Alter](gra/r3a_age_.png){#fig-pdp-age}
+
+
+![Partial-Dependence Plot der Variable Alter zusammen mit Heart disease](gra/r3a_age_heart_disease.png){#fig-pdp-agehd}
+
+
+Aber wir wollen uns hier ja nicht im inhaltlichen verlieren.
+Jetzt stellt sich noch die Frage, was wir uns in Zukunft erwarten können? Also
+was wie gut wird das Modell performen, wenn wir es auf unseren bis jetzt zurückgehaltenen
+Testdatensatz anwenden?
+
+## Testdatensatz
+
+Am Ende des Tages, wollen wir mit unserem Modell ja wissen, wie die Performance
+sein wird, wenn wir unser Modell mit der besten Parameterkombination auf einen
+neuen Datensatz anwenden. Diese Info bekommen wir hier.
+
+@fig-roc1 und @fig-pr1 zeigen die Modellperformance.
+
+::::{.columns}
+:::{.column width="50%"}
+```{r}
+#| label: fig-roc1
+#| fig-cap: ROC Kurve auf den Testdaten 
+pred_res = erg_list_mbo$pred_res %>% copy
+autoplot(pred_res, type ="roc")
+```
+:::
+:::{.column width="50%"}
+```{r}
+#| label: fig-pr1
+#| fig-cap: PR Kurve auf den Testdaten 
+autoplot(pred_res, type = "prc")
+```
+:::
+::::
+
+
+
+
+
+
+
+::: {style="float: left; margin: 1em;"}
+```{dot}
+//| fig-width: 6
+//| fig-height: 9
+digraph pipeline {
+  rankdir=TB;
+  splines=ortho;
+  node [shape=box, style=filled, fontname="Helvetica", fontsize=10];
+
+  robustify [label="Robustify Pipeline", fillcolor=lightblue];
+  branch [label="Branch\n(Unknown as Category / Impute Unknown)", shape=box, fillcolor=steelblue];
+  imp_d_imp [label="Impute numeric\nvariables", fillcolor=orange];
+  colapply [label="Smoking Status:\nUnknown as NA", fillcolor=orange];
+  imp_f_uk [label="Impute Smoking\nStatus", fillcolor=orange];
+  imp_d_uk [label="Impute num\nvariables", fillcolor=orange];
+  unbranch [label="Merge branches", fillcolor=plum, width=3];
+
+  // Basis-Learner als eigene Knoten in einem Cluster
+  subgraph cluster_base {
+    label="Base Learner";
+    style=dashed;
+    nop [label="Original\nDaten", fillcolor=yellow];
+    rf  [label="RF", fillcolor=yellow];
+    nb  [label="NB", fillcolor=yellow];
+    knn [label="kNN", fillcolor=yellow];
+    { rank=same; nop; rf; nb; knn; }
+  }
+  
+  base_union [label="Feature Union\nbase learner", shape=ellipse, fillcolor=gray];
+  encode [label="Encode\n(One-Hot)", fillcolor=lightblue];
+  xgboost [label="Super-Learner\nXGBoost", fillcolor=red];
+
+  // --- Kanten ---
+  robustify -> branch;
+  branch -> imp_d_imp [tailport=s, headport=n];
+  branch -> colapply   [tailport=s, headport=n];
+  colapply   -> imp_f_uk [tailport=s, headport=n];
+  imp_f_uk   -> imp_d_uk [tailport=s, headport=n];
+  
+  // Damit die Pfeile nicht direkt in den Unbranch-Kasten laufen,
+  // lassen wir sie von den beiden Imputationsergebnissen links bzw. rechts eintreten:
+  imp_d_imp -> unbranch [tailport=s, headport=wn];
+  imp_d_uk  -> unbranch [tailport=s, headport=en];
+  
+  // Von unbranch werden die Daten an alle Basis-Learner verteilt:
+  unbranch -> nop;
+  unbranch -> rf;
+  unbranch -> nb;
+  unbranch -> knn;
+  
+  // Die Ausgaben der Basis-Learner fließen in den Feature Union-Knoten:
+  nop  -> base_union;
+  rf   -> base_union;
+  nb   -> base_union;
+  knn  -> base_union;
+  
+  base_union -> encode;
+  encode     -> xgboost;
+}
+```
+:::
+
+
+
+
+
+
+
+## 
+
+Was kann ich beschreiben im Blogpost:
+
+1) Datensatz
+2) mlr3 package
+3) Was ist eine pipeline und welche hab ich genommen?
+4) Was sind die ML Methoden?
+5) Wie packe ich das in einen Docker container und bringe auf den Server?
+6) wie lasse ich es laufen?
+7) Was sind die Ergebnisse?
+
+
+
+
+
+
+
+
+
+
+
