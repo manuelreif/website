@@ -11,7 +11,7 @@ website:
   description: "Manuels Website und Blog zu höchtpersönlichen Data Science Themen"
   google-analytics: "G-TV2KQ9KDW0"
   page-footer:
-    left: "{{< fa copyright >}} 2024 Manuel Reif | site made with quarto"
+    left: "{{< fa copyright >}} 2025 Manuel Reif | site made with quarto"
     right:
         - icon: github
           href: https://github.com/manuelreif/website

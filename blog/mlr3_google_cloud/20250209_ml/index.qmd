@@ -1,58 +1,62 @@
 ---
 title: "Machine Learning in der Google Cloud"
-description: "Wenn man eine Maschine und 300$ hat, dann lässt man die Maschine auch was lernen, denn man kann es sich ja leisten."
+description: "Wenn man eine Maschine und 300$ hat, dann lässt man die Maschine auch was lernen, denn man kann es sich ja leisten. Dieser Blogeintrag zeigt in aller notwendigen Kürze, wie ich ein `mlr3` Modell aus auf Google Cloud laufen lasse."
 author: Manuel Reif 
-date: 2025-02-09
+date: 2025-02-08
 lang: de
 categories: [R, google Cloud, mlr3, docker, git]
 draft: false 
 highlight-style: monokai
-image: media/main_pic.webp
+image: media/thumb_drama.webp
 execute:
     eval: true
     message: false
     echo: false
     warning: false
-    freeze: false
+    freeze: true
 filters:
    - include-code-files
 ---
-<img src="media/christmas_docker.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
 
-`mlr3` ist ein package, das mich phasenweise leiden lässt. Jeder der das schon
-einmal gesehen hat, will es nicht nochmal erleben. Dennoch löst `mlr3` einige
-Probleme und wie jedes gute package, löst es mehr Probleme als es neue 
-Probleme schafft. Vielleicht nicht gerade für den 0815 R Anwender, der gerne einmal 
-ein Machine Learning Modell laufen lassen will, um zu sehen wie man sich
-als Data Scientist fühlt, sondern eher für jemanden, der sich dafür entscheidet
-heute, morgen und vermutlich auch übermorgen unterschiedliche Modelle anzuwenden
-und vor allem diese zu tunen. Denn so cool es auch ist, dass jeder User
-da draußen ein R-Package schreiben kann, so schwierig ist es, sich auf die Logik
-jeden Packages einzulassen. Heutzutage will man sich nicht die Zeit für sowas 
-nehmen. `mlr3` ist nicht das einzige package das dieses 
-Problem versucht zu lösen, aber das einzige das wir uns hier ansehen. Denn
-auf der useR! 2024 stolperte ich mehr oder weniger in ein Tutorial und einen
-Vortrag zu `mlr3`. Schicksalhafte Begegnungen, die nun in diesem Blogpost münden.
-Der stille Held dieser und allen weiteren Stories auf der Google Cloud,
-ist wieder der gute alte docker Container der wie ein gutes Elternteil alles 
-mit dabei hat was notwendig ist, um den Ausflug der R-Files in die Cloud 
-zu ermöglichen.
+<img src="media/thumb_drama.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
 
+[mlr3](https://mlr3.mlr-org.com/) ist ein Package, das mich phasenweise leiden lässt.
+Jeder, der das schon einmal gesehen hat, will es nicht noch einmal erleben. 
+Dennoch löst `mlr3` einige Probleme und, wie jedes gute Package, löst es mehr 
+Probleme, als es neue schafft. Vielleicht ist es nicht unbedingt etwas für den
+08/15-R-Anwender, der gerne einmal ein Machine-Learning-Modell laufen lassen möchte, 
+um zu sehen, wie man sich als Data Scientist fühlt, sondern eher für jemanden, der
+heute, morgen und vermutlich auch übermorgen unterschiedliche Modelle fitten 
+und vor allem tunen möchte. Denn so cool es auch ist, dass jeder da draußen ein
+R-Package schreiben kann, so schwierig ist es, sich auf die Logik jedes einzelnen
+Packages einzulassen. Die Zeit fehlt oft, obwohl man natürlich gerne die neuesten
+Modelle anwenden will (so wie ich Random Forests {{< bi emoji-laughing >}}). 
+
+`mlr3` ist nicht das einzige Package, das dieses Problem zu lösen versucht, aber das
+einzige, das wir uns hier ansehen. Auf der useR! 2024 stolperte ich mehr oder weniger
+in einen überfüllten Seminarraum und damit in ein Tutorial zu `mlr3`.
+Schicksalhafte Begegnungen, die nun in diesem Blogpost münden.
+Der stille Held dieser und aller weiteren Stories auf der Google Cloud ist wieder der
+gute alte [Docker Container](https://www.docker.com/), der wie ein gutes Elternteil
+alles mit dabei hat, was notwendig ist, um den Ausflug der R-Files in die Cloud zu
+ermöglichen.
 
 
 ## Der Datensatz
 
-Schlaganfälle sind eine ernste Sache. Um das Risiko eines Schlaganfalls
-vorhersagen zu können muss man Daten sammeln. In diesem Datensatz: https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset
-exisitieren 11 clinical features um Herzinfarkte vorherzusagen. 
-@tbl-data-desc-num und @tbl-data-desc-fct zeigen getrennt nach Skalenniveau
-die einzelnen Variablen. Die Variable die es vorherzusagen gilt ist `stroke` -- 
-codiert als 0/1. Die Angabe in der Tabelle ist etwas unintuitiv -- weist letztlich
-die Anzahl der Schlaganfälle aus (1) bzw. deren Anteil an den Gesamtbeobachtungen.
-Was auch immer die anderen Variablen genau bedeuten muss uns nicht interessieren.
-Wir wollen sie bloß verwenden um `stroke` möglichst gut zu erklären. 
-Die Bedeutung jeder einzelnen Variable zu verstehen ist für dieses Beispiel nicht
-wirklich notwendig.
+Schlaganfälle sind eine ernste Sache. Um das Risiko eines Schlaganfalls vorhersagen zu
+können, muss man Daten sammeln. 
+In [diesem Datensatz](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset) 
+existieren 11 clinical features - quasi die unabhängigen Variablen.
+@tbl-data-desc-num und @tbl-data-desc-fct zeigen getrennt nach Skalenniveau die einzelnen Variablen. Die Variable, die es vorherzusagen gilt, ist `stroke` – kodiert
+als 0/1. Die Angabe in der Tabelle ist etwas unintuitiv – sie weist letztlich die
+Anzahl der Schlaganfälle (1) bzw. deren Anteil an den Gesamtbeobachtungen aus. 
+Was die anderen Variablen im Detail bedeuten, ist nicht unbedingt wichtig. Wir 
+wollen sie bloß verwenden, um `stroke` möglichst gut zu erklären.
+Allerdings scheinen die Variablen sinnvoll: Alter (macht alles schlechter), Bluthochdruck,
+die Frage nach einer bereits bestehenden Herzerkrankung, der BMI oder die 
+Information ob jemand raucht oder nicht etc. wollen wir hier in weiterer Folge auf ihre 
+prognostische Werthaltigkeit prüfen.
 
 
 ```{r}
@@ -131,53 +135,38 @@ summary_table_n
   <img src="media/mlr3verse.svg" alt="mlr3-ecosystem" style="float: right; width: 60%; margin-left: 20px; margin-bottom: 10px;"/>
 </a>
 
-
-
-Um alle Abläufe rund um ein Machine Learning Projekt nicht immer selbst 
-implementieren zu müssen, ist es klug auf ein Package zurückzugreifen, das 
-dem einfachen User die wesentlichsten Schritte schon mal abnimmmt.
-Sonst findet man sich in der ermüdenden Lage verschachtelte Schleifen
-zu schreiben und Funktionen zu definieren die man eigentlich noch viel
-allgemeiner formulieren könnte um sie einfacher wiederverwenden zu können.
-Aber will man schon so sehr in der Zukunft leben, dass man die gerade aktuelle
-Funktion so baut, dass sie nicht nur das aktuelle, sondern auch möglichst 
-alle zukünftigen Probleme gleicher oder ähnlicher Art löst? Manchmal will man das.
-Manchmal will man aber auch nur das aktuelle Problem lösen, ohne schon
-an morgen denken zu müssen, insbesondere wenn sich schon andere Menschen 
-ihren schönen Kopf über solche Funktionen zerbrochen haben und ein mutmaßlich
-benutzerfreundliches Funktionskonstrukt geschaffen haben, das uns viel
-Denkarbeit abnimmt. Man muss nur lernen mit dem Package umzugehen und sich
-daran gewöhnen. Also das package mit dem hier gearbeitet wird ist das [mlr3 package.](https://mlr3.mlr-org.com/)
+Um alle Abläufe rund um ein Machine-Learning-Projekt nicht immer selbst implementieren
+zu müssen, ist es klug, auf ein Package zurückzugreifen, das dem/der User:in die
+wesentlichsten Schritte schon einmal abnimmt. Sonst findet man sich in der ermüdenden
+Lage, verschachtelte Schleifen zu schreiben und Funktionen zu definieren, die man
+eigentlich noch viel allgemeiner formulieren könnte, um sie einfacher 
+wiederverwenden zu können.
+Aber will man schon so sehr in der Zukunft leben, dass man die gerade aktuelle Funktion
+so baut, dass sie nicht nur das aktuelle, sondern auch möglichst alle zukünftigen
+Probleme gleicher oder ähnlicher Art löst? Manchmal will man das. Manchmal will man
+aber auch nur das aktuelle Problem lösen, ohne schon an morgen denken zu müssen,
+insbesondere, wenn sich bereits andere Menschen ihren schönen Kopf über solche
+Funktionen zerbrochen und ein mutmaßlich benutzerfreundliches Funktionskonstrukt
+geschaffen haben, das uns viel Denkarbeit abnimmt.
+Man muss nur lernen, mit dem Package umzugehen und sich daran zu gewöhnen. Also, das Package, mit dem hier gearbeitet wird, ist – wie schon angekündigt – [mlr3](https://mlr3.mlr-org.com/).
 
 
 ## Der Plan
 
-Ziel ist es einen Schlaganfall (stroke) möglichst gut vorherzusagen.
-Wie wir das machen, also mit welcher Methode, ist uns jetzt mal egal.
-Das konkrete Vorgehen soll also folgendes beinhalten:
+<img src="media/the_plan.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
 
-1. Wähle eine Methode mit der die Target Variable (`stroke`) vorhergesagt werden soll.
-2. Bereite den Datensatz so auf, wie es für die gewählte Methode notwendig ist.
-3. Splitte den Datensatz in Training und Testdatensatz. Der Testdatensatz kann
-dann dafür verwendet werden, unterschiedliche Methoden anhand deren Prognoseleistung 
-auf diesem zu vergleichen.
-4. Teile den Trainingsdatensatz wiederholt mittels Crossvalidation (CV) in Training und Testdatensatz 
-(z. B. klassische 5-fold CV). D. h. der Datensatz wird in 5 Teile geteilt.
-Auf 4/5 der Daten wird das Modell trainiert und auf dem restlichen 1/5 wird vorhergesagt.
-Dies wird 5 mal wiederholt.
-5. Fitte auf dem Trainingsdatensatz ein beliebiges Modell (z. B. Random Forest)
-mit einer bestimmten Parameterkonstellation.
-6. Sage mit dem trainierten Modell die Target Variable in den Testdaten vorher 
-und bestimme wie gut das gelungen ist (z. B. mittels `auc` Metrik).
-7. Tune die Parameter um die beste Parameterkombination zu ermitteln! 
-8. Am Ende versuchen wir mit dem getunten Modell unser target (`stroke`) am
-Testdatensatz vorherzusagen. Diese Performance gibt uns eine gute Einschätzung,
-wie gut das Modell in Zukunft performen wird!
+Hier der konkrete, geplante Ablauf:
 
+1. Wähle eine Methode, mit der die Target-Variable (`stroke`) vorhergesagt werden soll.  
+2. Bereite den Datensatz so auf, wie es für die gewählte Methode notwendig ist.  
+3. Splitte den Datensatz in Trainings- und Testdatensatz. Der Testdatensatz kann dann verwendet werden, um unterschiedliche Methoden anhand ihrer Prognoseleistung zu vergleichen.  
+4. Führe eine wiederholte Cross-Validation (CV) auf dem Trainingsdatensatz durch (z. B. klassische 5-fold-CV). Das bedeutet, der Datensatz wird in fünf Teile geteilt: Auf 4/5 der Daten wird das Modell trainiert und auf dem restlichen 1/5 wird vorhergesagt. Dies wird fünfmal wiederholt.  
+5. Fitte auf dem Trainingsdatensatz ein beliebiges Modell (z. B. einen Random Forest) mit einer bestimmten Parameterkonstellation.  
+6. Tune die Parameter, um die beste Parameterkombination zu ermitteln!  
+7. Am Ende versuchst du, mit dem getunten Modell `stroke` im Testdatensatz vorherzusagen. Diese Performance gibt uns eine gute Einschätzung, wie gut das Modell in Zukunft performen wird!
 
-Dieser Plan findet bei mir üblicherweise als R Code seinen Niederschlag.
+Dieser Plan findet bei mir üblicherweise als R-Code seinen Niederschlag. 
 Konkret sieht der Code so aus.
-
 
 
 ```{r}
@@ -222,12 +211,8 @@ set.seed(42)
 # einlesen und modden
 d = fread("healthcare-dataset-stroke-data.csv") %>% 
   .[, bmi := as.numeric(ifelse(bmi == "N/A", NA_character_, bmi))] %>% 
-  .[, id := as.character(id)]  %>% 
+  .[, id := as.character(id)]  %>% # id muss ein character sein!
   .[gender != "Other",]
-
-# id muss ein character sein, sonst bekomme ich unten bei der rollenzuteilung einen error
-# denn ein "name" spalte muss character oder factor sein, aber nie integer - whyever
-
 
 #### TASK ######################################################################
 
@@ -258,7 +243,6 @@ param_set = ps( #<7>
 resampling_CV5 = rsmp("cv", folds = 5) #<8>
 measure_AUC    = msr("classif.auc")
 
-
 ### tuner ----------------------------------------------------------------------
 tuner_bayes = tnr("mbo") #<9>
 
@@ -280,9 +264,9 @@ pip_rob = pipeline_robustify(task = task_stroke, #<11>
                              learner = learner_rf,
                              character_action = "factor!",
                              impute_missings = FALSE) %>>%
-  po_impute_d_uk %>>%
-  po("learner", 
-     learner = learner_rf) 
+po_impute_d_uk %>>%
+po("learner", 
+ learner = learner_rf) 
   
 ### autotune -------------------------------------------------------------------
 at = AutoTuner$new(
@@ -291,14 +275,12 @@ at = AutoTuner$new(
   measure = measure_AUC,
   search_space = param_set,
   terminator = terminator2,
-  tuner = tuner_bayes
-)
+  tuner = tuner_bayes)
 
 at$train(task_stroke, row_ids = split$train)
 
 pred_res = at$predict(task_stroke, row_ids = split$test)
 auc_test = measure_AUC$score(pred_res)
-
 
 full_res = list(at = at, 
                 pred_res = pred_res, 
@@ -307,44 +289,20 @@ full_res = list(at = at,
 
 saveRDS(full_res, "output/ranger_only.rds")  
 ```
-1. Wir laden wirklich viele packages. Insbesondere `mlr3` und friends sind mit dabei.
-2. Wir wollen parallelisieren sonst dauert es zu lang. Mit dieser Einstellung 
-werden alle vorliegenden Kerne genommen. Als Argument kann man `multicore` verwenden
-oder `multisession`. `multicore` funktioniert nur unter Linux, aber Achtung: 
-ich hab damit Probleme beim Ausprobieren unterschiedlicher ML-Tools bekommen.
-Konkret lief `XGboost` nur mit `multisession`!
-3. Das braucht man, dass man später auch in der shell mittels Argumenten die
-Terminator Bedingungen modulieren kann!
-4. In `mlr3` muss man zuerst immer einen Task definieren. Achtung: Man kann ein
-`target` definieren, aber keine `features`.
-5. In diesem Schritt wird ein Stratum definiert, nämlich unser target. 
-In der nächsten Zeile wird der Datensatz geteilt (genauer gesagt Row-Ids bestimmt)
-in einen Trainings- und einen Testdatensatz. Der Testdatensatz wird quasi "zurückgehalten"
-um halbwegs objektiv die zukünftige Prognosegenauigkeit bestimmen zu können. 
-6. Hier wird der `learner` definiert. In unserem Fall ein Random Forest, der
-mithilfe des `ranger` packages gefittet werden soll.
-7. Wenn man Parameter tunen will, dannmuss man einen Range angeben in dem 
-der optimale Parameter gesucht werden soll.
-8. Hier wird die Art der Kreuzvalidierung festgelegt. In diesem Fall ist es
-eine 5-fold Cross Validation. 
-9. Das ist der Tuner und stammt aus dem [mlr3mbo](https://mlr3mbo.mlr-org.com/articles/mlr3mbo.html) package. 
-Wir haben in Punkt 6 den Range der Parameter angegeben. 
-Doch wir haben nicht festgelegt welche Parameterwerte konkret verwendet werden 
-sollen. Dieser Tuner verwendet Bayesian Optimization und versucht auf Basis der
-bisherigen Parameterkombinationen die vermutlich beste Kombination im nächsten
-Durchlauf zu finden.
-10. Der kombinierte Terminator. Denn irgendwann muss auch mal Schluss sein mit
-dem Machine Learning. Hier wird eine Kombi aus Anzahl der Durchläufe und 
-Dauer genommen. Das ist sehr praktisch, denn man kann einstellen, dass
-das Ganze z. B.  maximal 24 Stunden laufen soll.
-11. Hier ist jetzt eigentlich das Coolste: [mlr3pipelines](https://mlr3pipelines.mlr-org.com/)!
-Das wirkt hier jetzt noch unspektakulär. Was macht diese Pipeline? Sie imputiert 
-missing values mittels eines Regression Trees und macht den Datensatz
-robust, falls, vor allem beim splitten der Daten via CV, Unvorhergesehenes auftritt.
-
+1. Wir laden wirklich viele Packages, insbesondere `mlr3` und seine Freunde. Im unten stehenden `Dockerfile` sieht man, welche Packages in Summe installiert werden. Das heißt: Lässt man alles im Docker-Container laufen, wird alles fix und fertig installiert!
+2. Wir wollen parallelisieren, sonst dauert es zu lange. Mit dieser Einstellung  werden alle vorliegenden Kerne genutzt. Als Argument kann man `multicore`  oder `multisession` verwenden. `multicore` funktioniert nur unter Linux, aber Vorsicht: Beim Ausprobieren verschiedener ML-Tools hatte ich damit Probleme. Konkret lief `XGboost` nur mit `multisession`!
+3. Dieses Statement ermöglicht es, später in der Shell mithilfe von Argumenten die Terminator-Bedingungen zu modulieren.
+4. In `mlr3` muss man zuerst immer einen Task definieren. Achtung: Man kann ein `target` definieren, aber keine `features`.
+5. In diesem Schritt wird ein Stratum definiert, nämlich unser `target`. In der nächsten Zeile wird der Datensatz geteilt (genauer gesagt werden Row-IDs bestimmt) in einen Trainings- und einen Testdatensatz. Der Testdatensatz wird quasi 'zurückgehalten', um halbwegs objektiv die zukünftige Prognosegenauigkeit bestimmen zu können. Das ist insbesondere wichtig, wenn wir in Zukunft mit anderen Modellen vergleichen wollen.
+6. Hier wird der `learner` definiert. In unserem Fall ein Random Forest, der mithilfe des `ranger` packages gefittet werden soll.
+7. Wenn man Parameter tunen möchte, dann muss man einen Range angeben in dem der optimale Parameter gesucht werden soll.
+8. Hier wird die Art der Kreuzvalidierung festgelegt. In diesem Fall ist es eine 5-fold Cross Validation. 
+9. Das ist der Tuner und er stammt aus dem [mlr3mbo](https://mlr3mbo.mlr-org.com/articles/mlr3mbo.html)-Package. Wir haben in Punkt 6 den Range der Parameter definiert, aber nicht festgelegt, welche Parameterwerte konkret getestet werden sollen. Dieser Tuner setzt auf Bayesian Optimization und versucht auf Basis der bisherigen Parameterkombinationen die vermutlich beste Kombination für den nächsten Durchlauf zu finden.
+10. Der kombinierte Terminator. Denn irgendwann muss auch mal Schluss sein mit dem Machine Learning. Hier wird eine Kombi aus Anzahl der Durchläufe und Dauer genommen. Das ist sehr praktisch, denn man kann einstellen, dass das Ganze z. B.  maximal 24 Stunden laufen soll.
+11. Hier kommt das eigentliche Highlight: [mlr3pipelines](https://mlr3pipelines.mlr-org.com/)! Das wirkt hier jetzt noch unspektakulär. Was macht diese Pipeline? Sie imputiert Missing Values mithilfe eines Regression Trees und macht den Datensatz robust, falls, vor allem beim Splitten der Daten via CV, Unvorhergesehenes auftritt.
 
 Diesen Code packen wir in einen docker Container, schicken ihn auf die 
-Google Cloud um ihn dort "laufen zu lassen"! Der konkrete docker Container für
+Google Cloud um ihn dort 'laufen zu lassen'! Der konkrete Docker-Container für
 dieses Projekt sieht so aus:
 
 ```dockerfile
@@ -375,20 +333,73 @@ RUN mkdir /tune/output
 ENTRYPOINT ["Rscript"]
 ```
 
-Und das ist die konkrete Abfolge wie ich das Docker image auf die VM-Instanz von
-Google bekommen habe. Um eine VM-Instanz zu starten einfach herumprobieren und
-eine Maschine wählen, die zum eigenen Problem passt. In der Testphase ist man
-relativ limitiert, d. h. man keine beliebig großen Instanzen mieten. D. h. die 
-zu lösenden Machine Learning Probleme sollten nicht zu groß sein!
+
+@fig-dockerworkflow zeigt die konkrete Abfolge, wie ich das Docker-Image auf die 
+VM-Instanz von Google übertragen habe. Wichtig ist natürlich, dass man einen Account
+auf [Docker Hub](https://hub.docker.com/) besitzt, um das Image dorthin pushen zu können. 
+
+Ebenfalls viel Arbeit spart das konsequente Ausprobieren auf dem eigenen Rechner – 
+das heißt, den Docker-Container lokal (mit wenigen Iterationen) laufen zu lassen, 
+um schnell zu testen.
+
+Um eine VM-Instanz zu starten, probiert man am besten ein wenig herum und wählt 
+eine Maschine, die zum eigenen Problem passt. In der Testphase ist man jedoch 
+relativ limitiert, das heißt, man kann nicht beliebig große Instanzen mieten. 
+Entsprechend sollten die zu lösenden Machine-Learning-Probleme nicht zu groß sein!
 
 
 
-## Random Forest (mbo) Ergebnisse 
+```{r, engine = 'tikz'}
+#| fig-width: 9
+#| fig-height: 6
+#| label: fig-dockerworkflow
+#| fig-cap: Verteilung der einzelnen auc Werte je Parameterkombination 
+
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    process/.style={
+        rectangle, draw, minimum height=1cm, minimum width=2.5cm, align=center
+    },
+    arrow/.style={
+        -{Latex[length=3mm,width=2mm]}, thick
+    }
+]
+% Lokale Prozesse
+\node[process] (build) {Lokal:\\ Docker build};
+\node[process, right=of build] (tag) {Lokal:\\ Docker tag};
+\node[process, right=of tag] (test) {Lokal:\\ Container ausprobieren};
+\node[process, right=of test] (push) {Lokal:\\ Docker push};
+
+% Cloud Prozesse
+\node[process, below=of push] (pull) {Cloud:\\ Docker pull};
+\node[process, right=of pull] (run) {Cloud:\\ Run Container};
+
+% Pfeile Lokaler Ablauf
+\draw[arrow] (build) -- (tag);
+\draw[arrow] (tag) -- (test);
+\draw[arrow] (test) -- (push);
+
+% Verbindung zwischen Lokal und Cloud
+\draw[arrow] (push) -- (pull);
+
+% Pfeil Cloud
+\draw[arrow] (pull) -- (run);
+
+\end{tikzpicture}
+```
+
+
+
+
+## Die Ergebnisse (Random Forest)
 
 
 Am Ende des Tages wollen wir irgendetwas über die Daten erfahren.
 
 1. Welche Variablen sind wichtig?
+2. Wie ist der funktionale Zusammenhang der Variablen mit `stroke`?
 2. Wie genau können wir vorhersagen?
 3. Wie müssen die Parameter gewählt werden um möglichst genaue Vorhersagen zu
 treffen?
@@ -428,7 +439,7 @@ erg_list_rs  = readRDS("data/ranger_rs.rds")
 ### Parameter
 
 Wir haben das Modell mittels Bayesian Optimization getuned. Das heisst, es wird
-nicht per Zufall, oder deterministisch gesucht, sondern es wird dort gesucht 
+nicht per Zufall, oder deterministisch (via grid) gesucht, sondern es wird dort gesucht 
 wo auf Basis der vorliegenden Daten ein möglichst hoher **auc** vermutet wird --
 das ist die Fläche unter eine ROC Kurve. Je größer die Fläche desto besser.
 Schauen wir uns also die Parameterkombination an, um zu sehen wo sich ein
@@ -448,6 +459,14 @@ wirkt es so, dass eigentlich alle Kombinationen zu recht guten Ergebnissen führ
 Der gelbe Fleck am Rand suggeriert, dass eventuell noch bessere Ergebnisse 
 zu finden wären, wenn wir `min.node.size` noch weiter nach oben schrauben würden.
 
+
+Das ist beste Kombination der beiden Parameter:
+
+```{r}
+erg_list_mbo$at$tuning_instance$result
+```
+
+
 ```{r}
 #| fig-width: 8
 #| fig-height: 6
@@ -458,17 +477,52 @@ twoD_parameter_gra(erg_list_mbo)
 ```
 
 
+<details>
+  <summary>Hier klicken um das Tuning Ergebnis des Random Search zu sehen</summary>
+    
+  Wer sich dafür interessiert: Ich habe das Ganze nochmal als "Random Search"
+  durchlaufen lassen. Der Nachteil: Es wird viel unsystematischer gesucht, d. h. 
+  der Algorithmus sucht auch in Ecken wo er ziemlich sicher weiß, dass kein
+  besserer auc Wert zu erzielen ist. Der Vorteil: Er sammelt überall
+  vertreut Daten. Gleichzeitig hab ich `min.node.size` auf 1200 erhöht. 
+  @fig-hyper-param-tuning2 zeigt das Ergebnis. 
+  Es ist gut zu erkennen, dass das Maximum in einem sehr ähnlichen Bereich
+  gefunden wird, wie zuvor das Tuning mittels `mlr3mbo`.
+  
+  Das ist beste Kombination der beiden Parameter:
+
+```{r}
+erg_list_rs$at$tuning_instance$result
+```
+
+ 
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+#| label: fig-hyper-param-tuning2
+#| fig-cap: Verteilung der einzelnen auc Werte je Parameterkombination 
+
+twoD_parameter_gra(erg_list_rs)
+```
+ </details>
+
+
+
 ### Variable Importance
 
 Die Variable Importance gibt an, welche Variablen am wichtigsten für die Vorhersage
-sind. Das package `ranger`, auf das hier zurückgegriffen wurde, um die Random Forests
-laufen zu lassen, berechnet unter anderem, die "permutation" Variable Importance.
-Dabei wird für jeden Tree dessen "Accuracy" bezüglich des OOB Samples bestimmt,
-um dann im nächsten Schritt jeweils eine Variable zufällig zu permutieren um so
-den Rückgang der "Accuracy" zu messen. Je stärker der Rückgang, desto 
-"wichtiger" ist diese Variable. Offensichtlich ist die Variable `age` besonders
-wichtig. Inhaltlich hätte ich eher mit der Variable `heart disease` gerechnet,
-also interessant, dass `age` so deutlich dominiert. 
+sind. Das Package `ranger`, auf das hier zurückgegriffen wurde, um die Random Forests
+laufen zu lassen, berechnet unter anderem die 'Permutation'-Variable-Importance. Dabei
+wird für jeden Tree dessen Accuracy anhand des OOB-Samples bestimmt, um dann im
+nächsten Schritt jeweils eine Variable zufällig zu permutieren, damit der Rückgang der
+Accuracy gemessen werden kann. Je stärker dieser Rückgang ausfällt, desto 'wichtiger'
+ist die Variable.
+Offensichtlich ist die Variable `age` besonders wichtig. Inhaltlich hätte ich eher mit
+der Variable `heart disease` gerechnet – umso interessanter, dass `age` so deutlich
+dominiert. Vermultlich weil auch vergleichsweise junge Personen im Datensatz sind,
+bei denen Schlaganfälle so gut wie nicht vorkommen (siehe @tbl-data-desc-num).
+
+
 
 
 ```{r}
@@ -490,12 +544,14 @@ p = ggplot(data = vi_dt, aes(Variable, y = importance)) +
 p
 ```
 
+### Funktionale Zusammenhänge
 
 Wenn man nicht nur einem einzelnen Wert vertrauen will, sondern sich auch die
 Erklärungskraft jeder einzelnen Variable und deren funktionalen
-Zusammenhang ansehen möchte, kann mittels `DALEX` und `DALEXtra` package
-ansprechende "partial dependency plots" anfertigen!
-In @fig-pdp-age sieht man den Zusammenhang der Variable Alter mit der
+Zusammenhang ansehen möchte, kann mittels [DALEX](https://dalex.drwhy.ai/) und 
+[DALEXtra](https://modeloriented.github.io/DALEXtra/) package
+ansprechende 'Partial Dependene Plots' anfertigen^[Hier sind es eigentlich 'Accumulated Local Dependence' Plots.]!
+In @fig-pdp-age sieht man den Zusammenhang der Variable `age` mit der
 Wahrscheinlichkeit einen `stroke` zu erleiden. Wie zu erwarten war: je älter
 desto eher droht die Gefahr eines Schlaganfalls.
 Dass das Vorliegen einer `heart disease` sich auch förderlich
@@ -506,19 +562,33 @@ auf einen Schlaganfall auswirkt zeigt @fig-pdp-agehd.
 
 ![Partial-Dependence Plot der Variable Alter zusammen mit Heart disease](gra/r3a_age_heart_disease.png){#fig-pdp-agehd}
 
-
-Aber wir wollen uns hier ja nicht im inhaltlichen verlieren.
-Jetzt stellt sich noch die Frage, was wir uns in Zukunft erwarten können? Also
-was wie gut wird das Modell performen, wenn wir es auf unseren bis jetzt zurückgehaltenen
+Das kann man natürlich für alle Variablen machen und diese miteinander kombinieren.
+Wir wollen uns hier keinesfalls im Inhaltlichen verlieren.
+Bezüglich Prognose stellt sich noch die Frage, was wir in Zukunft erwarten können? 
+Wie gut wird das Modell performen, wenn wir es auf unseren bis jetzt zurückgehaltenen
 Testdatensatz anwenden?
 
-## Testdatensatz
+### Testdatensatz
 
-Am Ende des Tages, wollen wir mit unserem Modell ja wissen, wie die Performance
-sein wird, wenn wir unser Modell mit der besten Parameterkombination auf einen
-neuen Datensatz anwenden. Diese Info bekommen wir hier.
+Irl macht man so eine Prozedur wie diese ja dafür, um am Ende des Tages 
+ein Modell zu haben, um zukünftige Fälle klassifizieren zu können, oder
+zukünftigen Personen eine `stroke` Wahrscheinlichkeit zuzuweisen.
+D. h. wir wollen *jetzt* abschätzen, wie gut wir unbekannte Datensätze
+vorhersagen würden. Diese Info bekommen wir, indem wir unser getuntes Modell,
+auf den Testdatensatz anwenden.
 
-@fig-roc1 und @fig-pr1 zeigen die Modellperformance.
+@fig-roc1 und @fig-pr1 zeigen die Modellperformance des Modells auf den Testdaten.
+Was wäre ideal? Die ideale ROC Kurve steigt extrem steil (möglichst senkrecht) 
+an und verläuft anschließend am oberen Rand
+möglichst parallel zur x-Achse. Umgekehrt verhält es sich mit dem PR-Plot. Er
+sollte von Anfang an oben verlaufen und möglichst spät steil abstürzen; in einer
+idealen Welt. 
+Beide Plots berechnen für viele unterschiedliche Thresholds die jeweiligen
+Kennwerte (Specificity, Sensitivity etc.) aus und stellt diese als Gesamtgrafik dar.
+
+Unser Modell schaut nicht so schlecht aus. Allerdings ist auch noch Luft nach oben; 
+hoffentlich.
+
 
 ::::{.columns}
 :::{.column width="50%"}
@@ -539,7 +609,18 @@ autoplot(pred_res, type = "prc")
 ::::
 
 
+In einem weiteren Blogbeitrag, wird dieser Datensatz noch weiter durch den 
+Daten Fleischwolf gedreht. Es wird sich die Gelegenheit ergeben, das neue Modell
+anhand des Testdatensatzes mit diesem Random Forest zu vergleichen.
 
+
+<br>
+
+::: {style='text-align:center;'}
+
+{{< bi brightness-alt-high-fill size=66px >}}
+
+:::
 
 
 
