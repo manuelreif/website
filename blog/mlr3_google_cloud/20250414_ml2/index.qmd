@@ -4,7 +4,7 @@ description: "Datenpipelines sind der coolste Part an einem Machine Learning Pro
 author: Manuel Reif 
 date: 2025-04-14
 lang: de
-categories: [R, mlr3, mlrpipelines]
+categories: [R, mlr3, mlr3pipelines]
 draft: false 
 highlight-style: monokai
 image: media/pancs.png
