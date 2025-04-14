@@ -1,0 +1,673 @@
+---
+title: "Machine Learning in der Google Cloud 2"
+description: "Datenpipelines sind der coolste Part an einem Machine Learning Projekt. Warum? Man kann in einem Satz mit ihnen z. B. inhaltsleere Buzzwords, wie 'streamlinen', so verwenden, dass auch der desinteressierte Bürger einem anerkennend zunickt. Jeder spürt: Wenn die Pipeline gebaut wurde, dann wird alles gut."
+author: Manuel Reif 
+date: 2025-04-14
+lang: de
+categories: [R, mlr3, mlrpipelines]
+draft: false 
+highlight-style: monokai
+image: media/pancs.png
+execute:
+    eval: true
+    message: false
+    echo: false
+    warning: false
+    freeze: true
+filters:
+   - include-code-files
+---
+
+
+```{r pkgs}
+library(data.table)
+library(magrittr)
+library(mlr3)
+library(mlr3tuning)
+library(mlr3extralearners)
+library(mlr3learners)
+library(mlr3pipelines)
+library(paradox)
+library(bbotk)
+library(mlr3mbo)
+library(forcats)
+library(DALEX)
+library(DALEXtra)
+```
+
+<img src="media/pipes.jpg" alt="True Piper" style="float: right; width: 52%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Prinzipiell ist gegen Random Forests nichts einzuwenden, wenn man auf Retro-Modelle
+aus den 90ern steht. Manche sagen auch "bewährte Technik". Allerdings muss
+man es sich auch erst einmal leisten können, die entsprechende Hardware anzuschaffen.
+Denn es ist das Eine, die Modelle zum Laufen zu bringen, aber das Andere, dass
+sie zu Lebzeiten auch fertig werden. Man freut sich ja, wenn der übergequollene 
+Arbeitsspeicher das Tuning nicht im Keim erstickt, weiß aber den schnellen Tod zu schätzen,
+wenn man gespannt auf Ergebnisse wartet, die nie geliefert werden.
+
+Wogegen aber schon etwas einzuwenden ist, ist die sehr niedrige Meme Dichte im 
+letzten Blog-Beitrag! Die Dichte verkam eher zum Vakuum.
+Viele Menschen haben mich auf der Straße angesprochen, ob der überbordenden 
+Seriosität, für die ich mich an dieser Stelle entschuldigen möchte. Dieser Beitrag
+soll sich als Fels in der Brandung erheben, der sich der
+`stroke`-Betroffenheitswelle entgegenstemmt, die danach trachtete, 
+jeglichen humoristischen Ansatz im Keim zu ersticken.
+
+Also, worum wird es im zweiten Teil gehen? 
+Wir schauen uns [mlr3pipelines](https://mlr3pipelines.mlr-org.com/) etwas 
+detaillierter an. Mit Pipelines
+kann man wunderbare Dinge machen, wie verschiedene Modelle parallel laufen zu lassen
+bzw. sie hintereinanderzuschalten (stacking).
+@fig-stacking1 zeigt uns gleich mal eine etwas komplexere Pipeline, wie sie auf
+unser `stroke` Klassifikationsproblem angewendet wurde.
+Schön bunt. Also was passiert hier?
+
+1. Im ersten Branch können wir uns nicht entscheiden, ob wir die Kategorie `Unknown`
+in der Variable `smoking status` imputieren sollen 
+(nach dem Motto: irgendeinen wahren `smoking status` müssen die Leute ja haben)
+oder ob wir einfach die Kategorie so lassen (nach dem Motto: Leute von denen man 
+es nicht weiß, sind qualitativ eventuell anders als Leute, von denen man den Status weiß).
+Diese Frage eignet sich hervorragen, um an Teilnehmer:innen in einem Statistik 
+gerichtet zu werden.
+Nach 20 Minuten Diskussion, 
+lernen alle, dass es nicht immer eine richtige Antwort gibt.
+2. Wir können uns nicht für ein Modell entscheiden. Daher trainieren wir mal mehrere
+Modelle parallel und leiten die Ergebnisse dann an unseren Super Learner (`xgboost`) weiter.
+Der soll dann das beste draus machen. Und Achtung: `xgboost` ist nicht nur Super, 
+sondern per Definition schon *extrem*.
+
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 9
+//| label: fig-stacking1
+//| fig-cap: Unsere Stacking Pipeline
+
+digraph pipeline {
+  rankdir=TB;
+  splines=ortho;
+  node [shape=box, style=filled, fontname="Helvetica", fontsize=10];
+
+  robustify [label="Robustify Pipeline", fillcolor=lightblue];
+
+  // Alle Knoten der vertikalen Kette in dieselbe Gruppe zwingen
+  branch    [label="Branch\n(Unknown as Cat / Impute Unknown)", fillcolor=steelblue, fixedsize=true, width=3.5];
+  imp_d_imp [label="Impute numeric\nvariables", fillcolor=orange, fixedsize=true, width=1.5, group="2"]; // anderer Pfad
+  colapply  [label="Smoking\nStatus:\nUnknown as NA", fillcolor=orange, fixedsize=true, width=1.5, group="1"];
+  imp_f_uk  [label="Impute\nSmoking\nStatus", fillcolor=orange, fixedsize=true, width=1.5, group="1"];
+  imp_d_uk  [label="Impute\nnum\nvariables", fillcolor=orange, fixedsize=true, width=1.5, group="1"];
+  
+  unbranch [label="Merge branches", fillcolor=steelblue, width=3.5];
+
+  // Basis-Learner als eigene Knoten in einem Cluster
+  subgraph cluster_base {
+    label="Base Learner";
+    style=dashed;
+    nop [label="Original\nDaten", fillcolor=yellow];
+    rf  [label="RF", fillcolor=yellow];
+    nb  [label="NB", fillcolor=yellow];
+    knn [label="kNN", fillcolor=yellow];
+    { rank=same; nop; rf; nb; knn; }
+  }
+  
+  base_union [label="Feature Union\nbase learner", shape=box, fillcolor=steelblue];
+  encode     [label="Encode\n(One-Hot)", fillcolor=lightblue];
+  xgboost    [label="Super-Learner\nXGBoost", fillcolor=red];
+
+  // --- Kanten ---
+  robustify -> branch;
+  branch -> imp_d_imp [tailport=s, headport=n];
+  branch -> colapply   [tailport=s, headport=n];
+  colapply   -> imp_f_uk [tailport=s, headport=n];
+  imp_f_uk   -> imp_d_uk [tailport=s, headport=n];
+  
+  imp_d_imp -> unbranch [tailport=s, headport=wn];
+  imp_d_uk  -> unbranch [tailport=s, headport=en];
+  
+  unbranch -> nop;
+  unbranch -> rf;
+  unbranch -> nb;
+  unbranch -> knn;
+  
+  nop  -> base_union;
+  rf   -> base_union;
+  nb   -> base_union;
+  knn  -> base_union;
+  
+  base_union -> encode;
+  encode     -> xgboost;
+}
+```
+
+
+
+Ich wollte eigentlich recht ausführlich über die Ergebnisse berichten und 
+dieses kompliziertere Modell mit dem einfachen Random Forest vergleichen.
+Aber gut, wayne interessierts?
+Also stürzen wir uns auf die Pipe!
+
+
+## Warum Pipelines?
+
+<img src="media/decide.jpg" alt="True Piper" style="float: right; width: 25%; margin-left: 20px; margin-bottom: 10px;"/>
+
+
+Jedem Anfang wohnt ein gewisser Zauber inne, sagen die einen. Die anderen sagen,
+dass man lieber die Finger von was Neuem lassen sollte, denn es kostet Zeit,
+Nerven und am Ende bleibt man, mit einer hohen Wahrscheinlichkeit, doch bei dem,
+was man vorher schon gekannt hat. Der bekannte Horror wird
+bevorzugt. Mir geht es mit neuen Packages meistens so, dass der Zauber ihnen nur so lange innewohnt,
+solange ich mich oberflächlich mit dem Thema beschäftigt habe, Stichwort: Vorträge 
+und YouTube-Videos.
+`mlr3` wirkt wie die Lösung aller Machine-Learning Probleme, bis zu dem Zeitpunkt,
+bei dem es sich dann selbst in die Schlange dieser Probleme einreiht.
+Nach dem Motto: Bevor ich `mlr3` probiert habe, hatte ich ein Problem beim 
+Tunen meines Modells, jetzt habe ich zwei.
+Tatsächlich (auch nachhaltig) positiv in diesem ganzen Prozess sind mir die `mlr3pipelines` aufgefallen.
+Mit einer Pipeline kann man quasi ein Rezept erstellen, das beschreibt, was
+mit meinen Daten alles passieren soll, ohne dass man selbst kochen muss.
+
+Die Aufarbeitungsschritte werden nicht sofort umgesetzt, wie z. B. Variablen imputieren 
+oder standardisieren, sondern die Daten werden erst im Laufe des Tuning Prozesses, 
+immer wieder, aufbereitet. 
+Manchmal ist die Aufbereitung (wie bei uns) auch Teil des Modells.
+Insbesondere verhindert man, z. B. im Falle einer Crossvalidation (CV), dass Infos
+von aus dem Trainingsdatensatz in den Test Datensatz "leaken".
+Auch hilfreich ist, dass man bestimmte Entscheidungen vielleicht nicht durch
+"Expertenwissen" treffen will^[Weil man vielleicht gar kein Experte ist!],
+sondern man kann auch einfach schauen was den besseren Fit ergibt.
+Probieren geht über studieren.
+Außerdem, kann man dann coole Grafiken machen.
+
+### Pipeline mit dem `stroke` Datensatz
+
+
+Hier ist der Code, der die Pipeline beinhaltet die in @fig-stacking1 dargestellt 
+ist.
+
+```{r}
+#| code-fold: true
+#| echo: true
+#| eval: false
+#| code-summary: "Code: Stacking mit mlr3 (Achtung: Viel Code!)"
+
+library(data.table)
+library(magrittr)
+library(mlr3)
+library(mlr3tuning)
+library(mlr3extralearners)
+library(mlr3learners)
+library(mlr3pipelines)
+library(paradox)
+library(bbotk)
+library(mlr3mbo)
+library(forcats)
+library(future)
+library(xgboost)
+
+plan(multisession)
+
+## Argumente uebernehmen
+args <- commandArgs(trailingOnly = TRUE)
+
+# defaults
+default_evals    <- 10
+default_duration <- 1 * 60 * 60
+
+n_evals  <- ifelse(length(args) >= 1, as.integer(args[1]), default_evals)
+duration <- ifelse(length(args) >= 2, as.integer(args[2]), default_duration)
+
+cat("\n -------------------------------------------- \n")
+cat("Tuning Stoppt nach:\n")
+cat("  Evals:", n_evals, "\n")
+cat("  Zeit in Sekunden:", duration)
+cat("\n -------------------------------------------- \n\n")
+
+set.seed(42)
+
+# einlesen und modden
+d = fread("healthcare-dataset-stroke-data.csv") %>% 
+  .[, bmi := as.numeric(ifelse(bmi == "N/A", NA_character_, bmi))] %>% 
+  .[, id := as.character(id)] %>% 
+  .[gender != "Other",]
+
+# id muss ein character sein, sonst bekomme ich unten bei der rollenzuteilung einen error
+# denn ein "name" spalte muss character oder factor sein, aber nie integer - whyever
+
+
+#### TASK ######################################################################
+
+# es ist etwas kompliziert eine variable den feature status zu entziehen.
+task_stroke = as_task_classif(d, target = "stroke")
+task_stroke$col_roles$feature <- setdiff(task_stroke$col_roles$feature, "id")
+task_stroke$col_roles$name <- "id"
+task_stroke$set_col_roles("stroke", c("target","stratum")) #<5>
+
+split = partition(task_stroke, ratio = 0.8) 
+### learner --------------------------------------------------------------------
+learner_rf = lrn("classif.ranger", 
+                 predict_type = "prob",
+                 respect.unordered.factors = "partition",
+                 num.trees = 3000,
+                 id = "rf") # mit id = "rf" kann ich bei ps dann die präambel kuerzer schreiben
+
+
+learner_nb = lrn("classif.naive_bayes", 
+                 predict_type = "prob",
+                 id = "nb") 
+
+learner_knn = lrn("classif.kknn", 
+                  predict_type = "prob",
+                  id = "knn") 
+
+# rf muss davor geschrieben werden, weil es sonst bei der pipe unklarheiten
+# bezueglich parameternamen gibt!
+param_set = ps(
+  gabelung.selection = p_fct(levels = c("unknown_as_category", "impute_unknown")),
+  cvnb.laplace = p_dbl(lower = 0, upper = 2),
+  cvnb.eps = p_dbl(lower = 1e-6, upper = 1e-2),
+  cvrf.mtry.ratio = p_dbl(0.4, 1),
+  cvrf.min.node.size = p_int(50, 1000),
+  super.eta = p_dbl(lower = 0.01, upper = 0.4),  # Lernrate von XGBoost
+  super.max_depth = p_int(lower = 3, upper = 11),  # Maximale Tiefe
+  super.nrounds = p_int(lower = 50, upper = 1000), # Anzahl der Boosting-Runden
+  cvknn.k = p_int(lower = 3, upper = 60)
+)
+
+### resampling -----------------------------------------------------------------
+resampling_CV5 = rsmp("cv", folds = 5)
+measure_AUC    = msr("classif.auc")
+
+### tuner ----------------------------------------------------------------------
+tuner_bayes = tnr("mbo")
+
+### terminator -----------------------------------------------------------------
+terminator2 = trm("combo",
+                  list(
+                    trm("evals", n_evals = n_evals),
+                    trm("run_time", secs = duration)
+                  )
+)
+
+################################################################################
+### pipeline -------------------------------------------------------------------
+################################################################################
+
+gabelung = po("branch",
+              options = c("unknown_as_category", "impute_unknown"), id = "gabelung")
+
+robustifiy = pipeline_robustify(task = task_stroke, 
+                                learner = learner_rf,
+                                character_action = "factor!",
+                                impute_missings = FALSE)
+
+#### keep unknown ==============================================================
+
+
+po_impute_f_uk <- po("imputelearner", learner = lrn("classif.rpart"), 
+                     param_vals = list(
+                       affect_columns = selector_type("factor")
+                     ), id = "imp_f_uk") # id notwendig weil sonst probleme bei robustify
+
+po_impute_d_uk <- po("imputelearner", learner = lrn("regr.rpart"), 
+                     param_vals = list(
+                       affect_columns = selector_type("numeric")
+                     ), id = "imp_d_uk")
+
+
+
+graph_impute_unknown = po("colapply",
+                          param_vals = list(
+                            applicator = function(x) {
+                              # x ist hier ein Vektor der Spalte
+                              x1 <- data.table::copy(x)
+                              x1[x == "Unknown"] <- NA_integer_
+                              res = forcats::fct_drop(x1)
+                              return(res)
+                            },
+                            affect_columns = selector_grep("smoking_status")
+                          ), id = "unknown_as_na"
+) %>>%
+  po_impute_f_uk %>>%
+  po_impute_d_uk
+
+#### impute unknown ============================================================
+
+po_impute_d_imp <- po("imputelearner", learner = lrn("regr.rpart"), 
+                      param_vals = list(
+                        affect_columns = selector_type("numeric")
+                      ), id = "imp_d")
+
+#############
+super_learner = lrn("classif.rpart", predict_type = "prob", id = "super")
+
+### stacking 
+
+base_learners = 
+  gunion(list(
+    po("nop", id = "nop_original"),
+    po("learner_cv", learner = learner_rf, id = "cvrf"),
+    po("learner_cv", learner = learner_nb, id = "cvnb"),
+    po("learner_cv", learner = learner_knn, id = "cvknn")
+  )) %>>% po("featureunion", id = "base_learners")
+
+#### COMBINED GRAPH ============================================================
+
+combined_graph = robustifiy %>>% 
+  gabelung %>>%
+  gunion(list(po_impute_d_imp, graph_impute_unknown)) %>>%
+  po("unbranch", id = "unbranch_main") %>>%
+  base_learners %>>%
+  po("encode", method = "one-hot", id = "encode_super") %>>% 
+  po("learner", learner = lrn("classif.xgboost", predict_type = "prob", id = "super"))
+
+
+################################################################################
+
+### autotune -------------------------------------------------------------------
+at = AutoTuner$new(
+  learner = combined_graph,
+  resampling = resampling_CV5,
+  measure = measure_AUC,
+  search_space = param_set,
+  terminator = terminator2,
+  tuner = tuner_bayes
+)
+
+at$train(task_stroke, row_ids = split$train)
+
+pred_res = at$predict(task_stroke, row_ids = split$test)
+auc_test = measure_AUC$score(pred_res)
+
+full_res = list(at = at, 
+                pred_res = pred_res, 
+                auc_test = auc_test,
+                split = split)
+
+saveRDS(full_res, "output/at_stack2_splitted.rds")  
+```
+
+
+
+
+
+## Was können Pipelines?
+
+Die Einzelteile einer Pipeline sind wie Mini-Modelle. 
+Also, man kann sie auch trainieren und wir bekommen ein etwas unübersichtliches, aber komplexes
+Objekt zurück. Wir nehmen jetzt mal den gekürzten Anfang unseres
+gestackten Modells, um uns dann mit den Pipes herumspielen zu können^[Was wir uns hier ansehen, hat weniger damit zu tun wie man Pipes tatsächlich einsetzt, sondern es geht mehr darum zu verstehen, was passiert!].
+
+
+```{r}
+# packages
+library(data.table)
+library(magrittr)
+library(mlr3)
+library(mlr3tuning)
+library(mlr3extralearners)
+library(mlr3learners)
+library(mlr3pipelines)
+library(paradox)
+library(bbotk)
+library(forcats)
+library(rpart)
+library(rpart.plot)
+
+# einlesen und modden
+d = fread("../20250209_ml/data/healthcare-dataset-stroke-data.csv") %>% 
+  .[, bmi := as.numeric(ifelse(bmi == "N/A", NA_character_, bmi))] %>% 
+  .[, id := as.character(id)] %>% 
+  .[gender != "Other",]
+
+
+#### TASK erstellen: Für jenen Pipe Operator brauchen wir einen Task
+
+# es ist etwas kompliziert eine variable den feature status zu entziehen.
+task_stroke = as_task_classif(d, target = "stroke")
+task_stroke$col_roles$feature <- setdiff(task_stroke$col_roles$feature, "id")
+task_stroke$col_roles$name <- "id"
+task_stroke$set_col_roles("stroke", c("target","stratum")) #<5>
+
+split = partition(task_stroke, ratio = 0.8) 
+
+### Learner
+learner_rf = lrn("classif.ranger", 
+                 predict_type = "prob",
+                 respect.unordered.factors = "partition",
+                 num.trees = 3000,
+                 id = "rf") # mit id = "rf" kann ich bei ps dann die präambel kuerzer schreiben
+
+```
+
+
+### Robustify
+
+<img src="media/robustify.jpg" alt="Save the Algorithm" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Wenn Modelle anfangen, Errors zu droppen, zieht es mich plötzlich ganz weit weg
+vom Computer. 
+
+[Diese vorgefertigte Pipeline](https://mlr3pipelines.mlr-org.com/reference/mlr_graphs_robustify.html), 
+sorgt dafür, dass es zu keinen bösen Überraschungen
+kommt! Aus meiner Sicht: Uneingeschränkte Empfehlung. Man erspart sich
+viele Fehlermeldungen! [Diesen Text zu lesen ist btw. auch sehr empfehlenswert!](https://mlr3book.mlr-org.com/chapters/chapter9/preprocessing.html)
+Es werden die Daten nur gerade so viel verändert, wie es für den `learner` 
+unbedingt notwendig ist. Minimalistisch und zielführend.
+
+- "factor!" erzwingt, dass `character` Spalten zu `factor` umgewandelt werden.
+Die Pipeline würde das nicht machen, wenn es für den `learner` nicht notwendig wäre.
+- Es werden keine Missings imputiert. Das will ich dann später selbst machen.
+
+
+```{r}
+robustifiy = pipeline_robustify(task = task_stroke, 
+                                learner = learner_rf,
+                                character_action = "factor!",
+                                impute_missings = FALSE)
+```
+
+
+Wir sehen hier einen Vorher-/Nachher-Vergleich. 
+Zuerst sind noch einige `character`-Spalten enthalten, nachher, keine einzige mehr!
+Wir sehen auch, dass die Spalten umsortiert wurden. Nun sind alle `factor`-Spalten
+in einem Block.
+
+
+```{r}
+#| echo: true
+# Vorher: 
+sapply(task_stroke$data(), class)
+
+# Anwenden der Robustify Pipe auf den Task 
+res_rob = robustifiy$train(task_stroke)
+
+# Nachher:
+sapply(res_rob[[1]]$data(), class)
+```
+
+Mit der `plot` Methode lässt sich die Pipeline samt ihrer Elemente
+sogar interaktiv darstellen wie in @fig-robust zu sehen ist!
+
+
+```{r}
+#| fig-width: 7
+#| fig-height: 6
+#| label: fig-robust
+#| fig-cap: Die Robustify Pipeline mit ihren einzelnen Elementen.
+
+robustifiy$plot(html = TRUE, horizontal = TRUE)
+```
+
+
+
+### Robustify - Mini Beispiel
+
+Konstanten machen Probleme, wenn man sie einfach so einer statistischen Methode
+zuführt. Die Methode erwartet Variablen. Eine Konstante hat diesen Namen
+nicht verdient, denn sie variiert ja per Definition nicht. Typischerweise
+will man Konstanten loswerden, da sie nichts -- aber auch gar nichts --
+Konstruktives beitragen, um die Varianz von y zu erklären. Jetzt wäre es 
+ein leichtes, alle Konstanten zu eliminieren. Allerdings kann eine Variable,
+die im Gesamtdatensatz noch ausreichend Variation zeigt, durch 
+die Gruppenbildung der Kreuzvalidierung zu einer Konstanten werden. Die
+Alarmglocken schrillen -- die Pipe kommt zur Hilfe.
+Schauen wir also mal, was passiert, wenn man eine
+Konstante im Datensatz hat.
+
+Hier wird aber gleich mehrerlei ausprobiert, in dem kleinen Datensatz `dat_mini`.
+Es wird gleich *zweimal* `pipeline_robustify`
+mit unterschiedlichen Einstellungen ausgeführt.
+
+1. Hier wird erwähnt, dass explizit *nicht* imputiert werden soll
+2. Es soll imputiert werden und es sollen alle `character` Spalten `factor` werden,
+egal, ob das notwendig ist oder nicht.
+
+
+
+```{r}
+#| echo: true
+
+# Simulation eines Mini Datensatzes
+set.seed(1653)
+dat_mini <- data.frame(
+    target = factor(sample(c("A", "B", "C"), 20, replace = TRUE)),
+    feature1 = rnorm(20),
+    feature2 = sample(letters, 20, replace = TRUE),
+    constant_feature = 1  # <- konstante Spalte
+) %>% 
+    data.table
+
+dat_mini[4:5, feature1 := NA_real_] # Missings erzeugen
+
+# Task erstellen
+task_mini = as_task_classif(dat_mini, target = "target")
+
+# Robustify
+robbi_mini1 = pipeline_robustify(task = task_mini, 
+                                learner = learner_rf,
+                                impute_missings = FALSE
+                               )
+
+robbi_mini2 = pipeline_robustify(task = task_mini, 
+                                learner = learner_rf,
+                                character_action = "factor!",
+                                impute_missings = TRUE)
+
+# Graph trainieren
+robbi_res1 = robbi_mini1$train(task_mini)
+robbi_res2 = robbi_mini2$train(task_mini)
+```
+
+Das wirkt sich direkt auf die Daten aus.
+
+1. Hier sind noch die 2 Missings enthalten und `feature2` ist noch `character` 
+aber die Konstante ist weg!
+2. Hier ist ebenso die Konstante weg, Missings sind weg, `character` geändert und 
+eine neue Spalte hier, die anzeigt, wo ursprünglich Missings waren!
+
+```{r}
+
+robbi_res1$removeconstants_postrobustify.output$data() %>% head
+robbi_res2$removeconstants_postrobustify.output$data() %>% head
+
+```
+
+
+
+### Imputation
+
+<img src="media/imputation.jpg" alt="Imputation" style="float: right; width: 30%; margin-left: 20px; margin-bottom: 10px;"/>
+
+Will man sich mit fehlenden Werten nicht zufriedengeben oder verwendet man
+obskure statistische Methoden, die mit fehlenden Werten nicht umgehen können,
+ist es Zeit, sich etwas auszudenken. Der erste Impuls ist vielleicht, sofort zu imputieren,
+denn die fehlenden Werte sind wie die von Datenkaries gefressenen Löcher in
+unserem, hoffentlich ansonsten gesunden, Datenzahn. Die sofortige Imputation ist 
+aber laut Beipackzettel nicht empfohlen und wird in Fachkreisen auch
+"Imputatio Praecox" genannt.
+Denn wer es sich leisten kann, und das sollte wirklich jeder, imputiert tunlichst
+innerhalb der CV Samples, mit dem Ziel, keinerlei Informationen vom 
+CV-Trainingssample an das CV-Testsample zu liefern. 
+Wer Style hat, imputiert also so spät wie möglich.
+
+Der Pipeline Operator `po` wird wie ein Modell trainiert.
+Interessant ist auch, dass in dem Fall für *alle* numerischen Variablen
+ein Modell gemacht wird, egal ob es wirklich benötigt wird oder nicht.
+In unserem Fall gibt es also Modelle für `age`, `avg_glucose_level` und `bmi`.
+Wirklich angewendet würde es in der pipe nur für `bmi`. Dort dann automatisch.
+Wir müssen die `predict` Methode verwenden, um die Werte wirklich zu imputieren.
+
+```{r}
+#| echo: true
+#| results: false
+po_impute_d_imp <- po("imputelearner", learner = lrn("regr.rpart"), 
+                      param_vals = list(
+                        affect_columns = selector_type("numeric")
+                      ), id = "imp_d")
+
+
+po_impute_d_imp$train(res_rob)
+tsk_imputed = po_impute_d_imp$predict(res_rob)
+```
+
+
+```{r}
+#| echo: true
+
+state_imputer = po_impute_d_imp$state
+trained_learners = state_imputer$model
+
+names(trained_learners)
+```
+
+Wir holen uns das Modell aus dem Objekt raus und können den Regression Tree, 
+der als Methode gewählt wurde, plotten. @fig-imptree1 gibt Gelegenheit dazu,
+die Splits, die der Baum gewählt hat, zu inspizieren. 
+Leider dienen hier nur gerundete Werte 
+der numerischen Einordnung. Die Autor:innen dieser schönen Funktion haben sich 
+sehr viel Mühe gemacht, 
+Argumente zu ersinnen, die eine mögliche Änderung des Rundungsverhaltens 
+insinnuieren, den Zahlendruck in der Grafik aber unangetastet lassen. 
+Mithilfe dieser Argumente lassen sich 
+Rundungen der verschiedensten Boxen feinabstimmen, um das, dem Eckigen abgeneigte, Auge nicht
+zu kränken. Ob dieser irreführenden Sackgassen, sackte ich in Resignation zusammen^[Das Argument `digits` verändert auch nichts an dieser mißlichen Lage!].
+
+```{r}
+#| echo: true
+#| fig-width: 7
+#| fig-height: 6
+#| label: fig-imptree1
+#| fig-cap: Der Imputations Tree für die Variable `bmi`
+
+model_bmi = trained_learners[["bmi"]]$model
+
+prp(model_bmi)
+```
+
+Wir können auch nachvollziehen, ob und was imputiert wurde.
+Statt vieler Missings, sind nun Werte zu sehen, die wir dank der Rundungen 
+in der vorigen Abbildung nicht wiedererkennen.
+
+
+```{r}
+#| echo: true
+index_bmi_na = task_stroke$data()[,which(is.na(bmi))]
+
+cbind(tsk_imputed$output$data(rows = index_bmi_na, cols = "bmi") %>% head,
+      task_stroke$data(rows = index_bmi_na, cols = "bmi") %>% head)
+```
+
+
+Ok, Pipelines können noch viel mehr und es gäbe noch einiges herzuzeigen, 
+aber das kommt vielleicht in einem dritten Teil. Vielleicht auch nicht.
+
+
+<br>
+
+::: {style='text-align:center;'}
+
+{{< bi fire size=66px >}}
+
+:::
+
