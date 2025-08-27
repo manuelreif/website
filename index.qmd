@@ -1,7 +1,7 @@
 ---
 title: "Manuel Reif"
 lightbox: auto
-image: mr_hellr.jpg
+image: media/me_pic.png
 toc: false
 about: 
     template: solana #jolla, trestles, solana, marquee, broadside

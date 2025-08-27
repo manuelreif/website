@@ -7,7 +7,7 @@ format: html
 
 <br>
 
-<img src="media/impr.webp" alt="Beschreibung" style="float: right; width: 20%;">
+<img src="media/impr.png" alt="Beschreibung" style="float: right; width: 20%;">
 
 
 Verantwortlich für den Inhalt dieser Seite:
