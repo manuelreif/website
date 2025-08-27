@@ -7,6 +7,8 @@ categories: [Python, OR-Tools, docker]
 draft: false 
 highlight-style: monokai
 image: media/memes/logical_brain.jpg
+execute:
+    freeze: true
 format:
   html:
     code-fold: true

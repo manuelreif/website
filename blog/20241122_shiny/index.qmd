@@ -13,7 +13,7 @@ execute:
     message: false
     echo: false
     warning: false
-    freeze: false
+    freeze: true
 filters:
    - include-code-files
 ---
