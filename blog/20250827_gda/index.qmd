@@ -1,0 +1,544 @@
+---
+title: "Das Geheimnis der Abtei"
+description: "Wenn im Kloster 'schon wieder was passiert' ist und man schon dabei ist das Rätsel zu lösen, kann man sich nebenbei auch noch fragen, wie man am besten Punkte lukriert. Ja, es kann so einfach sein, wenn man es sich nicht unnötig schwer macht."
+author: Manuel Reif 
+date: 2025-08-27
+lang: de
+categories: [Boardgames, R, Probabilities]
+draft: false 
+highlight-style: monokai
+execute:
+    eval: true
+    message: false
+    echo: false
+    warning: false
+    freeze: true
+filters:
+   - include-code-files
+---
+
+
+```{r pkgs}
+library(data.table)
+library(magrittr)
+library(ggplot2)
+library(gt)
+library(rpivotTable) # devtools::install_github(c("ramnathv/htmlwidgets", "smartinsightsfromdata/rpivotTable"))
+```
+
+## Der Beginn
+
+<img src="media/gda2.jpg" alt="Geheimnis der Abtei" style="float: right; width: 32%; margin-left: 20px; margin-bottom: 10px;"/>
+ 
+
+Wie treffen wir Entscheidungen im Leben? Intuitiv und schnell aus dem "Bauch heraus"
+oder durch sehr viel Nachdenken und Abwägen? 
+Ist das in Quizshows viel beschworene Bauchgefühl ein guter Ratgeber?
+Das ließe sich vermutlich mithilfe des Buchs von Kahneman 
+[Schnelles Denken, langsames Denken](https://www.morawa.at/detail/ISBN-9783328100348/Kahneman-Daniel/Schnelles-Denken-langsames-Denken) 
+beantworten. 
+Doch wir müssen gar nicht tief in das Buch eintauchen.
+Schon der Titel entpuppt sich als außerordentlich reichhaltig,
+denn es lässt sich aus ihm die von Kahnemann
+postulierte Dichotomie ableiten: Er 
+unterscheidet zwischen langsamem und schnellem Denken als 2 völlig 
+unterschiedliche Systeme, vermutlich, weil sich 
+diese beiden qualitativ stark voneinander unterscheiden. Was ist aber, wenn
+beide "Denksysteme" zum selben Ergebnis kommen? Das wäre doch ein gutes Zeichen?
+Kongruenz schafft Vertrauen. Aber ist dieses Vertrauen dann auch gerechtfertigt?
+In diesem Post möchte ich eine schmerzliche Denkerfahrung nachvollziehen,
+die mich sowohl beim langesamen als auch beim schnellen Denken auf die falsche
+Fährte lockte. 
+
+## Das Spiel
+
+Die Geschichte dreht sich um ein leider vergriffenes aber sehr unterhaltsames Spiel:
+[Das Geheimnis der Abtei](https://www.spieletest.at/gesellschaftsspiel/1645/das-geheimnis-der-abtei),
+das im Wesentlichen die Spielmechanik von Cluedo 
+verwendet und um einige Elemente erweitert. Ein mordender Mönch hat zugeschlagen und hat
+einen seiner Mitbrüder getötet, so die inhaltliche Einkleidung. Alle Spieler wollen
+herausfinden wer es war. Jeder spielt für sich -- das Spiel ist nicht kooperativ.
+
+Ziel des Spiels ist es, möglichst viele Punkte zu generieren indem man: 
+
+1. Eigenschaften des Mörders identifiziert (z. B. der Mörder ist ein "Abt" oder 
+der Mörder hat eine Kapuze etc.)
+2. den Mörder nennt (z. B. der Mörder ist "Bruder Jakob")
+
+Es gibt 24 unterschiedliche Mönchskarten. Jeder Mönch kann anhand von 5 Dimensionen
+charakterisiert werden. @fig-moenche zeigt jenes Blatt, das alle
+Mönche und damit alle möglichen Täter auflistet. Jeder Spieler erhält so ein 
+Blatt und kann alle Mönche, die im Laufe des Spiels unverdächtig werden, markieren.
+
+::::{.columns}
+
+:::{.column width="30%"}
+
+1. Zugehörigkeit zu einem Orden 
+2. Rang 
+3. Kapuze / Glatze
+4. Bart / kein Bart
+5. dünn / dick 
+
+
+:::
+
+:::{.column width="70%"}
+
+::: {#fig-moenche}
+![](media/alle_moenche.jpg){width=100% fig-alt="Alle 24 Mönchskarten und ein Beispiel-Spielerblatt"}
+
+Spielerblatt mit allen existierenden Mönchen im Spiel.
+:::
+
+:::
+
+::::
+
+
+Mittels @tbl-alle-moenche kann man eine Übersicht über die Anzahl der vorliegenden
+Eigenschaften selbst erstellen und diese auch miteinander verkreuzen. In weiterer Folge
+werden wir uns auf ein dichotomes Merkmal konzentrieren, nämlich: Hat
+der Täter eine **Kapuze**: ja/nein.
+
+
+```{r}
+#| label: tbl-alle-moenche
+#| tbl-cap: Pivottabelle mit allen Mönchen, die im Spiel vorkommen
+d = fread("data/moenche.csv")
+
+rpivotTable(d, vals = "Frequency", rows = "Kopf", height = 360)
+
+```
+
+Soviel zu den Zielen und zum Spielmaterial. Was passiert nun während des Spiels?
+Der vereinfachte, stark verkürzte und schon im Hinblick auf das später zu 
+lösende Problem optimiert dargestellte Ablauf sieht wie in @fig-ablauf aus. 
+
+::::{.columns}
+
+:::{.column width="54%"}
+
+::: {#fig-ablauf}
+![](media/ablauf.svg){width=100% fig-alt="Alle 24 Mönchskarten und ein Beispiel-Spielerblatt"}
+
+Schematischer Spielablauf bis zu dem Zeitpunkt, an dem noch 6 Charaktere verdächtig sind.
+:::
+
+:::
+
+:::{.column width="46%"}
+
+1. Aus dem Kartenstapel mit allen Mönchen wird einer entfernt (24 Karten) und 
+verdeckt beiseite gelegt. Das ist der Übeltäter.
+2. Die meisten restlichen Karten werden unter den Spielern aufgeteilt. 
+Jeder Spieler kennt seine Karten und damit Charaktere, die unverdächtig sind!
+3. Durch Kartenweitergabe stellen von Fragen und ansehen von noch unbekannten Karten, 
+werden weitere unverdächtige Mönche bzw. deren Eigenschaften bekannt.
+4. Im Laufe des Spiels kann man mutmaßliche Merkmale des Täters nennen, z. B. ob dieser dick oder dünn ist und erhält am Ende des Spiels dafür, falls korrekt,
+Punkte. Wenn das genannte Merkmal nicht zutrifft, gibt es Minuspunkte.
+    
+:::
+
+::::
+
+
+## Die Frage    
+    
+::: {.callout-tip icon=false}
+## {{< bi question-circle size=25px >}} Die zentrale Frage
+Kann ich auf Basis der noch verdächtigen Personen
+die Wahrscheinlichkeit für ein Merkmal vorhersagen? Anders formuliert:
+Kann ich mir sicherer sein, wenn ich viele Verdächtige mit Kapuze hab,
+dass der Täter auch eine Kapuze hat bzw. steigt die Sicherheit mit der Anzahl
+der Verdächtigen mit Kapuze?
+:::    
+    
+Werden wir noch konkreter. Der Spielablauf ist wie oben dargestellt. Ich sehe viele
+Charaktere und kann diese als unverdächtig abhaken. 6 Personen hab ich noch nicht
+abgehakt: Das sind meine Verdächtigen. Unter ihnen sind:
+
+- 5 mit Kapuze
+- 1 mit Glatze
+
+
+Ist es nun rational davon auszugehen, dass der Täter mit einer höheren Wahrscheinlichkeit
+eine Kapuze hat, weil noch mehr Personen mit Kapuze übrig sind? 
+Mein Gefühl sagt:"Eher nein!"
+
+Aber ich wollte mich nicht auf mein Gefühl verlassen. Alle die sich mit 
+Wahrscheinlichkeiten auseinandergesetzt haben wissen: Da liegt man schonmal 
+ziemlich daneben. 
+Daher ging ich in mich und strengte mich an das anfängliche Gefühl in was Rationales
+zu transformieren. Der Gedankengang war grob gesagt so:
+
+1. Ich habe zu Beginn eine **Gleichverteilung** von Kapuze vs. Glatze (jeweils 12 Karten).
+2. Es wird **eine** Karte entfernt. Wir wissen nicht, ob es sich um einen Kapuzenmönch
+oder einen Glatzenmönch handelt -- also die Wahrscheinlichkeit ist 50:50.
+3. Der weitere Prozess, also das Generieren von weiterem Wissen über die Mönche im Spiel,
+passiert völlig unabhängig vom Weglegen der ersten Karte -- also unabhängig von 
+der Bestimmung des Täters.
+4. Also ja, der Kapuzenüberhang bei den Verdächtigen spricht schon eher für 
+einen Täter mit Kapuze, aber bedeuten mehr Kapuzen mehr Evidenz?
+Der Unterschied beträgt ja fix nur 1 Karte!
+Meine Antwort wäre an dieser Stelle des denkens: Ok, es macht natürlich was aus, aber ich kann mir nicht
+vorstellen, dass mehr verdächtige Kapuzen gleichzeitig mehr Evidenz für einen 
+Kapuzentäter sprechen^[Spoiler: Hätte ich an das Extrembeispiel gedacht: 'Alle Verdächtigen haben eine Kapuze, damit ist die Wahrscheinlichkeit, dass der Täter eine Kapuze trägt 100\ %!' $\rightarrow$ dann wären meine Gedanken vielleicht früher richtig abgebogen!].
+
+
+Tatsächlich war ich ziemlich alleine mit dieser Meinung. Aber sollte hier
+überhaupt auf der Ebene von "Meinungen" diskutiert werden? Es geht ja nicht darum
+ob man den Geschmack eines Zitronenkuchen gut findet oder nicht, oder wie 
+sinnlos man die "kreative" Namensgebung von Weißtönen bei Küchenfronten 
+auf einer Skala von "extrem sinnlos" bis "ziemlich sinnlos" einstufen würde.
+Darüber kann man diskutieren. Darüber kann man unterschiedliche Meinungen haben.
+Aber wenn es um Wahrscheinlichkeiten in einem Urnenmodell geht, gibt es keine
+zwei Meinungen und schon gar keine "alternativen Wahrheiten". Warum das ganze
+ein Urnenmodell ist, beschreibe ich im nächsten Abschnitt und Spoiler: Es 
+hat nichts damit zu tun dass ein Mönch ermordet und eingeäschert wurde.
+
+
+## Die Berechnung
+    
+<img src="media/switching.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 35%; margin-left: 20px; margin-bottom: 10px;"/>    
+    
+Im Spiel dreht sich alles um:"Wer ist verdächtig?" Sofort können alle auf der
+Hand befindlichen Charakterkarten als Täter ausgeschlossen werden. Im Laufe des Spiels
+kommt man in Kontakt mit anderen Karten und lernt neue "Unverdächtige" 
+kennen. Der Fokus bleibt aber:"Who did it?" 
+Mit dieser Denkweise war es schwierig irgendeine Art von
+Wahrscheinlichkeiten aufzubauen. Wenn man den Fokus allerdings **umdreht** und sich
+auf die "Unverdächtigen" konzentriert, wird unser Problem zu einem charmanten
+Urnenproblem. Ich möchte an dieser Stelle gerne explizit ohne zynischen Unterton
+als Urnenmodell-Fan outen. 
+
+Also denken wir mal über diesen Prozess nach und versetzen uns in einen einzelnen Spieler.
+Wir haben einen Kartenstapel mit Charakteren. Aus diesem wurde die Täterkarte 
+bereits entfernt. Diese werden (nicht vollständig) ausgeteilt^[Man kann auf andere Weise Kenntnis über diese Karten erlangen im Spiel. Also es sind potentiell alle Karten für alle zugänglich.]. 
+Das heißt, *wir ziehen ohne Zurücklegen*. Im Laufe des Spiels lernen wir weitere 
+Unverdächtige kennen. Das kann auf vielfältige Art und Weise passieren. 
+Vereinfachen wir das und sagen wir, es sind Zufallsziehungen^[Natürlich kann es vorkommen, dass bestimmte Spieler versuchen, bestimmte Karten strategisch zurückzuhalten. Aber der grobe Prozess ist vermutlich durch eine Zufallsziehung ganz gut angenähert.].
+
+Haben wir also z. B. konkret noch 6 Verdächtige auf unserer Liste:
+
+- 5 mit Kapuze
+- 1 mit Glatze
+
+Dann könnten wir sagen, wir haben bereits **18 Unverdächtige**:
+
+- 7 mit Kapuze (12 - 5)
+- 11 mit Glatze (12 - 1)
+
+Wie hoch ist nun die Wahrscheinlichkeit, dass so etwas vorkommt? Die Antwort darauf
+ist das, was alle Statistiker sagen würden:"It depends."
+Denn wir wissen ja nicht, aus welcher Verteilung diese Karten gezogen wurden. 
+Stammen sie aus der Verteilung: 
+
+- Täter hat eine Kapuze
+- Täter hat eine Glatze
+
+Denn das verändert natürlich die Wahrscheinlichkeiten, mit der eine Karte gezogen 
+wird. Also wäre es wohl das Vernünftigste, die Wahrscheinlichkeit für die
+bisherigen "Ziehungen" (Unverdächtige) für beide Szenarien zu betrachten und diese
+Wahrscheinlichkeiten dann zu vergleichen!
+
+Da wir ohne Zurücklegen ziehen, brauchen wir die Hypergeometrische Verteilung. 
+Ich halte mich dabei an die Notation der 
+[Wikipedia-Seite.](https://en.wikipedia.org/wiki/Hypergeometric_distribution)
+@eq-hypergeom-kapuze gibt uns die Wahrscheinlichkeit wieder, so ein Ergebnis
+zu sehen, unter der Bedingung, dass der Täter eine Kapuze hat. @eq-hypergeom-glatze
+zeigt dasselbe für einen Täter mit Glatze.
+
+$$
+\Pr(X = k)
+= \frac{\binom{K}{k}\,\binom{N-K}{\,n-k\,}}{\binom{N}{n}}
+$$ {#eq-hypergeom}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+$$
+\Pr(X = 7\,|\, \text{T = Kapuze})
+= \frac{\binom{11}{7}\,\binom{12}{\,11\,}}{\binom{23}{18}}
+$$ {#eq-hypergeom-kapuze}
+
+:::
+
+:::{.column width="50%"}
+
+$$
+\Pr(X = 7\,|\, \text{T = Glatze})
+= \frac{\binom{12}{7}\,\binom{11}{\,11\,}}{\binom{23}{18}}
+$$ {#eq-hypergeom-glatze}
+
+:::
+
+::::
+
+- X = eine Zufallsvariable: $X \mid T \sim \operatorname{Hypergeom}\bigl(N, K(T), n\bigr)$
+- K = Anzahl der gesamten Kapuzen Personen zu Beginn (hängt vom Tätertyp ab, also mit oder ohne Kapuze)
+- k = Anzahl der gezogenen Kapuzen Personen
+- N = Anzahl der Karten (nach Entfernung der Täterkarte)
+- n = Anzahl der gezogenen Karten insgesamt
+- N - K = Anzahl der gesamten Glatzen Personen zu Beginn
+- n - k = Anzahl der gezogenen Glatzen Personen
+- T = "Täter"
+
+
+Das ist ja alles gut und schön, aber wir wollen ja eigentlich wissen, wie hoch die
+Wahrscheinlichkeit ist, dass der Täter eine Kapuze hat. Das bedeutet, ich möchte 
+wissen, wie wahrscheinlich es ist, dass die Ziehungen aus der Verteilung mit der 
+fehlenden Kapuzenperson stammen (Kapuzen = 11, Glatzen = 12).
+Oder anders ausgedrückt:
+$Pr(\text{ T = Kapuze}\,|\,k = 7)$. D. h. wir wollen die bedingte 
+Wahrscheinlichkeit aus @eq-hypergeom-kapuze "umdrehen". Und wer könnte hier besser helfen als
+[Thomas Bayes](https://en.wikipedia.org/wiki/Thomas_Bayes)? @eq-bayes zeigt
+die Anwendung des Bayes-Theorem auf unser konkretes Beispiel.
+Um die Formel nicht zu breit zu machen, wird statt 
+$\text{T = Kapuze}$ nun verkürzt $\text{Kpz}$ bzw. $\text{Glz}$ geschrieben.
+
+
+$$
+\Pr(\, \text{Kpz}\,|\,X = 7)
+= \frac{\Pr(X = 7\,|\, \text{Kpz})\, \Pr(\text{Kpz})}{\Pr(X = 7\,|\, \text{Kpz})\, \Pr(\text{Kpz}) + \Pr(X = 7\,|\, \text{Glz})\, \Pr(\text{Glz})}
+$$ {#eq-bayes}
+
+Hier sind $\Pr(\text{T = Kapuze})$ und $\Pr(\text{T = Glatze})$ die 
+Priorwahrscheinlichkeiten -- d. h. wie wahrscheinlich es a priori ist, dass der
+Täter eine Kapuze hat oder eine Glatze. Da ganz zu Beginn gemischt und zufällig
+gezogen wird, ist diese Wahrscheinlichkeit bei 0.5.
+Jetzt wird es Zeit, die Wahrscheinlichkeit zu ermitteln.
+
+
+```{r}
+#| echo: true
+
+t_kapuze = dhyper(x = 7, m = 11, n = 12, k = 18) # P(k=7|T = Kapuze)
+t_glatze = dhyper(x = 7, m = 12, n = 11, k = 18) # P(k=7|T = Glatze)
+
+zaehler = t_kapuze * 0.5
+nenner  = t_kapuze * 0.5 + t_glatze * 0.5
+
+zaehler/nenner # P(T = Kapuze|k=7)
+
+```
+
+Das Ergebnis war `r zaehler/nenner`. Es ließ mich und meine Intuition ratlos zurück.
+Ich bin mir nicht sicher womit ich gerechnet habe, aber eher nicht damit,
+dass hier einfach "kompliziert" $\frac{5}{6}$ ausgerechnet wurde. Ist es wirklich
+so einfach? Irgendwie war ich immer noch skeptisch. Alte Intuitionen, alte Gefühle
+können nicht so einfach von heute auf morgen weggewaschen werden.
+Was an Statistik wirklich toll ist, dass man einfach mal drauflos simulieren kann
+um ein Problem lösen. Genau das passiert im folgenden Abschnitt.
+
+
+## Die Simulation
+
+Die Simulation ist der letzte Test, um zu prüfen, ob zuvor
+irgendwo ein Fehler passiert ist.
+Die Simulation baut den Vorgang beim
+Spielen grob nach. Wir entfernen also zuerst die Täterkarte und bestimmen dann zufällig
+18 Charaktere, die unverdächtig gelabelt werden. Die restlichen 6 sind verdächtig.
+Wir speichern das Verhältnis von "Verdächtigen mit Kapuze" vs. "mit Glatze".
+Haben wir das 20\ 000 Mal gemacht (oder auch noch öfter), können wir vergleichen, ob die Anzahl
+das Verhältnis Kapuze zu Glatze etwas mit der wahren Ausprägung zu tun hat!
+
+
+```{r}
+#| eval: false
+#| echo: true
+
+LEN = 20000         # wie viele Durchläufe
+second_sample = 18 # wie viele Karten sollen "unverdächtig" sein?
+anz_karten = 24
+
+# die Karten
+dt = data.table(kartennr = 1:anz_karten, 
+                typ = rep(c("kapuze", "no_kapuze"), each = anz_karten/2))
+
+
+# output vektoren erzeugen
+truth         = vector(mode = "character", length = LEN)
+anteil_kapuze = vector(mode = "numeric", length = LEN)
+
+weg = sample(1:anz_karten, LEN, replace = TRUE) # alle taeter in der sim
+
+set.seed(1707)
+
+for(i in 1:LEN){
+  
+  truth_dt = dt[weg[i],] # verdaechtiger
+  truth[i] = truth_dt[,typ] # eigenschaft des verdaechtigen
+  rest = dt[-weg[i],] # aus dem restlichen datensatz rausnehmen
+  
+  weg2  = sample(rest$kartennr, 
+                 second_sample) # die unverdächtigen werden gezogen
+  rest2 = rest[!kartennr %in% weg2] %>% 
+    rbind(.,truth_dt) # restliche Verdaechtige + echter Taeter
+  
+  anteil_kpz = rest2[, .N, keyby = typ] %>% # anteil an verdaechtigen mit kapuze!
+    .[, rel := N / sum(N)] %>% 
+    .[typ == "kapuze", rel]
+    
+  if(length(anteil_kpz) > 0){
+  anteil_kapuze[i] = anteil_kpz
+  } else {
+    anteil_kapuze[i] = 0  
+  }
+  
+  cat(i,"\r")
+}
+
+res_dt = data.table(truth, anteil_kapuze) %>% 
+  .[, no_kaputze_truth := ifelse(truth == "no_kapuze", 1L, 0L)]
+
+
+saveRDS(res_dt, file = "data/res_dt.rds")
+
+```
+
+```{r}
+res_dt = readRDS(file = "data/res_dt.rds")
+```
+
+
+@tbl-sim-data zeigt die ersten 6 Zeilen des durch die Simulation entstandenen
+Datensatzes. Jede Zeile beinhaltet die Eigenschaften des Täters 
+(Spalte `truth`: `kapuze` oder `no_kapuze`)
+und den Anteil der Verdächtigen mit Kapuze in den letzten 6 Karten.
+
+
+```{r}
+#| label: tbl-sim-data
+#| tbl-cap: "Simulierte Daten — erste 6 Zeilen"
+
+sel <- head(res_dt[, !c("group", "no_kaputze_truth")])
+gt::gt(sel)
+```
+
+
+
+@fig-gda-sim1 fasst das Ergebnis sehr kompakt zusammen. Es wird auch hier
+klar, was wir schon vorher gesehen haben: Je mehr Verdächtige eine Kapuze haben,
+desto wahrscheinlicher ist es auch, dass der Täter tatsächlich eine Kapuze trägt.
+Das wurde in @fig-gda-sim1 so umgesetzt, dass innerhalb jedes möglichen Anteils
+von Verdächtigen mit Kapuze, der Anteil der Täter mit Kapuze ermittelt wurde.
+
+
+```{r}
+#| echo: true
+#| label: fig-gda-sim1
+#| fig-cap: Zusammenspiel vom Anteil verbliebener Verdächtiger mit Kapuze und dem Täteranteil mit Kapuze
+
+plt_data = res_dt[, .(anteil_kapuze_truth = sum(truth == "kapuze") / .N, 
+                      anz_obs = .N), 
+       keyby = "anteil_kapuze"]
+
+p = ggplot(data = plt_data, aes(x = anteil_kapuze, y = anteil_kapuze_truth)) + 
+  geom_point(aes(size = anz_obs), shape = 15, color = "steelblue") +
+  geom_line( color = "steelblue") +
+  coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + 
+  labs(x = "Anteil der verbliebenen verdächtigen Personen mit Kapuze", 
+       y = "Anteil der Täter mit Kapuze (Wahrheit)",
+       size = "Anzahl") +
+  theme_bw()
+
+p 
+```
+
+
+## Die Strategie
+
+Jede richtige Enthüllung, z. B. "der Täter hat eine Kapuze", bringt 2 Siegpunkte.
+Für jede falsche Enthüllung wird ein Punkt abgezogen (Minuspunkt).
+Man könnte sich jetzt fragen, ab welcher Wahrscheinlichkeit man eine
+Enthüllung machen sollte, denn man will ja das Spiel gewinnen.
+Anhand des Punkteschlüssels und der vorliegenden
+Karten kann man sich die erwarteten Punkte leicht ausrechnen, wie @eq-punkte zeigt.
+
+$$
+\begin{align}
+p \;&=\; \frac{\#\{\style{font-size:87%}{\text{Kapuze unter den verbleibenden Verdächtigen}}\}}
+     {\#\{\style{font-size:87%}{\text{verbleibende Verdächtige}}\}}\\
+\mathbb{E}[\,\text{Punkte} \mid p\,] &= 2p + (-1)(1-p) \\ 
+  &= 3p - 1
+\end{align}
+$$ {#eq-punkte}
+
+
+Wenn wieder angenommen 6 Verdächtige übrig sind, können wir die
+zu erwartenden Punkte wie in @fig-erw darstellen. Auf der x-Achse sind alle möglichen
+Wahrscheinlichkeiten bei 6 verbliebenen Karten. Der Zusammenhang ist nicht sehr komplex. 
+Die Punkte, die man sich  erwarten darf, steigen linear mit der Anzahl der Karten.
+Ich muss zugeben, dieser Verlauf agiert gerade hervorragend als eine Art 
+Informations-Verdauungshilfe für mein Hirn. @eq-abwann zeigt, ab welcher 
+Wahrscheinlichkeit es sich auszahlt jemanden zu enthüllen. Also die Wahrscheinlichkeit
+sollte $> \frac{1}{3}$ sein, was natürlich etwas seltsam anmutet, denn bei
+einem dichotomen Merkmal würde man dann die andere Eigenschaft enthüllen, also
+z. B. sagen, dass der Täter eine Glatze hat, weil hier die Aussichten auf Punkte 
+deutlich höher sind (Erwartungswert bei \frac{2}{3} wäre genau 1 Punkt).
+
+$$
+3p - 1 \ge 0
+\;\Longleftrightarrow\;
+p \ge \tfrac{1}{3}.
+$$ {#eq-abwann}
+
+
+
+
+```{r}
+#| label: fig-erw
+#| fig-cap: Die zu erwartenden Punkte bei 6 verbliebenen Verdächtigen. Alle Anteile von 1/6 bis 6/6.
+
+rect1 = data.table(xmin = -Inf, xmax = Inf, ymin = 0, ymax = 2)
+rect2 = data.table(xmin = -Inf, xmax = Inf, ymin = 1, ymax = 2)
+
+prob6 = data.table(probs = 0:6/6)
+prob6[, erw := 2 * probs - (1-probs)]
+
+p = ggplot(data = prob6, aes(x = probs, y = erw)) +
+    geom_rect(data = rect1, aes(xmin = xmin, xmax = xmax, 
+                                ymin = ymin, ymax = ymax), fill = "blue", 
+              alpha = 0.2, inherit.aes = FALSE) +
+    geom_rect(data = rect2, aes(xmin = xmin, xmax = xmax, 
+                                ymin = ymin, ymax = ymax), fill = "red", 
+              alpha = 0.2, inherit.aes = FALSE) +
+    geom_line() +
+    geom_segment(data = prob6[erw >= 0.9999], 
+                 aes(x = probs, y = -Inf, yend = erw), linetype = 2, alpha = 0.4) +
+    geom_point(shape = 1) + 
+    scale_x_continuous(breaks = round(c(0, 0.25, 0.5, prob6$probs[prob6$probs > 0.5]),3)) +
+    labs(x = "Anteil der Charaktere mit Kapuze bei den verbliebenen 6 Verdächtigen", 
+         y = "Erwartungswert der Punkte, wenn man unterstellt,
+         dass der Täter eine Kapuze trägt") +
+    theme_bw()
+
+p
+```
+
+## Die Conclusio
+
+Beim Zusammenschreiben dieses Posts habe ich bemerkt, dass ich mich schön
+langsam daran gewöhne, dass die Realität der Wahrscheinlichkeiten so ist, wie sie ist.
+Es wird vielleicht noch länger dauern meine Intuition zu shapen, aber die 
+Konfrontation mit solchen Themen beschleunigt den Prozess dramatisch. Also,
+falls ihr Mal "Das Geheimnis der Abtei" spielt, wisst ihr nun, dass man
+sich gar nicht allzu sicher sein muss, um Punkte zu lukrieren. Schon mit 
+einer Wahrscheinlichkeit von z. B. $\frac{2}{3}$ darf man sich schon einen
+Punkt erwarten! In the long run.
+
+
+
+<br>
+
+<br>
+
+::: {style='text-align:center;'}
+
+{{< bi file-spreadsheet size=66px >}}
+
+:::
+
+
