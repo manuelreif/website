@@ -24,7 +24,7 @@ filters:
 <img src="media/pp_hex.png" alt="Hexsticker PP package" style="float: right; width: 28%; margin-left: 20px; margin-bottom: 10px;"/>
 
 
-Als ich vor vielen Jahren das `PP` package zu schreiben begann, war
+Als ich vor vielen Jahren das **PP** package zu schreiben begann, war
 für mich Psychometrie alles, was mich interessierte.
 Die perfekte Überschneidung von Psychologie und Statistik. 
 Aus Testergebnissen alles rauskitzeln, was man bekommen konnte. 
