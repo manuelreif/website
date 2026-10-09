@@ -4,7 +4,7 @@ description: "Eigene Packages sind wie eigene Kinder, zumindest bis zu dem Zeitp
 author: Manuel Reif 
 date: 2026-09-30
 lang: de
-categories: [R, R-packages, IRT, claude, PP]
+categories: [R, R-packages, IRT, Claude, PP]
 draft: false 
 highlight-style: monokai
 execute:

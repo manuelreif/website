@@ -4,7 +4,7 @@ description: "Claude und ich machen einen ausführlichen Schlachtplan. Es werden
 author: Manuel Reif 
 date: 2026-10-09
 lang: de
-categories: [R, R-packages, IRT, claude, PP]
+categories: [R, IRT, Claude, PP]
 draft: false 
 highlight-style: monokai
 execute:
