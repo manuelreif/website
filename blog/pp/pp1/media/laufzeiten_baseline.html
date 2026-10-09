@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="ppbench" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+#ppbench table {
+  font-family: 'Source Sans 3', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ppbench thead, #ppbench tbody, #ppbench tfoot, #ppbench tr, #ppbench td, #ppbench th {
+  border-style: none;
+}
+
+#ppbench p {
+  margin: 0;
+  padding: 0;
+}
+
+#ppbench .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ppbench .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ppbench .gt_title {
+  color: #333333;
+  font-size: 22px;
+  font-weight: bold;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ppbench .gt_subtitle {
+  color: #333333;
+  font-size: 14px;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ppbench .gt_heading {
+  background-color: #FFFFFF;
+  text-align: left;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ppbench .gt_bottom_border {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ppbench .gt_col_headings {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #1F2328;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ppbench .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ppbench .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ppbench .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ppbench .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ppbench .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #1F2328;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ppbench .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ppbench .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #F6F8FA;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D0D7DE;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D0D7DE;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ppbench .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #F6F8FA;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D0D7DE;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D0D7DE;
+  vertical-align: middle;
+}
+
+#ppbench .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ppbench .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ppbench .gt_row {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #EAEEF2;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ppbench .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ppbench .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ppbench .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ppbench .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ppbench .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ppbench .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ppbench .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ppbench .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ppbench .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ppbench .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ppbench .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ppbench .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ppbench .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #1F2328;
+}
+
+#ppbench .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ppbench .gt_footnote {
+  margin: 0px;
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ppbench .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ppbench .gt_sourcenote {
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ppbench .gt_left {
+  text-align: left;
+}
+
+#ppbench .gt_center {
+  text-align: center;
+}
+
+#ppbench .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ppbench .gt_font_normal {
+  font-weight: normal;
+}
+
+#ppbench .gt_font_bold {
+  font-weight: bold;
+}
+
+#ppbench .gt_font_italic {
+  font-style: italic;
+}
+
+#ppbench .gt_super {
+  font-size: 65%;
+}
+
+#ppbench .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ppbench .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ppbench .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ppbench .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ppbench .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ppbench .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ppbench .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ppbench .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ppbench div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+
+#ppbench .gt_table {
+  font-variant-numeric: tabular-nums;
+}
+
+#ppbench .gt_heading {
+  padding-bottom: 10px;
+}
+
+#ppbench code {
+  font-size: 0.95em;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_title gt_font_normal" style="font-weight: bold;">Laufzeiten von PP 0.6.4-1 vor dem Umbau</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>30 Durchläufe je Szenario · Intel Core i5-1335U · R 4.6.1 · ein Thread</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="a::stub"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="iter">Iterationen<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" style="color: #57606A; font-size: 12px; text-transform: uppercase;" scope="colgroup" id="Laufzeit in Sekunden">
+        <div class="gt_column_spanner">Laufzeit in Sekunden</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="color: #57606A; font-size: 12px; text-transform: uppercase;" scope="colgroup" id="Streuung">
+        <div class="gt_column_spanner">Streuung</div>
+      </th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="mittel">Mittelwert</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="sd">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="median">Median</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="iqr">IQR</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="min">Min–Max</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="vk">VK<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="verteilung">Verteilung<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;PP_4pl()&lt;/code&gt; · 1PL, 5.000 Personen × 40 Items&lt;/span&gt;"><span class='gt_from_md'><code>PP_4pl()</code> · 1PL, 5.000 Personen × 40 Items</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MLE</span></th>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 iter" class="gt_row gt_right">6</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 mittel" class="gt_row gt_right">0,399</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 sd" class="gt_row gt_right">0,0106</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 median" class="gt_row gt_right">0,397</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 iqr" class="gt_row gt_right">0,00850</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 min" class="gt_row gt_right">0,389–0,433</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 vk" class="gt_row gt_right">2,6%</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_1 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="42.6273137765019" y1="65" x2="193.274722645854" y2="65" width="64.0254478035944" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="67.1077419933614" y="35" width="64.0254478035944" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="42.6273137765019" y1="50" x2="42.6273137765019" y2="80" width="64.0254478035944" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="193.274722645854" y1="50" x2="193.274722645854" y2="80" width="64.0254478035944" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="64.0254478035944" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="306.258784127269" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="374.049819084358" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="298.726114649682" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="306.258784127269" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="374.049819084358" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="298.726114649682" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="32.6273137765019" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.0 %</text><text x="61.1077419933614" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.2 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="137.133189796956" y="120" fill="transparent" font-size="30px" text-anchor="start">+0.9 %</text><text x="203.274722645854" y="75" fill="transparent" stroke="transparent" font-size="30px">+3.0 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>WLE</span></th>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 iter" class="gt_row gt_right">6</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 mittel" class="gt_row gt_right">0,461</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 sd" class="gt_row gt_right">0,0130</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 median" class="gt_row gt_right">0,457</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 iqr" class="gt_row gt_right">0,0138</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 min" class="gt_row gt_right">0,447–0,497</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 vk" class="gt_row gt_right">2,8%</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_2 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="34.254358422296" y1="65" x2="223.806106276726" y2="65" width="89.8732095332077" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="62.0331329804731" y="35" width="89.8732095332077" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="34.254358422296" y1="50" x2="34.254358422296" y2="80" width="89.8732095332077" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="223.806106276726" y1="50" x2="223.806106276726" y2="80" width="89.8732095332077" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="89.8732095332077" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="361.06874794414" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="295.705870039772" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="334.924194850632" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="361.06874794414" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="295.705870039772" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="334.924194850632" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="24.254358422296" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.3 %</text><text x="56.0331329804731" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.4 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="157.906342513681" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.6 %</text><text x="233.806106276726" y="75" fill="transparent" stroke="transparent" font-size="30px">+4.0 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MAP</span></th>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 iter" class="gt_row gt_right">5</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 mittel" class="gt_row gt_right">0,338</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 sd" class="gt_row gt_right">0,00857</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 median" class="gt_row gt_right">0,337</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 iqr" class="gt_row gt_right">0,00775</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 min" class="gt_row gt_right">0,326–0,365</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 vk" class="gt_row gt_right">2,5%</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_3 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="9.57507251577404" y1="65" x2="196.196285996232" y2="65" width="68.8705481295416" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="65.1176699261386" y="35" width="68.8705481295416" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="9.57507251577404" y1="50" x2="9.57507251577404" y2="80" width="68.8705481295416" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="196.196285996232" y1="50" x2="196.196285996232" y2="80" width="68.8705481295416" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="68.8705481295416" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="356.152627014742" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="347.26832331569" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="356.152627014742" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="347.26832331569" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="-0.424927484225956" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-3.1 %</text><text x="59.1176699261386" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.3 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="139.98821805568" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.0 %</text><text x="206.196285996232" y="75" fill="transparent" stroke="transparent" font-size="30px">+3.1 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>EAP</span></th>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 iter" class="gt_row gt_right">–</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 mittel" class="gt_row gt_right">0,829</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 sd" class="gt_row gt_right">0,0226</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 median" class="gt_row gt_right">0,826</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 iqr" class="gt_row gt_right">0,0213</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 min" class="gt_row gt_right">0,805–0,900</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 vk" class="gt_row gt_right">2,7%</td>
+<td headers="pp-4pl-1pl-5-000-personen-40-items stub_1_4 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="28.6253401513113" y1="65" x2="224.238210579827" y2="65" width="76.9772883586017" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="56.6993361442541" y="35" width="76.9772883586017" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="28.6253401513113" y1="50" x2="28.6253401513113" y2="80" width="76.9772883586017" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="224.238210579827" y1="50" x2="224.238210579827" y2="80" width="76.9772883586017" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="76.9772883586017" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="372.758888789211" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="311.177297329625" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="260.46260578332" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="372.758888789211" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="311.177297329625" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="260.46260578332" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="18.6253401513113" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.5 %</text><text x="50.6993361442541" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.5 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="139.676624502856" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.0 %</text><text x="234.238210579827" y="75" fill="transparent" stroke="transparent" font-size="30px">+4.1 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;PP_4pl()&lt;/code&gt; · 2PL, 5.000 Personen × 40 Items&lt;/span&gt;"><span class='gt_from_md'><code>PP_4pl()</code> · 2PL, 5.000 Personen × 40 Items</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MLE</span></th>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 iter" class="gt_row gt_right">7</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 mittel" class="gt_row gt_right">0,461</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 sd" class="gt_row gt_right">0,0147</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 median" class="gt_row gt_right">0,455</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 iqr" class="gt_row gt_right">0,00800</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 min" class="gt_row gt_right">0,440–0,499</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 vk" class="gt_row gt_right">3,2%</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_5 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="47.0829221614186" y1="65" x2="152.121647079932" y2="65" width="52.5193624592566" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="86.4746867617595" y="35" width="52.5193624592566" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="47.0829221614186" y1="50" x2="47.0829221614186" y2="80" width="52.5193624592566" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="152.121647079932" y1="50" x2="152.121647079932" y2="80" width="52.5193624592566" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="52.5193624592566" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="1.12735863161987" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="329.377111928471" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="388.460273317185" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="329.377111928471" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="342.507700128585" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="296.552136598786" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="1.12735863161987" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="329.377111928471" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="388.460273317185" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="329.377111928471" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="342.507700128585" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="296.552136598786" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="37.0829221614186" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.9 %</text><text x="80.4746867617595" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.5 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="144.994049221016" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.2 %</text><text x="162.121647079932" y="75" fill="transparent" stroke="transparent" font-size="30px">+1.6 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>WLE</span></th>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 iter" class="gt_row gt_right">7</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 mittel" class="gt_row gt_right">0,532</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 sd" class="gt_row gt_right">0,0125</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 median" class="gt_row gt_right">0,528</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 iqr" class="gt_row gt_right">0,00750</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 min" class="gt_row gt_right">0,519–0,571</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 vk" class="gt_row gt_right">2,3%</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_6 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="51.9139542905622" y1="65" x2="187.838554199692" y2="65" width="42.4764374728102" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="87.3109855145777" y="35" width="42.4764374728102" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="51.9139542905622" y1="50" x2="51.9139542905622" y2="80" width="42.4764374728102" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="187.838554199692" y1="50" x2="187.838554199692" y2="80" width="42.4764374728102" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="42.4764374728102" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="346.41725408681" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="289.782004126711" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="312.436104110493" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="346.41725408681" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="289.782004126711" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="312.436104110493" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="41.9139542905622" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.7 %</text><text x="81.3109855145777" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.5 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="135.787422987388" y="120" fill="transparent" font-size="30px" text-anchor="start">+0.9 %</text><text x="197.838554199692" y="75" fill="transparent" stroke="transparent" font-size="30px">+2.8 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MAP</span></th>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 iter" class="gt_row gt_right">5</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 mittel" class="gt_row gt_right">0,341</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 sd" class="gt_row gt_right">0,0129</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 median" class="gt_row gt_right">0,337</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 iqr" class="gt_row gt_right">0,00875</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 min" class="gt_row gt_right">0,327–0,375</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 vk" class="gt_row gt_right">3,8%</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_7 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="9.8531742471816" y1="65" x2="169.337041356419" y2="65" width="77.5253431416525" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="54.1550790945247" y="35" width="77.5253431416525" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="9.8531742471816" y1="50" x2="9.8531742471816" y2="80" width="77.5253431416525" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="169.337041356419" y1="50" x2="169.337041356419" y2="80" width="77.5253431416525" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="77.5253431416525" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="319.963517837385" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="408.564337190874" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="328.823898806854" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="311.103136867917" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="435.145480099279" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="319.963517837385" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="408.564337190874" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="328.823898806854" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="311.103136867917" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="435.145480099279" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="-0.146825752818399" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-3.1 %</text><text x="48.1550790945247" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.6 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="137.680422236177" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.0 %</text><text x="179.337041356419" y="75" fill="transparent" stroke="transparent" font-size="30px">+2.2 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>EAP</span></th>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 iter" class="gt_row gt_right">–</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 mittel" class="gt_row gt_right">0,831</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 sd" class="gt_row gt_right">0,0203</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 median" class="gt_row gt_right">0,828</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 iqr" class="gt_row gt_right">0,0217</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 min" class="gt_row gt_right">0,805–0,885</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 vk" class="gt_row gt_right">2,4%</td>
+<td headers="pp-4pl-2pl-5-000-personen-40-items stub_1_8 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="21.5774049819084" y1="65" x2="249.240752369845" y2="65" width="78.5980532878802" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="69.4589725187644" y="35" width="78.5980532878802" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="21.5774049819084" y1="50" x2="21.5774049819084" y2="80" width="78.5980532878802" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="249.240752369845" y1="50" x2="249.240752369845" y2="80" width="78.5980532878802" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="78.5980532878802" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="285.377829610359" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="310.673723871894" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="285.377829610359" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="310.673723871894" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="11.5774049819084" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.7 %</text><text x="63.4589725187644" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.1 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="154.057025806645" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.5 %</text><text x="259.240752369845" y="75" fill="transparent" stroke="transparent" font-size="30px">+4.9 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;PP_4pl()&lt;/code&gt; · 3PL, 5.000 Personen × 40 Items&lt;/span&gt;"><span class='gt_from_md'><code>PP_4pl()</code> · 3PL, 5.000 Personen × 40 Items</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MLE</span></th>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 iter" class="gt_row gt_right">40</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 mittel" class="gt_row gt_right">2,53</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 sd" class="gt_row gt_right">0,0543</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 median" class="gt_row gt_right">2,53</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 iqr" class="gt_row gt_right">0,0517</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 min" class="gt_row gt_right">2,47–2,75</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 vk" class="gt_row gt_right">2,1%</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_9 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="24.332406327562" y1="65" x2="150.726353876977" y2="65" width="61.1299004216381" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="60.6558565832362" y="35" width="61.1299004216381" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="24.332406327562" y1="50" x2="24.332406327562" y2="80" width="61.1299004216381" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="150.726353876977" y1="50" x2="150.726353876977" y2="80" width="61.1299004216381" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="61.1299004216381" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="365.714542029246" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="365.714542029246" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="14.332406327562" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.6 %</text><text x="54.6558565832362" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.4 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="127.785757004874" y="120" fill="transparent" font-size="30px" text-anchor="start">+0.6 %</text><text x="160.726353876977" y="75" fill="transparent" stroke="transparent" font-size="30px">+1.6 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>WLE</span></th>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 iter" class="gt_row gt_right">40</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 mittel" class="gt_row gt_right">2,94</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 sd" class="gt_row gt_right">0,0909</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 median" class="gt_row gt_right">2,93</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 iqr" class="gt_row gt_right">0,0312</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 min" class="gt_row gt_right">2,88–3,34</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 vk" class="gt_row gt_right">3,1%</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_10 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="49.258694417033" y1="65" x2="141.190753865016" y2="65" width="31.9209951855507" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="82.4562662599803" y="35" width="31.9209951855507" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="49.258694417033" y1="50" x2="49.258694417033" y2="80" width="31.9209951855507" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="141.190753865016" y1="50" x2="141.190753865016" y2="80" width="31.9209951855507" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="31.9209951855507" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="351.612691008044" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="528.326306031518" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="351.612691008044" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="528.326306031518" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="39.258694417033" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.8 %</text><text x="76.4562662599803" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.7 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="120.377261445531" y="120" fill="transparent" font-size="30px" text-anchor="start">+0.4 %</text><text x="151.190753865016" y="75" fill="transparent" stroke="transparent" font-size="30px">+1.3 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MAP</span></th>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 iter" class="gt_row gt_right">9</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 mittel" class="gt_row gt_right">0,587</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 sd" class="gt_row gt_right">0,0121</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 median" class="gt_row gt_right">0,583</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 iqr" class="gt_row gt_right">0,0110</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 min" class="gt_row gt_right">0,567–0,618</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 vk" class="gt_row gt_right">2,1%</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_11 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="20.8187554199934" y1="65" x2="190.084028587662" y2="65" width="56.4217577225562" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="82.3689482970007" y="35" width="56.4217577225562" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="20.8187554199934" y1="50" x2="20.8187554199934" y2="80" width="56.4217577225562" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="190.084028587662" y1="50" x2="190.084028587662" y2="80" width="56.4217577225562" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="56.4217577225562" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="282.407822732574" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="251.634221464669" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="261.891091773571" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="282.407822732574" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="251.634221464669" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="261.891091773571" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="10.8187554199934" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.7 %</text><text x="76.3689482970007" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.7 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="144.790706019557" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.2 %</text><text x="200.084028587662" y="75" fill="transparent" stroke="transparent" font-size="30px">+2.9 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>EAP</span></th>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 iter" class="gt_row gt_right">–</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 mittel" class="gt_row gt_right">0,837</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 sd" class="gt_row gt_right">0,0274</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 median" class="gt_row gt_right">0,827</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 iqr" class="gt_row gt_right">0,0320</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 min" class="gt_row gt_right">0,806–0,921</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 vk" class="gt_row gt_right">3,3%</td>
+<td headers="pp-4pl-3pl-5-000-personen-40-items stub_1_12 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="26.9519849908857" y1="65" x2="316.223201235761" y2="65" width="115.708486498032" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="73.9585576305703" y="35" width="115.708486498032" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="26.9519849908857" y1="50" x2="26.9519849908857" y2="80" width="115.708486498032" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="316.223201235761" y1="50" x2="316.223201235761" y2="80" width="115.708486498032" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="115.708486498032" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="442.779358342714" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="442.779358342714" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="16.9519849908857" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.5 %</text><text x="67.9585576305703" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.0 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="195.667044128603" y="120" fill="transparent" font-size="30px" text-anchor="start">+2.9 %</text><text x="326.223201235761" y="75" fill="transparent" stroke="transparent" font-size="30px">+7.1 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;PP_gpcm()&lt;/code&gt; · GPCM, 2.000 Personen × 20 Items, 5 Kategorien&lt;/span&gt;"><span class='gt_from_md'><code>PP_gpcm()</code> · GPCM, 2.000 Personen × 20 Items, 5 Kategorien</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>MLE</span></th>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 iter" class="gt_row gt_right">7</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 mittel" class="gt_row gt_right">0,198</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 sd" class="gt_row gt_right">0,00790</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 median" class="gt_row gt_right">0,196</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 iqr" class="gt_row gt_right">0,00350</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 min" class="gt_row gt_right">0,189–0,228</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 vk" class="gt_row gt_right">4,0%</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_13 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="18.7584103346192" y1="65" x2="171.717352949972" y2="65" width="53.537573637152" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="95.2363864716964" y="35" width="53.537573637152" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="18.7584103346192" y1="50" x2="18.7584103346192" y2="80" width="53.537573637152" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="171.717352949972" y1="50" x2="171.717352949972" y2="80" width="53.537573637152" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="53.537573637152" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="3.46281510720372" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="294.085105110493" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="462.339642953261" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="600" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="3.46281510720372" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="294.085105110493" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="462.339642953261" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="600" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="8.75841033461918" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.8 %</text><text x="89.2363864716964" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.3 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="154.773960108848" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.5 %</text><text x="181.717352949972" y="75" fill="transparent" stroke="transparent" font-size="30px">+2.3 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>WLE</span></th>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 iter" class="gt_row gt_right">7</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 mittel" class="gt_row gt_right">0,971</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 sd" class="gt_row gt_right">0,0212</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 median" class="gt_row gt_right">0,967</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 iqr" class="gt_row gt_right">0,0192</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 min" class="gt_row gt_right">0,948–1,06</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 vk" class="gt_row gt_right">2,2%</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_14 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="44.130267921601" y1="65" x2="220.396501924807" y2="65" width="59.5285088522978" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="81.2389487642424" y="35" width="59.5285088522978" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="44.130267921601" y1="50" x2="44.130267921601" y2="80" width="59.5285088522978" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="220.396501924807" y1="50" x2="220.396501924807" y2="80" width="59.5285088522978" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="59.5285088522978" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="390.477955789595" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="390.477955789595" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="34.130267921601" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.0 %</text><text x="75.2389487642424" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.7 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="146.76745761654" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.3 %</text><text x="230.396501924807" y="75" fill="transparent" stroke="transparent" font-size="30px">+3.9 %</text></g>
+</svg>
+</div></td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>EAP</span></th>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 iter" class="gt_row gt_right">–</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 mittel" class="gt_row gt_right">1,30</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 sd" class="gt_row gt_right">0,0419</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 median" class="gt_row gt_right">1,29</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 iqr" class="gt_row gt_right">0,0265</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 min" class="gt_row gt_right">1,26–1,42</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 vk" class="gt_row gt_right">3,2%</td>
+<td headers="pp-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_15 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="36.6403516641249" y1="65" x2="187.726443587213" y2="65" width="61.5966926826351" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="86.0336861935947" y="35" width="61.5966926826351" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="36.6403516641249" y1="50" x2="36.6403516641249" y2="80" width="61.5966926826351" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="187.726443587213" y1="50" x2="187.726443587213" y2="80" width="61.5966926826351" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="61.5966926826351" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="413.19308633115" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="378.327203133878" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="410.868694117999" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="413.19308633115" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="378.327203133878" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="410.868694117999" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="26.6403516641249" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.2 %</text><text x="80.0336861935947" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.6 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="153.63037887623" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.5 %</text><text x="197.726443587213" y="75" fill="transparent" stroke="transparent" font-size="30px">+2.8 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;JKpp()&lt;/code&gt; · 3PL, 500 Personen × 40 Items, WLE-Objekt&lt;/span&gt;"><span class='gt_from_md'><code>JKpp()</code> · 3PL, 500 Personen × 40 Items, WLE-Objekt</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>Jackknife (40 Teilstichproben)</span><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span></th>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 iter" class="gt_row gt_right">40 × 500</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 mittel" class="gt_row gt_right">142</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 sd" class="gt_row gt_right">2,27</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 median" class="gt_row gt_right">142</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 iqr" class="gt_row gt_right">1,94</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 min" class="gt_row gt_right">140–152</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 vk" class="gt_row gt_right">1,6%</td>
+<td headers="jkpp-3pl-500-personen-40-items-wle-objekt stub_1_16 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="56.0981429981161" y1="65" x2="121.489459047277" y2="65" width="40.6439699769744" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="67.2205526150534" y="35" width="40.6439699769744" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="56.0981429981161" y1="50" x2="56.0981429981161" y2="80" width="40.6439699769744" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="121.489459047277" y1="50" x2="121.489459047277" y2="80" width="40.6439699769744" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="40.6439699769744" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="312.668819712329" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="172.043928112198" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="312.668819712329" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="172.043928112198" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="46.0981429981161" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.6 %</text><text x="61.2205526150534" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.2 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="113.864522592028" y="120" fill="transparent" font-size="30px" text-anchor="start">+0.2 %</text><text x="131.489459047277" y="75" fill="transparent" stroke="transparent" font-size="30px">+0.6 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;PV()&lt;/code&gt; · 3PL, 300 Personen × 40 Items, EAP-Objekt&lt;/span&gt;"><span class='gt_from_md'><code>PV()</code> · 3PL, 300 Personen × 40 Items, EAP-Objekt</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>10 Plausible Values (MH)</span></th>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 iter" class="gt_row gt_right">–</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 mittel" class="gt_row gt_right">0,452</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 sd" class="gt_row gt_right">0,0113</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 median" class="gt_row gt_right">0,450</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 iqr" class="gt_row gt_right">0,0150</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 min" class="gt_row gt_right">0,435–0,480</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 vk" class="gt_row gt_right">2,5%</td>
+<td headers="pv-3pl-300-personen-40-items-eap-objekt stub_1_17 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="0" y1="65" x2="298.702191920098" y2="65" width="99.5664005263001" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="53.1024789928531" y="35" width="99.5664005263001" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="0" y1="50" x2="0" y2="80" width="99.5664005263001" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="298.702191920098" y1="50" x2="298.702191920098" y2="80" width="99.5664005263001" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="99.5664005263001" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="-10" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-3.4 %</text><text x="47.1024789928531" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-1.7 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="158.668879519153" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.7 %</text><text x="308.702191920098" y="75" fill="transparent" stroke="transparent" font-size="30px">+6.5 %</text></g>
+</svg>
+</div></td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="9" class="gt_group_heading" style="font-weight: bold;" scope="colgroup" id="&lt;span class='gt_from_md'&gt;&lt;code&gt;sim_gpcm()&lt;/code&gt; · GPCM, 2.000 Personen × 20 Items, 5 Kategorien&lt;/span&gt;"><span class='gt_from_md'><code>sim_gpcm()</code> · GPCM, 2.000 Personen × 20 Items, 5 Kategorien</span></th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub"><span class='gt_from_md'>Simulation</span></th>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 iter" class="gt_row gt_right">–</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 mittel" class="gt_row gt_right">0,833</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 sd" class="gt_row gt_right">0,0195</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 median" class="gt_row gt_right">0,828</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 iqr" class="gt_row gt_right">0,0212</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 min" class="gt_row gt_right">0,807–0,899</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 vk" class="gt_row gt_right">2,3%</td>
+<td headers="sim-gpcm-gpcm-2-000-personen-20-items-5-kategorien stub_1_18 verteilung" class="gt_row gt_center" style="padding-top:0; padding-bottom:0; vertical-align: middle; overflow-x: visible;"><div>
+<svg 
+role="img" 
+viewBox="0 0 600 130" 
+style="
+height:2em;
+margin-left:auto;
+margin-right:auto;
+font-size:inherit;
+overflow:visible;
+vertical-align:middle;
+position:relative;"
+>
+<defs>
+<pattern id="area_pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+<path class="pattern-line" d="M 0,8 l 8,-8 M -1,1 l 4,-4 M 6,10 l 4,-4" stroke="#FF0000" stroke-width="1.5" stroke-linecap="round" shape-rendering="geometricPrecision">
+</path>
+</pattern>
+</defs>
+<style>text { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; stroke-width: 0.15em; paint-order: stroke; stroke-linejoin: round; cursor: default; } .vert-line:hover rect { fill: #911EB4; fill-opacity: 40%; stroke: #FFFFFF60; color: red; } .vert-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover text { stroke: white; fill: #212427; } .horizontal-line:hover rect { fill: transparent; stroke: transparent; color: blue; } .boxplot-line:hover text { stroke: white; fill: #212427; } .boxplot-line:hover rect { fill: transparent; stroke: transparent; } .horizontal-line:hover text { stroke: white; fill: #212427; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; } .y-axis-line:hover rect { fill: #EDEDED; fill-opacity: 60%; stroke: #FFFFFF60; color: red; } .y-axis-line:hover text { stroke: white; stroke-width: 0.20em; fill: #1A1C1F; } .ref-line:hover rect { stroke: #FFFFFF60; } .ref-line:hover line { stroke: #FF0000; } .ref-line:hover text { stroke: white; fill: #212427; }</style>
+<line x1="27.0446457940851" y1="65" x2="232.899733859633" y2="65" width="76.7441165036931" height="60" stroke="#C2410C" stroke-width="4" fill="none"></line><rect x="81.2176669357974" y="35" width="76.7441165036931" height="60" stroke="#C2410C" stroke-width="4" fill="white" ></rect><line x1="27.0446457940851" y1="50" x2="27.0446457940851" y2="80" width="76.7441165036931" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="232.899733859633" y1="50" x2="232.899733859633" y2="80" width="76.7441165036931" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><line x1="102.885679256003" y1="35" x2="102.885679256003" y2="95" width="76.7441165036931" height="60" stroke="#C2410C" stroke-width="4" fill="none" ></line><circle cx="359.304446637361" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<circle cx="359.304446637361" cy="65" r="4" stroke="#FB7356FF" stroke-width="2" fill="#FFBDA5FF" ></circle>
+<g class="boxplot-line">
+<rect x="0" y="35" width="600" height="60" stroke="transparent" stroke-width="12" fill="transparent"></rect>
+<text x="17.0446457940851" y="75" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-2.5 %</text><text x="75.2176669357974" y="120" fill="transparent" stroke="transparent" font-size="30px" text-anchor="end">-0.7 %</text><text x="102.885679256003" y="27.5" fill="transparent" stroke="transparent" font-size="30px" text-anchor="middle">+0.0 %</text><text x="163.96178343949" y="120" fill="transparent" font-size="30px" text-anchor="start">+1.8 %</text><text x="242.899733859633" y="75" fill="transparent" stroke="transparent" font-size="30px">+4.3 %</text></g>
+</svg>
+</div></td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> <span class='gt_from_md'>Newton-Raphson-Durchläufe. Der alte Code rechnet für alle Personen weiter, bis die letzte konvergiert ist oder <code>maxsteps</code> erreicht ist (40 bei <code>PP_4pl()</code>, 500 bei <code>JKpp()</code>). EAP, Plausible Values und Simulation iterieren nicht. Gezählt sind die ausgeführten Durchläufe; <code>PP_gpcm()</code> meldet in <code>nsteps</code> einen weniger.</span></td>
+    </tr>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Variationskoeffizient: Standardabweichung geteilt durch den Mittelwert.</td>
+    </tr>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span> Boxplot der Einzelläufe als Abweichung vom Median der Zeile in Prozent, alle Zeilen auf derselben Skala.</td>
+    </tr>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span> <span class='gt_from_md'>Eine einzige Person pendelt im Newton-Verfahren. Weil der alte Code erst abbricht, wenn alle Personen konvergiert sind, rechnen alle 40 Teilstichproben bis <code>maxsteps = 500</code>.</span></td>
+    </tr>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="9"><span class='gt_from_md'><strong>Messung:</strong> <code>bench/bench.R</code>, PP 0.6.4.1.9000, Commit <code>a833907</code>, 05.10.2026 · <strong>Daten:</strong> in R simuliert (<code>bench/scenarios.R</code>) · Verstrichene Zeit nach einem Aufwärmlauf, die Durchläufe verschränkt in zufälliger Reihenfolge.</span></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</body>
+</html>
