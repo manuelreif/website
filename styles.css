@@ -1,7 +1,7 @@
 /* css styles */
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Karma:wght@300&display=swap');
+/* Schriften lokal statt von Google Fonts */
+@import url('fonts/fonts.css');
 
 .navbar-logo {
     max-height: 44px;
@@ -58,6 +58,21 @@ div.sourceCode {
 
 .code-annotation-gutter {
     background-color: rgba(1,1,1,.75);
+}
+
+/* Inline-Code: neuere Quarto-Versionen übernehmen sonst den dunklen
+   Monokai-Hintergrund, die Schrift bleibt aber dunkel -> unlesbar */
+:not(pre) > code:not(.sourceCode) {
+    color: #7d12ba;
+    background-color: #f8f9fa;
+}
+
+a > code:not(.sourceCode) {
+    color: inherit;
+}
+
+nav :not(pre) > code:not(.sourceCode) {
+    background-color: transparent;
 }
 
 .code-with-filename .code-with-filename-file, .code-with-filename .code-with-filename-file pre {

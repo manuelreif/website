@@ -1,3 +1,8 @@
 
 [[plugins]]
 package = "@quarto/netlify-plugin-quarto"
+
+  # Quarto-Version pinnen, sonst installiert das Plugin immer "latest"
+  # (neue Versionen können die Optik unbemerkt ändern). Lokal dieselbe Version verwenden.
+  [plugins.inputs]
+  version = "v1.10.19"

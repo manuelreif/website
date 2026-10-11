@@ -4,7 +4,12 @@ project:
     - "*.qmd"
     - "!dontgit/"
     - "!cv"
-    
+  resources:
+    - "fonts/*"
+    - "fonts/licenses/*"
+  post-render:
+    - scripts/local-fonts.ts
+
 website:
   title: "Manuel Reif"
   site-url: https://manuelreif.at
@@ -35,7 +40,7 @@ website:
         
 format:
   html:
-    theme: cosmo
+    theme: [cosmo, theme.scss]
     css: styles.css
     toc: true
     page-layout: full
