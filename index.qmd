@@ -1,8 +1,18 @@
 ---
 title: "Manuel Reif"
 lightbox: auto
-image: media/me_pic.png
+image: media/me_pic.webp
 toc: false
+listing:
+  id: neueste
+  contents: blog/**/*.qmd
+  sort: "date desc"
+  type: table
+  max-items: 5
+  fields: [date, title]
+  sort-ui: false
+  filter-ui: false
+  table-hover: true
 about: 
     template: solana #jolla, trestles, solana, marquee, broadside
     image-shape: rounded
@@ -33,50 +43,9 @@ Python (seit neuestem) und wie man hier sieht
 auch `quarto` herum. Ich bin Autor von [drei R packages](pkgs.qmd) die 
 thematisch vor allem im Bereich IRT angesiedelt sind.
 
+## Neu im Blog
 
-```{r pkgs}
-#| include: false
-#| echo: false
+::: {#neueste}
+:::
 
-
-library(timevis)
-library(readxl)
-library(data.table)
-library(magrittr)
-library(vistime)
-library(gt)
-library(gtExtras)
-library(plotly)
-library(fontawesome)
-```
-
-
-```{r vistime-gra}
-#| echo: false
-
-dat = fread("cv_dat.csv") %>%
-    .[, group := factor(group, levels = c("Studium", "Uni", "Lektor", "Arbeit"))]
-
-gruppen_dt = data.table(group = c("Studium", "Uni", "Lektor", "Arbeit"),
-                        color = c("#f2eaae", "#E6A59A", "#E4BFF8", "#BAC1F4"))
-
-dat[gruppen_dt, color := i.color, on = "group"]
-
-p = vistime(dat,
-            col.event = "content",
-            col.start = "start",
-            col.end = "end",
-            col.group = "group", optimize_y = T)
-
-pp = plotly_build(p)
-
-pp$x$layout$yaxis$ticktext <- c("", "", "", "")
-
-pp
-```
-
-
-
-
-
-
+[Alle Posts →](blog.qmd)

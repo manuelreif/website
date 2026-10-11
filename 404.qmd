@@ -1,0 +1,26 @@
+---
+title: "404"
+toc: false
+search: false
+---
+
+```{=html}
+<pre class="r-fehler"><code>&gt; seite &lt;- lade_seite("<span class="r-pfad">/…</span>")
+<span class="r-error">Error in lade_seite("<span class="r-pfad">/…</span>") :
+  Objekt 'seite' nicht gefunden</span>
+<span class="r-kommentar"># Traceback:
+# 2: lade_seite(pfad)
+# 1: manuelreif.at::navigiere(pfad = "<span class="r-pfad">/…</span>")</span>
+&gt; <span class="r-kommentar"># Vorschlag: neu starten mit</span>
+&gt; navigiere("/")</code></pre>
+<script>
+  // tatsächlich aufgerufenen Pfad in die Fehlermeldung schreiben
+  document.querySelectorAll(".r-pfad").forEach(el => { el.textContent = window.location.pathname; });
+</script>
+```
+
+Diese Seite gibt es (noch) nicht. Vielleicht hilft eines davon:
+
+- [Startseite](/index.html)
+- [Blog](/blog.html)
+- die Suche oben rechts {{< fa magnifying-glass >}}

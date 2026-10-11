@@ -1,166 +1,121 @@
 ---
 title: "Packages"
-format: html
-toc: true
-page-layout: custom
+toc: false
 ---
 
-<style>
-/* Versteckt den automatisch generierten Titel */
-.title, .header { 
-    display: none;
-}
-</style>
+Drei R-Packages, alle rund um Item Response Theory und Large Scale Assessments.
+Der Code unten ist jeweils ein kurzes Beispiel aus der Dokumentation.
 
+<!-- Status bitte prüfen: PP auf CRAN, mcIRT und svyPVpack nur auf GitHub -->
+
+::: {.pkg-card style="--pkg-accent: rgb(215, 40, 96);"}
 ::: {.grid}
-
-::: {.g-col-4 .g-start-3}
-<h1 class="packi">Packages</h1>
+::: {.g-col-12 .g-col-md-4}
+[![](hex_sticker/pp1_hex_2.png){.pkg-hex fig-alt="Hexsticker PP"}](https://cran.r-project.org/package=PP)
 :::
 
-:::
+::: {.g-col-12 .g-col-md-8}
+### PP {.unnumbered .unlisted}
 
+[CRAN]{.pkg-badge} [wird gerade überarbeitet]{.pkg-badge}
 
+Das PP package schätzt Personenparameter für IRT-Modelle wie das Rasch-Modell
+(1-PL), 2-PL, 3-PL, 4-PL und das Partial Credit Model, mittels MLE, WLE, MAP,
+EAP oder robusten Methoden. Zusätzlich können unterschiedliche Person-Fit-Indizes
+berechnet werden, wie Infit, Outfit oder die lz-Statistik. Es ist aus der Idee
+entstanden, mit vorliegenden Itemparametern Personenparameter berechnen zu können,
+unabhängig vom Software-Package, das die IRT-Analyse durchgeführt hat.
 
-<br>
-
-::: {.grid}
-
-
-::: {.g-col-4 .g-start-3}
-[![](hex_sticker/pp1_hex_2.png)](https://cran.r-project.org/web/packages/PP/)
-:::
-
-::: {.g-col-4 .g-start-7}
-
-## PP package
-
-Das PP package schätzt Personenparameter für IRT Modelle wie das Rasch Modell 
-(1-Pl Model), 2-PL, 3-PL, 4-PL Modell und das Partial Credit Model, mittels
-MLE, WLE, MAP, EAP oder robusten Methoden. Zusätzlich
-können unterschiedliche Person Fit Indices berechnet werden, wie Infit, Outfit, 
-lz Statistik etc. . Es ist aus der Idee entstanden, unabhängig vom Software Package
-das die IRT Analyse durchgeführt hat, mit vorliegenden Item Parametern, 
-Personenparameter berechnen zu können.
-
-
-
-```{r pp-package-example-code}
-#| echo: true
-#| eval: false
-
+```r
 library(PP)
 
-#Example Code
 data(fourpl_df)
-diff_par <- attr(fourpl_df,"diffpar")
-slope_par <- attr(fourpl_df,"slopes")
+diff_par  <- attr(fourpl_df, "diffpar")
+slope_par <- attr(fourpl_df, "slopes")
 
-res1plmle <- PP_4pl(respm = itmat, 
-                    thres = diff_par, 
-                    slopes = slope_par, 
+res1plmle <- PP_4pl(respm = itmat,
+                    thres = diff_par,
+                    slopes = slope_par,
                     type = "mle")
 ```
 
+[{{< fa brands r-project >}} CRAN](https://cran.r-project.org/package=PP) ·
+[{{< fa brands github >}} GitHub](https://github.com/manuelreif/PP) ·
+[{{< fa blog >}} Blogserie zur Überarbeitung](blog.qmd#category=PP)
+:::
+:::
 :::
 
-:::
-
-
-<br>
-
-
+::: {.pkg-card style="--pkg-accent: rgb(205, 118, 50);"}
 ::: {.grid}
-
-
-::: {.g-col-4 .g-start-3}
-[![](hex_sticker/mcirt_hex.png)](https://github.com/manuelreif/mcIRT)
+::: {.g-col-12 .g-col-md-4}
+[![](hex_sticker/mcirt_hex.png){.pkg-hex fig-alt="Hexsticker mcIRT"}](https://github.com/manuelreif/mcIRT)
 :::
 
-::: {.g-col-4 .g-start-7}
+::: {.g-col-12 .g-col-md-8}
+### mcIRT {.unnumbered .unlisted}
 
-## mcIRT
+[GitHub]{.pkg-badge}
 
-Das package wurde erstellt um das Nominal Response Model bzw. das
-Nested Logit Model zu schätzen und damit eine tiefere Einsicht in die 
-Funktionalität von MC Items zu erlangen. Geschätzt wird mit
-MML Methode, mit oder ohne latenter Regression.
+Das Package schätzt das Nominal Response Model bzw. das Nested Logit Model und
+gibt damit einen tieferen Einblick in die Funktionsweise von Multiple-Choice-Items.
+Geschätzt wird mit der MML-Methode, mit oder ohne latente Regression.
 
-
-```{r mcirt-package-example-code}
-#| echo: true
-#| eval: false
-#| 
+```r
 library(mcIRT)
 
-ParList <- lapply(1:3,function(x)
-{
-  Item1 <- c(c(-2,-1,1,2),c(-1.2,0.3,0.2,0.7))
-  names(Item1) <- c(paste("zeta",1:4,sep=""),
-                    paste("lamb",1:4,sep=""))
+ParList <- lapply(1:3, function(x) {
+  Item1 <- c(c(-2, -1, 1, 2), c(-1.2, 0.3, 0.2, 0.7))
+  names(Item1) <- c(paste("zeta", 1:4, sep = ""),
+                    paste("lamb", 1:4, sep = ""))
   Item1
 })
-
-names(ParList) <- paste("item",1:3,sep="")
+names(ParList) <- paste("item", 1:3, sep = "")
 
 perp1     <- rnorm(1100, 0, 1)
-sim.nrm.1 <- NRM.sim(ParList,perp1)
+sim.nrm.1 <- NRM.sim(ParList, perp1)
 
-reshdat1 <- reshMG(sim.nrm.1,items=1:3,correct=rep(0,3))
+reshdat1 <- reshMG(sim.nrm.1, items = 1:3, correct = rep(0, 3))
 res_nrm  <- nrm(reshdat1)
 ```
 
-
+[{{< fa brands github >}} GitHub](https://github.com/manuelreif/mcIRT)
+:::
+:::
 :::
 
-:::
-
-
-<br>
-
-
+::: {.pkg-card style="--pkg-accent: rgb(133, 154, 165);"}
 ::: {.grid}
-
-::: {.g-col-4 .g-start-3}
-[![](hex_sticker/pvpack_hex.png)](https://github.com/manuelreif/svyPVpack)
+::: {.g-col-12 .g-col-md-4}
+[![](hex_sticker/pvpack_hex.png){.pkg-hex fig-alt="Hexsticker svyPVpack"}](https://github.com/manuelreif/svyPVpack)
 :::
 
-::: {.g-col-4 .g-start-7}
+::: {.g-col-12 .g-col-md-8}
+### svyPVpack {.unnumbered .unlisted}
 
-## svyPV package
+[GitHub]{.pkg-badge}
 
-Dieses package ist im Laufe des PIAAC Projekts entstanden und diente
-vor allem dazu, den Umgang mit dem komplexen Surveydesign und den Plausibel Values
-zu erleichtern. Mit den implementierten Funktionen wird sichergestellt,
-dass bei der Berechnung der Konfidenzintervalle sowohl der SE mittels 
-Bootstrap bzw. Jackknive (mittels `survey` package), als auch die Imputationsvarianz 
-berücksichtigt wird. Von einfachen Berechnungen wie Quantilen bis glm sind 
-hier einige gängige Methoden umgesetzt die speziell auf diesen Anwendungszweck 
-zugeschnitten sind.
+Dieses Package ist im Laufe des PIAAC-Projekts entstanden und erleichtert den
+Umgang mit komplexen Surveydesigns und Plausible Values. Die Funktionen stellen
+sicher, dass bei der Berechnung der Konfidenzintervalle sowohl der Standardfehler
+über Bootstrap bzw. Jackknife (mit dem `survey`-Package) als auch die
+Imputationsvarianz berücksichtigt werden. Von einfachen Berechnungen wie Quantilen
+bis zu GLMs sind gängige Methoden umgesetzt, die speziell auf diesen
+Anwendungszweck zugeschnitten sind.
 
-```{r svypvpack-package-example-code}
-#| echo: true
-#| eval: false
-#| 
+```r
 library(svyPVpack)
 
 data(svy_example1)
 
-res_glm <- svyPVglm(plaus.. ~ otherPlaus.. + age, 
-                    svy.exrep, 
+res_glm <- svyPVglm(plaus.. ~ otherPlaus.. + age,
+                    svy.exrep,
                     placeholder = 1:3)
-
 res_glm
 ```
 
-[Weiter Informationen](https://github.com/manuelreif/svyPVpack/wiki)
-
+[{{< fa brands github >}} GitHub](https://github.com/manuelreif/svyPVpack) ·
+[Wiki](https://github.com/manuelreif/svyPVpack/wiki)
 :::
-
-
 :::
-
-<br>
-
-
-
+:::

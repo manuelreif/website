@@ -7,7 +7,7 @@ format: html
 
 <br>
 
-<img src="media/impr.png" alt="Beschreibung" style="float: right; width: 20%;">
+<img src="media/impr.png" alt="Impressum" class="float-img-right" style="width: 20%;">
 
 
 Verantwortlich für den Inhalt dieser Seite:
@@ -27,4 +27,27 @@ Die Inhalte dieser Website werden mit größtmöglicher Sorgfalt erstellt. Der A
 
 Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
 
+## Datenschutz {#datenschutz}
+
+**Hosting.** Diese Website liegt bei Netlify. Beim Aufruf verarbeitet Netlify technisch
+notwendige Daten wie IP-Adresse, Zeitpunkt und aufgerufene Seite in Server-Logs.
+
+**Google Analytics.** Zur Reichweitenmessung verwende ich Google Analytics mit
+anonymisierter IP-Adresse. Das Script wird **erst nach deiner Zustimmung** im
+Cookie-Banner geladen. Ohne Zustimmung wird nichts von Google Analytics geladen.
+Deine Entscheidung kannst du jederzeit über den Link „Cookie-Einstellungen“ unten auf
+jeder Seite ändern.
+
+**Schriften.** Alle Schriften liegen auf diesem Server; es werden keine Schriften von
+Google oder anderen Anbietern nachgeladen.
+
+**Externe Bibliotheken.** Für die Darstellung von Formeln wird MathJax vom CDN
+jsDelivr geladen, dazu ein kleines Kompatibilitäts-Script von cdnjs (Cloudflare). Die
+interaktive Grafik auf der [CV-Seite](cv.qmd) lädt Observable Plot ebenfalls von
+jsDelivr. Dabei wird deine IP-Adresse an den jeweiligen Anbieter übermittelt.
+
+**Eingebettete Apps.** Einzelne Blogposts binden Shiny-Apps ein, die bei shinyapps.io
+bzw. Google Cloud Run laufen. Diese werden nur beim Aufruf des jeweiligen Posts geladen.
+
+Fragen zum Datenschutz an [info@manuelreif.at](mailto:info@manuelreif.at).
 
