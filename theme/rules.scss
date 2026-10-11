@@ -221,3 +221,76 @@ body .termsfeed-com---palette-light .cc-nb-changep {
     bottom: 0.5rem;
   }
 }
+
+// CV-Seite (cv.qmd)
+.cv-skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem 2rem;
+
+  h3 {
+    font-family: $font-family-monospace;
+    font-size: 0.95rem;
+    margin-top: 0;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+.cv-seit {
+  font-family: $font-family-monospace;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.cv-eintrag {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0 0.75rem 1rem;
+  border-left: 4px solid var(--cv-farbe);
+  margin-bottom: 0.75rem;
+
+  ul {
+    margin: 0.25rem 0 0;
+  }
+}
+
+.cv-zeit {
+  font-family: $font-family-monospace;
+  font-size: 0.85rem;
+  padding-top: 0.15rem;
+}
+
+.cv-titel {
+  font-weight: 600;
+}
+
+.cv-org {
+  font-weight: 400;
+}
+
+@media (max-width: 576px) {
+  .cv-eintrag {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
+// Observable Plot (CV): Tooltip-Hintergrund passend zum Theme
+body {
+  --plot-background: #{$body-bg};
+}

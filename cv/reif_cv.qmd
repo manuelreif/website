@@ -1,12 +1,13 @@
 ---
 author: Manuel Reif
 title: Data Scientist
+cvtitle: Lebenslauf
 tagline: 
   field1: Manuel Reif
   field2: Data Scientist
-  field3: Wien, Österreich
+  field3: Wien
   colored: info@manuelreif.at
-  field5: Wien, Österreich
+  field5: manuelreif.at
 format:
   modern-cv-pdf: default
 cvfooter:
@@ -17,8 +18,8 @@ bgcolor: 616161
 cvfont: raleway #texlive fonts like raleway,fetamont,gillius,comfortaa
 cvmeta:
   - title: Status
-    text: Data Scientist bei Statsitik Austria
-  - title: Field
+    text: Data Scientist bei Statistik Austria
+  - title: Bereich
     text: Statistik, Data Science
   - title: Software
     text: R (fast 20 Jahre), stan, git, bash, Linux User, Python (N00b)
@@ -28,11 +29,26 @@ cvmeta:
     text: GLMs, Multilevel Models, Bayesian Statistics, IRT Models, Rasch Models, Scaling, Microsimulation, exponential Smoothing \ldots          
 execute:
   echo: false
+  freeze: false  # cv/ ist vom Website-Render ausgeschlossen, kein _freeze nötig
 ---
 
 ```{r}
 #| label: cvevents
-cvevents <- function(tbl, when, what, where, para1,para2) {
+
+# Daten: dieselbe Tabelle wie die interaktive CV-Seite (../data/cv_stationen.csv)
+stationen <- read.csv("../data/cv_stationen.csv", encoding = "UTF-8")
+stationen$start <- as.Date(stationen$start)
+stationen$ende <- as.Date(ifelse(stationen$ende == "", NA, stationen$ende))
+stationen$zeitraum <- ifelse(
+    is.na(stationen$ende),
+    paste(format(stationen$start, "%Y"), "bis heute"),
+    paste(format(stationen$start, "%Y"), "--", format(stationen$ende, "%Y"))
+)
+# „…“ hat die PDF-Schrift nicht: Arbeitstitel stattdessen kursiv
+stationen$kurz <- gsub("„(.*?)“", "\\\\emph{\\1}", stationen$kurz, perl = TRUE)
+stationen <- stationen[order(is.na(stationen$ende), stationen$start, decreasing = TRUE), ]
+
+cvevents <- function(tbl, when, what, where, para1, para2) {
 
     command_start <- "\\cvevent"
 
@@ -57,25 +73,22 @@ cvevents <- function(tbl, when, what, where, para1,para2) {
 #| label: Arbeitserfahrung
 #| output: asis
 
-#dat_cv = readxl::read_excel("work.xlsx", sheet = "deutsch_work")
-dat_cv = read.csv("work_ger.csv")
-
-dat_cv |>
-    cvevents(when = "Zeitraum", 
-             what = "Bezeichnung", 
-             where = "Arbeitgeber", para1 = "pt1", para2 = "pt2")
+stationen[stationen$gruppe != "Studium", ] |>
+    cvevents(when = "zeitraum", what = "titel", where = "org",
+             para1 = "detail1", para2 = "detail2")
 ```
 
 # Ausbildung
 
-```{r }
+```{r}
 #| label: Ausbildung
 #| output: asis
-#| message: false
 
-#dat_edu = readxl::read_excel("work.xlsx", sheet = "deutsch_edu")
-dat_edu = read.csv("edu_ger.csv")
+studium <- stationen[stationen$gruppe == "Studium", ]
+studium$ort_land <- paste0(studium$org, ", ", studium$ort)
+studium$methoden <- paste("Anwendung von:", studium$detail1)
 
-dat_edu |>
-    cvevents(when = "dates", what = "degree", where = "location", para1 = "titel", para2 = "skills")
+studium |>
+    cvevents(when = "zeitraum", what = "titel", where = "ort_land",
+             para1 = "kurz", para2 = "methoden")
 ```
