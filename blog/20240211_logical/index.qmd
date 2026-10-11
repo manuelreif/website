@@ -1,14 +1,14 @@
 ---
 title: "Logical"
 description: "Logicals sind ein hervorragender Zeitvertreib, insbesondere wenn sie mit Google OR-Tools und Python gelöst werden."
-author: Manuel Reif 
 date: 2024-02-11
-categories: [Python, OR-Tools, docker]
-draft: false 
-highlight-style: monokai
+categories: [Python, OR-Tools, Docker]
+draft: false
 image: media/memes/logical_brain.jpg
 execute:
-    freeze: true
+    echo: true
+    message: true
+    warning: true
 format:
   html:
     code-fold: true
@@ -25,7 +25,7 @@ $\rightarrow$ Dann **Lesebefehl!**
 :::
 
 
-<img src="media/pm_header.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/pm_header.jpg" alt="Logiktrainer Frontpage" class="float-img-right" style="width: 45%;"/>
 
 Wenn ich mit dem Zug fahre vergeht die Zeit am schnellsten wenn ich versuche Rätsel
 zu lösen. Dann investiere ich mein Geld in den [P. M. Logik Trainer](https://www.verlagshaus24.at/pm-logik-trainer-vorteilsabo/)^[Ich werde (leider) nicht gesponsert von P. M.!], nehme mir sehr
@@ -116,7 +116,7 @@ besonders gut eignet.
 # Die Suche
 
 
-<img src="media/memes/logical_brain.jpg" alt="My brain when solving a logical" style="float: right; width: 55%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/memes/logical_brain.jpg" alt="My brain when solving a logical" class="float-img-right" style="width: 55%;"/>
 
 Das klingt alles sehr mühsam -- und ok, wenn man es dann gelöst hat stellt
 sich eine gewisse Zufriedenheit ein. Aber auf dem Weg dorthin erlebt man zahlreiche
@@ -237,7 +237,7 @@ _{n \times l} \times \quad \begin{bmatrix}
 
 ## Verschiedene Elemente
 
-<img src="media/memes/worst_constraint.jpg" alt="My brain when solving a logical" style="float: right; width: 35%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/memes/worst_constraint.jpg" alt="Meme: Alle Thetas müssen unterschiedliche Werte zwischen 1 und 26 annehmen" class="float-img-right" style="width: 35%;"/>
 
 Wenn man sich obenstehende Tabelle ansieht, dann merkt man, dass man 26 Buchstaben
 hat, aber nur 20 Nebenbedingungen. Daher kann das nicht alles sein. Es darf nicht
@@ -265,7 +265,7 @@ Also begann ich mit Python und den OR-Tools. {{< bi cloud-drizzle >}}
 ## OR-Tools
 
 
-<img src="media/memes/oneline.jpg" alt="Oneline" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/memes/oneline.jpg" alt="Oneline" class="float-img-right" style="width: 40%;"/>
 
 Der Witz ist, dass sich dieses Problem mit **Constraint Optimization** sehr 
 effizient lösen lässt. In unserem Beispiel haben wir nicht mal eine Zielfunktion.

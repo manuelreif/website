@@ -1,24 +1,13 @@
 ---
 title: "Shiny-App in der Google Cloud"
 description: "Ich habe jetzt einen Google Cloud Computing Account und hab mal eine Shiny App in einem Container raufgeschoben. Das ganze Projekt ist eine erste einfache Näherung an die Google Cloud. Das Ziel ist, weiter Erfahrungen zu sammeln. Ich gebe außerdem bekannt, dass ich (leider) kein Geld von Google für das kompetente Testen ihrer Plattform bekomme."
-author: Manuel Reif 
 date: 2024-11-22
-lang: de
-categories: [shiny, R, google Cloud, docker, git]
-draft: false 
-highlight-style: monokai
+categories: [Shiny, R, Google Cloud, Docker, Git]
+draft: false
 image: media/main_pic.webp
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
 ---
 
-<img src="media/main_pic.webp" alt="Shiny-Docker-Google" style="float: right; width: 34%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/main_pic.webp" alt="Shiny-Docker-Google" class="float-img-right" style="width: 34%;"/>
 
 300$ darf man in den ersten 3 Monaten ausgeben, wenn man sich bei Google Cloud 
 anmeldet. Natürlich nur mit Diensten die Google auf seiner 7. Wolke jedes 
@@ -71,7 +60,7 @@ schneller wenn man bereits ein Google Konto hat.
 
 # Shiny-App
 
-<img src="media/useR.jpg" alt="R und SPSS" style="float: right; width: 46%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/useR.jpg" alt="R und SPSS" class="float-img-right" style="width: 46%;"/>
 
 Wenn man in der Psychologie mit statistischer Software in Berührung gekommen ist,
 dann war das Anfang der 2000er Jahre typischerweise SPSS. Das heißt man war es
@@ -128,7 +117,7 @@ Jetzt haben wir die App. Jetzt müssen wir sie fertig für den Transport machen!
 
 # Dockerize und github
 
-<img src="media/fremder_computer.jpg" alt="Dockerize" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/fremder_computer.jpg" alt="Meme: Mein Code auf einem anderen Computer" class="float-img-right" style="width: 45%;"/>
 
 "Never change a running Data Science Setup" ist nicht wirklich ein Sprichwort
 und trotzdem eine Prämisse nach der viele Statistiker oder sonstige Menschen die 

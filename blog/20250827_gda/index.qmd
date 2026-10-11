@@ -1,20 +1,10 @@
 ---
 title: "Das Geheimnis der Abtei"
 description: "Wenn im Kloster 'schon wieder was passiert' ist und man schon dabei ist das Rätsel zu lösen, kann man sich nebenbei auch noch fragen, wie man am besten Punkte lukriert. Ja, es kann so einfach sein, wenn man es sich nicht unnötig schwer macht."
-author: Manuel Reif 
 date: 2025-08-27
-lang: de
-categories: [Boardgames, R, Probabilities]
-draft: false 
-highlight-style: monokai
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
+categories: [Brettspiele, R, Wahrscheinlichkeit]
+draft: false
+image: media/gda2.jpg
 ---
 
 
@@ -28,7 +18,7 @@ library(rpivotTable) # devtools::install_github(c("ramnathv/htmlwidgets", "smart
 
 ## Der Beginn
 
-<img src="media/gda2.jpg" alt="Geheimnis der Abtei" style="float: right; width: 32%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/gda2.jpg" alt="Geheimnis der Abtei" class="float-img-right" style="width: 32%;"/>
  
 
 Wie treffen wir Entscheidungen im Leben? Intuitiv und schnell aus dem "Bauch heraus"
@@ -200,7 +190,7 @@ hat nichts damit zu tun dass ein Mönch ermordet und eingeäschert wurde.
 
 ## Die Berechnung
     
-<img src="media/switching.jpg" alt="Logiktrainer Frontpage" style="float: right; width: 35%; margin-left: 20px; margin-bottom: 10px;"/>    
+<img src="media/switching.jpg" alt="Meme: Have you tried switching perspectives?" class="float-img-right" style="width: 35%;"/>    
     
 Im Spiel dreht sich alles um:"Wer ist verdächtig?" Sofort können alle auf der
 Hand befindlichen Charakterkarten als Täter ausgeschlossen werden. Im Laufe des Spiels

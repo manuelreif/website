@@ -1,0 +1,11 @@
+# Gemeinsame Einstellungen für alle Posts unter blog/.
+# Posts setzen nur noch, was davon abweicht.
+author: Manuel Reif
+execute:
+  eval: true
+  echo: false
+  message: false
+  warning: false
+  freeze: true
+filters:
+  - include-code-files

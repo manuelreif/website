@@ -1,21 +1,10 @@
 ---
 title: "Machine Learning in der Google Cloud 2"
 description: "Datenpipelines sind der coolste Part an einem Machine Learning Projekt. Warum? Man kann in einem Satz mit ihnen z. B. inhaltsleere Buzzwords, wie 'streamlinen', so verwenden, dass auch der desinteressierte Bürger einem anerkennend zunickt. Jeder spürt: Wenn die Pipeline gebaut wurde, dann wird alles gut."
-author: Manuel Reif 
 date: 2025-04-14
-lang: de
 categories: [R, mlr3, mlr3pipelines]
-draft: false 
-highlight-style: monokai
+draft: false
 image: media/pancs.png
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
 ---
 
 
@@ -35,7 +24,7 @@ library(DALEX)
 library(DALEXtra)
 ```
 
-<img src="media/pipes.jpg" alt="True Piper" style="float: right; width: 52%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/pipes.jpg" alt="True Piper" class="float-img-right" style="width: 52%;"/>
 
 Prinzipiell ist gegen Random Forests nichts einzuwenden, wenn man auf Retro-Modelle
 aus den 90ern steht. Manche sagen auch "bewährte Technik". Allerdings muss
@@ -149,7 +138,7 @@ Also stürzen wir uns auf die Pipe!
 
 ## Warum Pipelines?
 
-<img src="media/decide.jpg" alt="True Piper" style="float: right; width: 25%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/decide.jpg" alt="Meme: zwei Knöpfe, am Ende entscheidet die Pipeline" class="float-img-right" style="width: 25%;"/>
 
 
 Jedem Anfang wohnt ein gewisser Zauber inne, sagen die einen. Die anderen sagen,
@@ -443,7 +432,7 @@ learner_rf = lrn("classif.ranger",
 
 ### Robustify
 
-<img src="media/robustify.jpg" alt="Save the Algorithm" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/robustify.jpg" alt="Save the Algorithm" class="float-img-right" style="width: 45%;"/>
 
 Wenn Modelle anfangen, Errors zu droppen, zieht es mich plötzlich ganz weit weg
 vom Computer. 
@@ -577,7 +566,7 @@ robbi_res2$removeconstants_postrobustify.output$data() %>% head
 
 ### Imputation
 
-<img src="media/imputation.jpg" alt="Imputation" style="float: right; width: 30%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/imputation.jpg" alt="Imputation" class="float-img-right" style="width: 30%;"/>
 
 Will man sich mit fehlenden Werten nicht zufriedengeben oder verwendet man
 obskure statistische Methoden, die mit fehlenden Werten nicht umgehen können,

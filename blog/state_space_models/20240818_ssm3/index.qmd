@@ -1,25 +1,17 @@
 ---
 title: "State Space Models - Teil 3"
 description: "Wir sind am Mars. Wir betreten den Mars. Wir setzen die Maschine in Gang. Wir estimaten und predicten und machen alles, was wir schon die ganze Zeit machen wollten. Wir formen die Curves. Wir playen die Cards. Wir sind gekommen um zu bleiben. MARSS ist die Zukunft."
-author: Manuel Reif 
 date: 2024-08-18
-lang: de
-categories: [R, MARSS, polls, state-space-models]
-draft: false 
-highlight-style: monokai
+categories: [R, MARSS, Umfragen, State Space Models]
+draft: false
 image: media/mars_rover1.png
 format:
   html:
-    css: ssm3.css
+    css: ../ssm.css
+body-classes: ssm-teil3
 execute:
     eval: false
-    message: false
-    echo: false
-    warning: false
-    freeze: true
 bibliography: ../texts.bib
-filters:
-   - include-code-files
 ---
 
 # `MARSS` und die echten Daten
@@ -120,7 +112,7 @@ ssm_theme2 <- function(){
 ```
 
 
-<img src="media/TFM_box.png" alt="MARSS" style="float: right; width: 32%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/TFM_box.png" alt="Spielschachtel Terraforming Mars, umbenannt in State n' Space Forming MARSS" class="float-img-right" style="width: 32%;"/>
 
 Alles was wir bis jetzt mit `MARSS` gemacht haben, war eher eine [Fingerübung](../20240303_ssm1),
 ein vorsichtiges [rantasten](../20240520_ssm2). Jetzt wollen wir die Estimation-Bestie entfesseln 
@@ -168,7 +160,7 @@ Karten zum richtigen Zeitpunkt zu spielen!
 # Multivariate Zeitreihe
 
 
-<img src="media/multivariat_event.png" alt="TFM card event multivariat" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/multivariat_event.png" alt="TFM card event multivariat" class="float-img-left" style="width: 32%;"/>
 
 Unsere Daten sind multivariat -- man kann es drehen und wenden wie man will.
 Niemand mag multivariate Daten, niemand mag Methoden zu multivariaten Daten,
@@ -324,7 +316,7 @@ p
 
 ## Äquidistanz
 
-<img src="media/aequidistant_card.png" alt="TFM card Equidistant" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/aequidistant_card.png" alt="TFM card Equidistant" class="float-img-left" style="width: 32%;"/>
 
 
 
@@ -348,7 +340,7 @@ auf!
 
 ## Transformation
 
-<img src="media/transform_card.png" alt="TFM card event multivariat" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/transform_card.png" alt="Spielkarte Variable Transformator" class="float-img-left" style="width: 32%;"/>
 
 Im Fall von Umfragedaten wie unseren, müssen wir mit Anteile umgehen und der Tatsache zurechtkommen,
 dass unsere Variablen auf Zahlen zwischen 0 und 1 festgelegt sind, es sich 
@@ -389,7 +381,7 @@ dargestellt:
 
 ## Q Matrix
 
-<img src="media/q_matrix_enhancer.png" alt="Q-Matrix" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/q_matrix_enhancer.png" alt="Q-Matrix" class="float-img-left" style="width: 32%;"/>
 
 Die Matrix ist so aufgebaut, dass sie sowohl die Varianzen als auch Kovarianzen 
 zwischen verschiedenen Elementen (Levels und Slopes) der (latenten) Zustandsvariablen 
@@ -432,7 +424,7 @@ Q.cov\_lvl1\_lvl2&0&Q.var\_lvl2&0& \ldots\\
 
 ## B - Matrix
 
-<img src="media/chase_card.png" alt="MARSS" style="float: left; width: 32%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/chase_card.png" alt="Spielkarte Floating Matrix Capture Device" class="float-img-left" style="width: 32%;"/>
 
 
 Die B-Matrix enthält ebenfalls selbst keine Parameter. Sie ist im Wesentlichen
@@ -523,7 +515,7 @@ x_{X10}
 
 ## Ergebnisse und Forecasts
 
-<img src="media/model_results.jpg" alt="MARSS" style="float: left; width: 36%; margin-right: 30px; margin-bottom: 10px;"/>
+<img src="media/model_results.jpg" alt="Meme: Q-Matrix, ich und die MARSS Model Results im Pool" class="float-img-left" style="width: 36%;"/>
 
 
 Nachdem wir nun lange auf Matrizen geschaut haben (oder auch nicht) wird es
@@ -546,7 +538,7 @@ wird eine eigene Varianz geschätzt (sehr einfaches Modell)
 @fig-ssm3-dygraph2 zeigt unser Best Fitting Modell (**BFM**) mit den extra
 steilen und kurvigen Slopes für den Sensation-Seeker unter den Politik-Insider.
 
-<img src="media/bfm.jpg" alt="MARSS" style="float: right; width: 40%; margin-left: 30px; margin-bottom: 10px;"/>
+<img src="media/bfm.jpg" alt="Meme: There is only one rule – BFM-Forecasts" class="float-img-right" style="width: 40%;"/>
 
 Warum ist es prinzipiell klug Forecast Ergebnisse zu mitteln? 
 Weil die Annahmen von Modellen
@@ -875,7 +867,7 @@ gt_table
 ```
 :::
 
-<img src="media/bran_dyl_90210.jpg" alt="MARSS" style="float: right; width: 36%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/bran_dyl_90210.jpg" alt="Meme: BFM Forecasts …" class="float-img-right" style="width: 36%;"/>
 
 Unsere Modelle unterscheiden sich primär anhand ihrer Q-Matrizen.
 Also betrachten wir die Q-Matrix unseres BFM um vielleicht so diese rasanten predicts 

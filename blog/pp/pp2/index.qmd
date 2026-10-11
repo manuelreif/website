@@ -1,21 +1,10 @@
 ---
 title: "PP - Veränderungen"
 description: "Jetzt gehen wir in 'medias res' und bauen die Funktionen wirklich um, dass alles richtiger und schneller wird!"
-author: Manuel Reif 
 date: 2026-10-10
-lang: de
 categories: [R, IRT, Claude, PP]
-draft: false 
-highlight-style: monokai
+draft: false
 image: media/newton_speed_klein.webp
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
 ---
 
 
@@ -49,7 +38,7 @@ Dann wird endlich der C++-Kern angegriffen, um einige Probleme zu lösen.
 ### Newton sprang hin und her
 
 
-<img src="media/declare_war.jpg" alt="Declaring war" style="float: right; width: 46%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/declare_war.jpg" alt="Declaring war" class="float-img-right" style="width: 46%;"/>
 
 
 Wenn Newton bei einem Modell mit Rateparameter alleine zugange war, fand er 

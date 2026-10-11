@@ -1,25 +1,17 @@
 ---
 title: "State Space Models - Teil 2"
 description: "Es geht weiter in der Space Saga. Wir callen nicht nur die Anzahl der bisherigen Parameter von zuletzt, wir raisen sogar. Das bringt Turbulenzen in den Alltag so mancher Algorithmen. Soviel kann ebenfalls noch verraten: Wir müssen einen Slope finden und es gibt wieder nice Grafiken zum watchen!"
-author: Manuel Reif 
 date: 2024-05-20
-lang: de
-categories: [R, stan, state-space-models]
-draft: false 
-highlight-style: monokai
+categories: [R, Stan, State Space Models]
+draft: false
 image: media/startbild2.png
 format:
   html:
-    css: ssm2.css
+    css: ../ssm.css
+body-classes: ssm-teil2
 execute:
     eval: false
-    message: false
-    echo: false
-    warning: false
-    freeze: true
 bibliography: ../texts.bib
-filters:
-   - include-code-files
 ---
 
 # Local Linear Trend Model
@@ -94,7 +86,7 @@ ssm_theme2 <- function(){
 }
 ```
 
-<img src="media/more_parameters.gif" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/more_parameters.gif" alt="Meme: A statistician looks unhappy, add more parameters!" class="float-img-right" style="width: 40%;"/>
 
 Ok, bisher hatten wir nur einen Intercept in unserem State Space Model
 der sich je nach Daten "random" bewegt. Zusätzlich nimmt man an, dass man einen 
@@ -135,7 +127,7 @@ y &= \alpha + \beta_1\,x + \epsilon & |  \quad \alpha = Intercept,\,\beta_1 = Sl
 ```
 
 
-<img src="media/where_slope_pic.jpg" alt="State Space Model" style="float: left; width: 28%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/where_slope_pic.jpg" alt="Meme: Where is the slope?" class="float-img-left" style="width: 28%;"/>
 
 Mit diesem Wissen im Hinterkopf schauen wir uns nun das erweiterte State-Space Model wie es 
 hier unten angeführt ist. Es gibt einen neuen Parameter $\nu$ und schon wieder 
@@ -391,7 +383,7 @@ Parametern ab. Das Auge erkennt aber nicht welcher Parameter nun welche Auspräg
 hat.
 
 
-<img src="media/autoreg.jpg" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/autoreg.jpg" alt="Meme: Die Zustandsgleichungen flüstern einander die Werte weiter" class="float-img-right" style="width: 40%;"/>
 
 Dabei hilft uns der Density Plot, der immer im 2. Panel zu sehen ist.
 Die Density beschreibt die Häufigkeit, wie oft der nachfolgende True Value größer ist
@@ -597,7 +589,7 @@ Nun darf nicht an der falschen Stelle gespart werden. Als Ersatz werden
 Mit der Hoffnung, dass nicht wie im alten Sprichwort viele R-Packages 
 das State-Space Kontinuum verzerren.
 
-<img src="media/three_pack.jpg" alt="State Space Model" style="float: left; width: 34%; margin-right: 20px; margin-bottom: 10px;"/>
+<img src="media/three_pack.jpg" alt="Spider-Man-Meme: StateSpacer, KFAS und MARSS zeigen aufeinander" class="float-img-left" style="width: 34%;"/>
 
 Die 3 sollen nun die erste Simulation, die in @fig-sim-slope2 
 zu sehen ist, fitten! Die gefitteten Zeitreihen samt Forecast für die nächsten 
@@ -620,7 +612,7 @@ predicts beeinflusst^[Insbesondere konvergierte `MARSS` erst nach Erhöhung der 
 Wir versuchen es positiv zu sehen: Wir haben nun eine Auswahl!
 
 
-<img src="media/smoothed_predicts.jpg" alt="State Space Model" style="float: right; width: 40%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/smoothed_predicts.jpg" alt="Geordi-Meme: Filtered Predicts nein, Smoothed Predicts ja" class="float-img-right" style="width: 40%;"/>
 
 Die Frage ist nur: Wie kommt das Modell zu **diesem** Slope, wenn doch im Modell
 eigentlich kein fixer Slope definiert wurde? Betrachten wir das exemplarisch beim `statespacer` package. Die Frage lautet: Wie wird die Steigung festgelegt?

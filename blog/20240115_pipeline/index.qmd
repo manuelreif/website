@@ -1,21 +1,16 @@
 ---
 title: "Presentation pipeline"
 description: "Wie aus Quarto Präsentationen mit revealjs automatisiert pdfs und Handouts werden."
-author: Manuel 
 date: 2024-02-03
-categories: [quarto, bash, Linux, Python]
-thumbnail: pipeline.png
+categories: [Quarto, bash, Linux, Python]
+draft: false
+image: pipeline.png
 format:
   html:
     code-line-numbers: true
     code-block-bg: true
     code-block-border-left: true
-execute:
-  echo: false
-  draft: false 
-  freeze: true
 code-annotations: hover
-highlight-style: monokai
 ---
 
 # {{< bi fullscreen >}} Folien, Folien, Folien
@@ -28,7 +23,7 @@ highlight-style: monokai
 $\rightarrow$ Dann **Lesebefehl!**
 :::
 
-<img src="pipeline.png" alt="Bildbeschreibung" style="float: right; width: 37%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="pipeline.png" alt="Eine Pipeline schießt Folien in einen Hörsaal" class="float-img-right" style="width: 37%;"/>
  
 
 In meiner Lehrveranstaltung zu "Forschungsmethoden und Statistik" habe ich meine

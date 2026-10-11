@@ -16,7 +16,7 @@ title-block-banner: false
 <br>
 
 So Leute, lest meinen Blog. <br> Hier gehts um R, Statistik, Daten, Python 
-(bin ein extremr N00b), Automatisierung von langweiligen Sachen und alles was 
+(bin ein extremer N00b), Automatisierung von langweiligen Sachen und alles was 
 mir irgendwie Spaß macht. Ich verbringe meine Freizeit gerne damit, mich mit
 sowas zu beschäftigen und who knows: vielleicht liest es sonst noch wer
 und kann es sogar brauchen (Ich habe selbst schon viel von anderen Blogs profitiert). 

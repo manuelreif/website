@@ -1,30 +1,25 @@
 ---
 title: "State Space Models - Teil 1"
 description: "Mittels State Space Models können Zeitreihen beschrieben werden. Natürlich interessieren wir uns auch für Predictions. Wer möchte nicht die Zukunft kennen? Es wird spannend, es wird wild, es geht auf und es geht ab. Das ist Teil 1."
-author: Manuel Reif 
 date: 2024-03-03
-lang: de
-categories: [state-space-models, R, stan]
-draft: false 
-highlight-style: monokai
+categories: [State Space Models, R, Stan]
+draft: false
 image: media/ssm_thumbnail.webp
 format:
   html:
-    css: ssm1.css
+    css: ../ssm.css
     resources:
         - shinylive-sw.js
+body-classes: ssm-teil1
 execute:
-    eval: true
-    message: false
+    echo: true
+    warning: true
 bibliography: ../texts.bib
 code-annotations: hover
 code-fold: false
 code-block-bg: true
 code-line-numbers: true
 code-block-border-left: true
-freeze: true
-filters:
-   - include-code-files
 ---
 
 # Einführung
@@ -37,7 +32,7 @@ filters:
 $\rightarrow$ Der **Lesebefehl** erfolgt unabhängig der gegebenen Antworten!
 :::
 
-<img src="media/ssm_thumbnail.webp" alt="State Space Model" style="float: right; width: 45%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/ssm_thumbnail.webp" alt="State Space Model" class="float-img-right" style="width: 45%;"/>
 
 Zeitreihen haben mich nie wirklich interessiert. Als Psychologe bekommt man es 
 nicht so leicht mit Zeitreihen zu tun -- vielleicht deshalb. Einerseits will 

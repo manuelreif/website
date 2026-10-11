@@ -1,27 +1,17 @@
 ---
 title: "PP - Bestandsaufnahme"
 description: "Claude und ich machen einen ausführlichen Schlachtplan. Es werden Laufzeiten dokumentiert. Es werden Fehler ins Visier genommen. Es werden Funktionen geschrieben, die uns die richtigen Werte liefern und die unsere Referenz sein werden."
-author: Manuel Reif 
 date: 2026-10-09
-lang: de
 categories: [R, IRT, Claude, PP]
-draft: false 
-highlight-style: monokai
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
+draft: false
+image: media/geordi_meme.jpg
 ---
 
 
 ## 05.10.2026
 
 
-<img src="media/geordi_meme.jpg" alt="Hexsticker PP package" style="float: right; width: 36%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/geordi_meme.jpg" alt="Geordi-Meme" class="float-img-right" style="width: 36%;"/>
 
 Ich habe Claude in Opus 5.5 im **xhigh**-Modus gestartet. **xhigh**, das ist, wie
 sehr sich Claude anstrengt, und ich hoffe, dass damit korreliert, dass er möglichst keinen

@@ -1,0 +1,19 @@
+/* Gemeinsame Callout-Farben der State-Space-Serie.
+   Jeder Teil setzt seine Akzentfarbe über body-classes: ssm-teil1 | ssm-teil2 | ssm-teil3 */
+
+.ssm-teil1 { --ssm-accent: #5B1414; }
+.ssm-teil2 { --ssm-accent: #AD722C; }
+.ssm-teil3 { --ssm-accent: #1A6384; }
+
+div.callout-tip.callout-style-default > .callout-header {
+    background-color: var(--ssm-accent);
+    color: white;
+}
+
+div.callout-tip.callout {
+    border-left-color: var(--ssm-accent);
+}
+
+div.callout-note.callout-style-default > .callout-header {
+    background-color: var(--ssm-accent);
+}

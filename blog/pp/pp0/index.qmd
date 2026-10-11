@@ -1,27 +1,17 @@
 ---
 title: "PP package"
 description: "Eigene Packages sind wie eigene Kinder, zumindest bis zu dem Zeitpunkt ab dem man wirklich eigene Kinder hat. Dann erkennt man den Unterschied: Packages sind Packages und Kinder sind Kinder."
-author: Manuel Reif 
 date: 2026-09-30
-lang: de
-categories: [R, R-packages, IRT, Claude, PP]
-draft: false 
-highlight-style: monokai
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
+categories: [R, R-Packages, IRT, Claude, PP]
+draft: false
+image: media/pp_hex.png
 ---
 
 
 ## Woher
 
 
-<img src="media/pp_hex.png" alt="Hexsticker PP package" style="float: right; width: 28%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/pp_hex.png" alt="Hexsticker PP package" class="float-img-right" style="width: 28%;"/>
 
 
 Als ich vor vielen Jahren das **PP** package zu schreiben begann, war

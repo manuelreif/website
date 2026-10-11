@@ -16,3 +16,6 @@ wahl2024_forecasts
 CLAUDE.md
 
 **/*.quarto_ipynb
+
+# Python-Bytecode
+__pycache__/

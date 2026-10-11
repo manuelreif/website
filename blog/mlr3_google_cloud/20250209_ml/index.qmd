@@ -1,24 +1,13 @@
 ---
 title: "Machine Learning in der Google Cloud"
 description: "Wenn man eine Maschine und 300$ hat, dann lässt man die Maschine auch was lernen, denn man kann es sich ja leisten. Dieser Blogeintrag zeigt in aller notwendigen Kürze, wie ich ein `mlr3` Modell aus auf Google Cloud laufen lasse."
-author: Manuel Reif 
 date: 2025-02-08
-lang: de
-categories: [R, google Cloud, mlr3, docker, git]
-draft: false 
-highlight-style: monokai
+categories: [R, Google Cloud, mlr3, Docker, Git]
+draft: false
 image: media/thumb_drama.webp
-execute:
-    eval: true
-    message: false
-    echo: false
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
 ---
 
-<img src="media/thumb_drama.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/thumb_drama.webp" alt="Christmas-Docker" class="float-img-right" style="width: 38%;"/>
 
 [mlr3](https://mlr3.mlr-org.com/) ist ein Package, das mich phasenweise leiden lässt.
 Jeder, der das schon einmal gesehen hat, will es nicht noch einmal erleben. 
@@ -132,7 +121,7 @@ summary_table_n
 ## Das Package
 
 <a href="https://mlr3.mlr-org.com/">
-  <img src="media/mlr3verse.svg" alt="mlr3-ecosystem" style="float: right; width: 60%; margin-left: 20px; margin-bottom: 10px;"/>
+  <img src="media/mlr3verse.svg" alt="mlr3-ecosystem" class="float-img-right" style="width: 60%;"/>
 </a>
 
 Um alle Abläufe rund um ein Machine-Learning-Projekt nicht immer selbst implementieren
@@ -153,7 +142,7 @@ Man muss nur lernen, mit dem Package umzugehen und sich daran zu gewöhnen. Also
 
 ## Der Plan
 
-<img src="media/the_plan.webp" alt="Christmas-Docker" style="float: right; width: 38%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/the_plan.webp" alt="Abstrakte Grafik zum Plan" class="float-img-right" style="width: 38%;"/>
 
 Hier der konkrete, geplante Ablauf:
 
