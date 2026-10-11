@@ -1,0 +1,223 @@
+// Gemeinsame Basis für theme/light.scss und theme/dark.scss.
+// Farben kommen aus den beiden Dateien; hier stehen nur Dinge, die in beiden Modi gleich sind.
+// Kein !default und keine Variable, die auch light/dark setzen: dann ist die
+// Reihenfolge, in der Quarto die defaults-Abschnitte zusammenfügt, egal.
+
+/*-- scss:defaults --*/
+
+// Cosmo lädt "Source Sans Pro" sonst von Google Fonts; die Schriften kommen aus fonts/fonts.css
+$web-font-path: false;
+
+$font-family-sans-serif: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+$font-size-base: 1.05rem;
+$headings-font-weight: 600;
+
+$accent-yellow: #f2eaae;
+
+// Code-Blöcke immer Monokai-dunkel (passt zu highlight-style: monokai)
+$code-block-bg: #272822;
+
+/*-- scss:rules --*/
+
+// Inline-Code: Farben explizit setzen. Neuere Quarto-Versionen geben Inline-Code
+// sonst den Hintergrund des (dunklen) Highlight-Themes, bei dunkler Schrift.
+body :not(pre) > code:not(.sourceCode) {
+  color: $code-color;
+  background-color: $code-bg;
+}
+
+body a > code:not(.sourceCode) {
+  color: inherit;
+}
+
+body nav :not(pre) > code:not(.sourceCode) {
+  background-color: transparent;
+}
+
+.code-with-filename .code-with-filename-file,
+.code-with-filename .code-with-filename-file pre {
+  background-color: $code-bg;
+  color: $body-color;
+}
+
+// Navbar: Titel in Mono mit blinkendem Cursor, gelbe Unterkante
+.navbar {
+  border-bottom: 3px solid $accent-yellow;
+}
+
+.navbar-logo {
+  max-height: 44px;
+  width: auto;
+  padding-right: 4px;
+}
+
+.navbar-title {
+  font-family: $font-family-monospace;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar-title::after {
+  content: "▌";
+  margin-left: 0.1em;
+  color: $code-color;
+  animation: cursor-blink 1.1s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-title::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-title {
+    font-size: 1rem;
+  }
+}
+
+// Metadaten (Datum, Lesezeit, Kategorien) in Mono, Kategorien als #tag
+.listing-date,
+.listing-reading-time,
+.listing-categories,
+.quarto-title-meta,
+.quarto-categories {
+  font-family: $font-family-monospace;
+  font-size: 0.85em;
+}
+
+.listing-category::before,
+.quarto-category::before {
+  content: "#";
+  opacity: 0.6;
+}
+
+::selection {
+  background-color: $accent-yellow;
+  color: #1d1f23;
+}
+
+// Bilder neben dem Text; am Handy volle Breite statt winzig
+.float-img-right,
+.float-img-left {
+  margin-bottom: 10px;
+  max-width: 100%;
+  height: auto;
+}
+
+.float-img-right {
+  float: right;
+  margin-left: 20px;
+}
+
+.float-img-left {
+  float: left;
+  margin-right: 20px;
+}
+
+@media (max-width: 576px) {
+  .float-img-right,
+  .float-img-left {
+    float: none;
+    width: 100% !important;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+// Karten auf der Packages-Seite; Akzentfarbe pro Package über --pkg-accent
+.pkg-card {
+  --pkg-accent: #{$accent-yellow};
+  border: 1px solid $border-color;
+  border-top: 4px solid var(--pkg-accent);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+// Callouts etwas größer als Quartos Standard
+.callout.callout-style-default .callout-body {
+  font-size: 1.05rem;
+}
+
+.callout.callout-style-default > div.callout-header {
+  font-size: 1.07rem;
+}
+
+// Icons der about-Links brauchen die Body-Schrift, sonst sehen sie komisch aus
+div.quarto-about-solana .about-entity .about-link {
+  font-family: var(--bs-body-font-family);
+}
+
+// Cookie-Banner (TermsFeed, über website.cookie-consent): kompakt und in den Farben des Themes.
+// "body" vor den Selektoren, damit die Regeln die Styles der Bibliothek überstimmen.
+body .termsfeed-com---nb-simple {
+  max-width: 26rem;
+  height: auto;
+  max-height: 80vh;
+  right: 1rem;
+  bottom: 1rem;
+  border: 1px solid $border-color;
+  border-top: 4px solid $accent-yellow;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+
+body .termsfeed-com---nb,
+body .termsfeed-com---palette-light.termsfeed-com---nb {
+  background-color: $body-bg;
+  color: $body-color;
+  font-family: $font-family-sans-serif;
+}
+
+body .termsfeed-com---nb .cc-nb-main-container {
+  padding: 1.25rem 1.5rem;
+}
+
+body .termsfeed-com---palette-light .cc-nb-title {
+  color: $body-color;
+  font-family: $font-family-monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+body .termsfeed-com---palette-light .cc-nb-text {
+  color: $body-color;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+body .termsfeed-com---nb .cc-nb-okagree,
+body .termsfeed-com---nb .cc-nb-reject,
+body .termsfeed-com---nb .cc-nb-changep {
+  border-radius: 6px;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+body .termsfeed-com---palette-light .cc-nb-okagree,
+body .termsfeed-com---palette-light .cc-nb-reject {
+  background-color: $link-color;
+  color: $body-bg;
+}
+
+body .termsfeed-com---palette-light .cc-nb-changep {
+  background-color: $code-bg;
+  color: $body-color;
+}
+
+@media (max-width: 576px) {
+  body .termsfeed-com---nb-simple {
+    max-width: none;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+  }
+}

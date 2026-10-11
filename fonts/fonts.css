@@ -2,49 +2,46 @@
    woff2-Dateien: Fontsource v5, Subset "latin"; Lizenzen (SIL OFL 1.1) in licenses/.
    Es sind nur die Schnitte enthalten, die die Seite tatsächlich verwendet. */
 
-/* Seiten-Schriften (styles.css) */
+/* Seiten-Schriften (theme/light.scss, theme/dark.scss) */
 
 @font-face {
-    font-family: 'Karma';
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url('karma-latin-300-normal.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Quicksand';
+    font-family: 'IBM Plex Sans';
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('quicksand-latin-400-normal.woff2') format('woff2');
+    src: url('ibm-plex-sans-latin-400-normal.woff2') format('woff2');
 }
 
-/* Basisschrift des Cosmo-Themes (u. a. about-Links, Tooltips); der Google-Import
-   von Cosmo ist in theme.scss abgeschaltet */
-
 @font-face {
-    font-family: 'Source Sans Pro';
-    font-style: normal;
-    font-weight: 300;
+    font-family: 'IBM Plex Sans';
+    font-style: italic;
+    font-weight: 400;
     font-display: swap;
-    src: url('source-sans-pro-latin-300-normal.woff2') format('woff2');
+    src: url('ibm-plex-sans-latin-400-italic.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Source Sans Pro';
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('source-sans-pro-latin-400-normal.woff2') format('woff2');
+    src: url('jetbrains-mono-latin-400-normal.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Source Sans Pro';
+    font-family: 'JetBrains Mono';
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('source-sans-pro-latin-700-normal.woff2') format('woff2');
+    src: url('jetbrains-mono-latin-700-normal.woff2') format('woff2');
 }
 
 /* dygraphs in der State-Space-Serie (blog/state_space_models/dygraph_css.css) */

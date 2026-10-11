@@ -13,8 +13,16 @@ project:
 website:
   title: "Manuel Reif"
   site-url: https://manuelreif.at
-  description: "Manuels Website und Blog zu höchtpersönlichen Data Science Themen"
-  google-analytics: "G-TV2KQ9KDW0"
+  description: "Manuels Website und Blog zu höchstpersönlichen Data Science Themen"
+  # Google Analytics kommt über theme/analytics.html und läuft erst nach Zustimmung
+  cookie-consent:
+    type: express
+    style: simple
+    language: de
+    policy-url: /impressum.html#datenschutz
+    prefs-text: "Cookie-Einstellungen"
+  open-graph: true
+  twitter-card: true
   page-footer:
     left: "{{< fa copyright >}} 2026 Manuel Reif | site made with quarto"
     right:
@@ -22,7 +30,7 @@ website:
           href: https://github.com/manuelreif/website
   navbar:
     search: true
-    logo: logo1.png
+    logo: media/logo.webp
     left:
       - href: index.qmd
         text: Home
@@ -40,10 +48,14 @@ website:
         
 format:
   html:
-    theme: [cosmo, theme.scss]
-    css: styles.css
+    theme:
+      light: [cosmo, theme/rules.scss, theme/light.scss]
+      dark: [cosmo, theme/rules.scss, theme/dark.scss]
+    css: fonts/fonts.css
+    include-in-header: theme/analytics.html
     toc: true
-    page-layout: full
+
+lang: de
 
 highlight-style: monokai
 
