@@ -1,25 +1,16 @@
 ---
 title: "PP - Finale"
 description: "Eine Mini-Leistungsschau. Es ist sehr schön, es freut mich sehr."
-author: Manuel Reif 
 date: 2026-10-18
-lang: de
 categories: [R, IRT, Claude, PP]
-draft: false 
-highlight-style: monokai
+draft: false
 image: media/PP_krabbe.png
 execute:
-    eval: true
-    message: false
-    echo: true
-    warning: false
-    freeze: true
-filters:
-   - include-code-files
+  echo: true
 ---
 
 
-<img src="media/speed.jpg" alt="Just another Hexsticker PP package" style="float: right; width: 42%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/speed.jpg" alt="Just another Hexsticker PP package" class="float-img-right" style="width: 42%;"/>
 
 Jetzt ist die neue Version des PP-Package fertig. 
 Personenparameter kann man nun in Hochgeschwindigkeit schätzen -- so 
@@ -49,7 +40,7 @@ Items aus einem Leistungs- oder Intelligenztest aus.
 ### Simulation 2-PL-Modell
 
 
-<img src="media/notalways.jpg" alt="Simulating Data" style="float: right; width: 30%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/notalways.jpg" alt="Simulating Data" class="float-img-right" style="width: 30%;"/>
 
 Im ersten Schritt sollten die Itemparameter geschätzt werden.
 Dazu nimmt man gerne Packages wie [eRm](https://cran.r-project.org/web/packages/eRm/index.html)
@@ -161,7 +152,7 @@ plot(perspar_2pl_wle, which = "precision")
 ### Personfit
 
 
-<img src="media/personfit.jpg" alt="Mr Bean" style="float: right; width: 42%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/personfit.jpg" alt="Mr Bean" class="float-img-right" style="width: 42%;"/>
 
 Haben sich auch alle Personen instruktionskonform verhalten?
 Setzt beim Bearbeiten des Tests Ermüdung ein, oder 
@@ -268,7 +259,7 @@ person = drei_probleme_und_ein_nichtproblem)
 ## Ordinale Daten
 
 
-<img src="media/ordinal.jpg" alt="The Hound, hungry for chicken." style="float: right; width: 48%; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="media/ordinal.jpg" alt="The Hound, hungry for chicken." class="float-img-right" style="width: 48%;"/>
 
 Die Ordinalskala ist das Stiefkind unter den Skalenniveaus.
 Sie wird entweder behandelt wie eine Nominalskala, indem
