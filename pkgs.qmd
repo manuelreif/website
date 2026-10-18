@@ -124,7 +124,7 @@ res_nrm  <- nrm(reshdat1)
 ::: {.pkg-card style="--pkg-accent: rgb(133, 154, 165);"}
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
-[![](hex_sticker/pvpack_hex.png){.pkg-hex fig-alt="Hexsticker svyPVpack"}](https://github.com/manuelreif/svyPVpack)
+[![](hex_sticker/svyPVpack1.png){.pkg-hex fig-alt="Hexsticker svyPVpack"}](https://github.com/manuelreif/svyPVpack)
 :::
 
 ::: {.g-col-12 .g-col-md-8}

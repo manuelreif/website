@@ -9,7 +9,12 @@ tagline:
   colored: info@manuelreif.at
   field5: manuelreif.at
 format:
-  modern-cv-pdf: default
+  modern-cv-pdf:
+    # System-TeX statt ~/.TinyTeX (dort fehlen raleway/fontawesome) und xelatex
+    # statt lualatex (sonst ist der Text im PDF nicht sauber kopierbar)
+    latex-tinytex: false
+    latex-auto-install: false
+    pdf-engine: xelatex
 cvfooter:
   left: "manuelreif.at"
   right: "github.com/manuelreif"
@@ -39,6 +44,23 @@ execute:
 stationen <- read.csv("../data/cv_stationen.csv", encoding = "UTF-8")
 stationen$start <- as.Date(stationen$start)
 stationen$ende <- as.Date(ifelse(stationen$ende == "", NA, stationen$ende))
+
+# Laufende Einträge mit gleichem Titel und gleicher Organisation (z. B. mehrere LVs als
+# Lektor an der Uni Wien) im PDF zu einem Eintrag zusammenfassen: Beginn der ersten,
+# je LV ein Punkt „LV-Name: erstes Detail“. Die Website zeigt sie weiter einzeln.
+schluessel <- paste(stationen$gruppe, stationen$titel, stationen$org)
+for (k in unique(schluessel[is.na(stationen$ende) & duplicated(schluessel)])) {
+    zeilen <- which(is.na(stationen$ende) & schluessel == k)
+    if (length(zeilen) < 2) next
+    zeilen <- zeilen[order(stationen$start[zeilen], decreasing = TRUE)]
+    punkte <- paste0(stationen$kurz[zeilen], ": ", stationen$detail1[zeilen])
+    neu <- stationen[zeilen[1], ]
+    neu$start <- min(stationen$start[zeilen])
+    neu$detail1 <- punkte[1]
+    neu$detail2 <- paste(punkte[-1], collapse = "; ")
+    stationen <- rbind(stationen[-zeilen, ], neu)
+    schluessel <- c(schluessel[-zeilen], k)
+}
 stationen$zeitraum <- ifelse(
     is.na(stationen$ende),
     paste(format(stationen$start, "%Y"), "bis heute"),
