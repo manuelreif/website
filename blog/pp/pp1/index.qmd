@@ -5,6 +5,8 @@ date: 2026-10-09
 categories: [R, IRT, Claude, PP]
 draft: false
 image: media/geordi_meme.jpg
+execute:
+  echo: true
 ---
 
 
@@ -96,7 +98,7 @@ eigentlich ein PCM. Den Messtheoretiker wird es freuen ;-).
 ::: {.panel-tabset}
 
 
-### 1-4PL und GPCM
+### 1- bis 4-PL und GPCM
 
 ::: {#tbl-schaetzer-kontrolle}
 
