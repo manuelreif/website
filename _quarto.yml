@@ -7,6 +7,8 @@ project:
   resources:
     - "fonts/*"
     - "fonts/licenses/*"
+  pre-render:
+    - scripts/pkg-badges.ts
   post-render:
     - scripts/local-fonts.ts
 
@@ -29,6 +31,7 @@ website:
         - icon: github
           href: https://github.com/manuelreif/website
   navbar:
+    title: "reif::manuel"
     search: true
     logo: media/logo.webp
     left:
@@ -53,7 +56,10 @@ format:
       dark: [cosmo, theme/rules.scss, theme/dark.scss]
     css: fonts/fonts.css
     include-in-header: theme/analytics.html
+    include-after-body: theme/icc.html
     toc: true
+    grid:
+      body-width: 850px # Quarto-Standard 800px, +15 %
 
 lang: de
 

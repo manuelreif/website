@@ -1,0 +1,57 @@
+<!-- Rasch-ICC im Footer (Mitte, über dem Link "Cookie-Einstellungen"):
+     P(X=1 | θ) = exp(θ−β) / (1 + exp(θ−β)), β lässt sich per Schieberegler verschieben.
+     Styles in theme/rules.scss, Abschnitt "Footer: Rasch-ICC". -->
+<script>
+// Quarto setzt include-after-body vor den Footer, daher erst nach dem Laden ausführen
+document.addEventListener("DOMContentLoaded", function () {
+  const ziel = document.querySelector(".nav-footer-center");
+  if (!ziel) return;
+
+  // Zeichenfläche: θ von -4 bis 4, P von 0 bis 1
+  const B = 160, H = 48, rand = 4;
+  const x = theta => rand + (theta + 4) / 8 * (B - 2 * rand);
+  const y = p => H - 6 - p * (H - 6 - rand);
+  const formel = "Rasch-Modell: P(X=1 | θ) = exp(θ−β) / (1 + exp(θ−β))";
+
+  const fig = document.createElement("figure");
+  fig.className = "icc";
+  fig.innerHTML =
+    `<svg viewBox="0 0 ${B} ${H}" width="${B}" height="${H}" role="img" aria-label="${formel}">
+       <title>${formel}</title>
+       <line class="icc-achse" x1="${rand}" y1="${y(0)}" x2="${B - rand}" y2="${y(0)}"/>
+       <text class="icc-label" x="${B - rand}" y="${H - 0.5}" text-anchor="end">θ</text>
+       <line class="icc-beta" y1="${y(0)}" y2="${rand}"/>
+       <path class="icc-kurve"/>
+       <circle class="icc-punkt" r="2.5" cy="${y(0.5)}"/>
+     </svg>
+     <label class="icc-regler">
+       <input type="range" min="-3" max="3" step="0.1" value="0" aria-label="Itemschwierigkeit β">
+       <span class="icc-wert"></span>
+     </label>`;
+  ziel.prepend(fig);
+
+  const kurve = fig.querySelector(".icc-kurve");
+  const linie = fig.querySelector(".icc-beta");
+  const punkt = fig.querySelector(".icc-punkt");
+  const regler = fig.querySelector("input");
+  const wert = fig.querySelector(".icc-wert");
+
+  function zeichne() {
+    const beta = Number(regler.value);
+    let d = "";
+    for (let i = 0; i <= 80; i++) {
+      const theta = -4 + i / 10;
+      const p = 1 / (1 + Math.exp(-(theta - beta)));
+      d += (i ? "L" : "M") + x(theta).toFixed(1) + "," + y(p).toFixed(1);
+    }
+    kurve.setAttribute("d", d);
+    linie.setAttribute("x1", x(beta));
+    linie.setAttribute("x2", x(beta));
+    punkt.setAttribute("cx", x(beta));
+    wert.textContent = "β = " + beta.toFixed(1);
+  }
+
+  regler.addEventListener("input", zeichne);
+  zeichne();
+});
+</script>

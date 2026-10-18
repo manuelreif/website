@@ -5,13 +5,9 @@
 
 /*-- scss:defaults --*/
 
-// Cosmo lädt "Source Sans Pro" sonst von Google Fonts; die Schriften kommen aus fonts/fonts.css
+// Cosmo lädt "Source Sans Pro" sonst von Google Fonts; die Schriften kommen aus fonts/fonts.css.
+// Schriftfamilien, -größen und -gewichte bleiben beim Cosmo-Standard, Karma und Quicksand setzen die Regeln unten.
 $web-font-path: false;
-
-$font-family-sans-serif: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-$font-size-base: 1.05rem;
-$headings-font-weight: 600;
 
 $accent-yellow: #f2eaae;
 
@@ -20,20 +16,26 @@ $code-block-bg: #272822;
 
 /*-- scss:rules --*/
 
+// Schriften: Fließtext in Karma, Titel und Navigation in Quicksand
+body {
+  font-family: "Karma", serif;
+}
+
+h1,
+.navbar-brand,
+.nav-link {
+  font-family: "Quicksand", sans-serif;
+}
+
+:root {
+  --bs-body-font-size: 1.1rem;
+}
+
 // Inline-Code: Farben explizit setzen. Neuere Quarto-Versionen geben Inline-Code
 // sonst den Hintergrund des (dunklen) Highlight-Themes, bei dunkler Schrift.
 body :not(pre) > code:not(.sourceCode) {
   color: $code-color;
   background-color: $code-bg;
-}
-
-// Keine Ligaturen im Code: JetBrains Mono würde z. B. "<-" als Pfeil zeigen
-code,
-pre,
-kbd,
-samp {
-  font-variant-ligatures: none;
-  font-feature-settings: "liga" 0, "calt" 0;
 }
 
 body a > code:not(.sourceCode) {
@@ -50,7 +52,7 @@ body nav :not(pre) > code:not(.sourceCode) {
   color: $body-color;
 }
 
-// Navbar: Titel in Mono mit blinkendem Cursor, gelbe Unterkante
+// Navbar: gelbe Unterkante
 .navbar {
   border-bottom: 3px solid $accent-yellow;
 }
@@ -61,47 +63,7 @@ body nav :not(pre) > code:not(.sourceCode) {
   padding-right: 4px;
 }
 
-.navbar-title {
-  font-family: $font-family-monospace;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.navbar-title::after {
-  content: "▌";
-  margin-left: 0.1em;
-  color: $code-color;
-  animation: cursor-blink 1.1s step-end infinite;
-}
-
-@keyframes cursor-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .navbar-title::after {
-    animation: none;
-  }
-}
-
-@media (max-width: 576px) {
-  .navbar-title {
-    font-size: 1rem;
-  }
-}
-
-// Metadaten (Datum, Lesezeit, Kategorien) in Mono, Kategorien als #tag
-.listing-date,
-.listing-reading-time,
-.listing-categories,
-.quarto-title-meta,
-.quarto-categories {
-  font-family: $font-family-monospace;
-  font-size: 0.85em;
-}
-
+// Kategorien als #tag
 .listing-category::before,
 .quarto-category::before {
   content: "#";
@@ -170,6 +132,21 @@ body nav :not(pre) > code:not(.sourceCode) {
   border-radius: 999px;
   padding: 0.05rem 0.6rem;
   margin-bottom: 0.75rem;
+}
+
+// Badges sind Links (CRAN bzw. GitHub): ohne Unterstreichung, beim Hovern leicht getönt
+a.pkg-badge {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.pkg-badge:hover {
+  background-color: color-mix(in srgb, var(--pkg-accent) 15%, transparent);
+}
+
+// Badges mit Live-Daten (Shortcode pkg-badge): Beschriftung vor dem Wert
+.pkg-badge-label {
+  opacity: 0.65;
 }
 
 // 404-Seite: R-Fehlermeldung
@@ -341,4 +318,55 @@ body .termsfeed-com---palette-light .cc-nb-changep {
 // Observable Plot (CV): Tooltip-Hintergrund passend zum Theme
 body {
   --plot-background: #{$body-bg};
+}
+
+// Footer: Rasch-ICC (Script in theme/icc.html)
+.icc {
+  margin: 0 auto 0.25rem;
+  width: 160px;
+  font-size: 0.75em;
+
+  svg {
+    display: block;
+    overflow: visible;
+  }
+}
+
+.icc-achse {
+  stroke: $text-muted;
+  stroke-width: 1;
+}
+
+.icc-label {
+  fill: $text-muted;
+  font-size: 9px;
+}
+
+.icc-kurve {
+  fill: none;
+  stroke: $link-color;
+  stroke-width: 2;
+}
+
+.icc-beta {
+  stroke: $code-color;
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.icc-punkt {
+  fill: $code-color;
+}
+
+.icc-regler {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: $text-muted;
+  font-variant-numeric: tabular-nums;
+
+  input {
+    width: 100px;
+    accent-color: $link-color;
+  }
 }

@@ -19,3 +19,6 @@ CLAUDE.md
 
 # Python-Bytecode
 __pycache__/
+
+# von scripts/pkg-badges.ts beim Rendern erzeugt
+data/pkg_badges.json
