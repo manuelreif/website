@@ -101,6 +101,13 @@ body nav :not(pre) > code:not(.sourceCode) {
     margin-left: 0;
     margin-right: 0;
   }
+
+  // kleine Bilder (z. B. im Impressum) bleiben am Handy rechts neben dem Text
+  .float-img-right.float-img-klein {
+    float: right;
+    width: 35% !important;
+    margin-left: 20px;
+  }
 }
 
 // Karten auf der Packages-Seite; gemeinsame Akzentfarbe (Rot des PP-Stickers), pro Karte über --pkg-accent änderbar
@@ -115,6 +122,24 @@ body nav :not(pre) > code:not(.sourceCode) {
 
 .pkg-card h3 {
   margin-top: 0;
+}
+
+// Unter 768px stehen Sticker und Text ohnehin untereinander; das 12-Spalten-Raster
+// mit seinen Abständen wäre dann breiter als die Karte
+@media (max-width: 767.98px) {
+  .pkg-card .grid {
+    display: block;
+  }
+
+  .pkg-card .pkg-hex {
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .pkg-card {
+    padding: 1rem;
+  }
 }
 
 .pkg-hex {
@@ -199,6 +224,7 @@ div.quarto-about-solana .about-entity .about-link {
 
   div.quarto-about-solana .about-contents {
     text-align: left;
+    padding-right: 0; // Abstand zum Foto braucht es nur, wenn es daneben steht
   }
 
   div.quarto-about-solana .about-entity .about-image {
@@ -393,5 +419,26 @@ body {
   input {
     width: 100px;
     accent-color: $link-color;
+  }
+}
+
+// Breite Formeln scrollen seitlich (wie Codeblöcke), statt die ganze Seite zu verbreitern
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0 !important; // MathJax setzt bei nummerierten Formeln eine feste Mindestbreite
+}
+
+@media (max-width: 576px) {
+  // Lange Inline-Codes (Pfade usw.) dürfen am Handy umbrechen
+  body :not(pre) > code:not(.sourceCode) {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  // Spalten (::: {.column}) untereinander statt gequetscht nebeneinander
+  div.column {
+    display: block;
+    width: 100% !important;
   }
 }

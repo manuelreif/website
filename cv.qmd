@@ -94,9 +94,12 @@ Plot.plot({
     Plot.barX(zeitleiste, {x1: "start", x2: "ende_plot", y: "id", fill: "gruppe", insetTop: 22, rx: 4}),
     // laufende Stationen: Pfeil am rechten Ende
     Plot.text(zeitleiste.filter(d => d.laufend), {x: "ende_plot", y: "id", text: () => "▶", dy: 11, dx: -2, textAnchor: "end", fill: "white", fontSize: 10}),
-    // Beschriftung links- bzw. rechtsbündig, damit sie nicht aus dem Bild läuft
-    Plot.text(zeitleiste.filter(d => d.start < mitte), {x: "start", y: "id", text: "label", textAnchor: "start", dy: -8, fill: "currentColor"}),
-    Plot.text(zeitleiste.filter(d => d.start >= mitte), {x: "ende_plot", y: "id", text: "label", textAnchor: "end", dy: -8, fill: "currentColor"}),
+    // Beschriftung links- bzw. rechtsbündig, damit sie nicht aus dem Bild läuft;
+    // am Handy reicht der Platz dafür nicht, dort stehen alle Beschriftungen am linken Rand
+    ...(width < 576
+      ? [Plot.text(zeitleiste, {y: "id", text: "label", frameAnchor: "left", textAnchor: "start", dy: -8, fill: "currentColor", fontSize: 11})]
+      : [Plot.text(zeitleiste.filter(d => d.start < mitte), {x: "start", y: "id", text: "label", textAnchor: "start", dy: -8, fill: "currentColor"}),
+         Plot.text(zeitleiste.filter(d => d.start >= mitte), {x: "ende_plot", y: "id", text: "label", textAnchor: "end", dy: -8, fill: "currentColor"})]),
     Plot.tip(zeitleiste, Plot.pointerY({
       x1: "start", x2: "ende_plot", y: "id",
       title: d => `${d.titel}\n${d.org} · ${zeitraum(d)}\n\n${

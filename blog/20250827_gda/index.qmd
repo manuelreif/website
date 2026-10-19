@@ -266,7 +266,7 @@ $$ {#eq-hypergeom-glatze}
 
 ::::
 
-- X = eine Zufallsvariable: $X \mid T \sim \operatorname{Hypergeom}\bigl(N, K(T), n\bigr)$
+- X = eine Zufallsvariable: $X \mid T$ folgt der Verteilung $\operatorname{Hypergeom}\bigl(N, K(T), n\bigr)$
 - K = Anzahl der gesamten Kapuzen Personen zu Beginn (hängt vom Tätertyp ab, also mit oder ohne Kapuze)
 - k = Anzahl der gezogenen Kapuzen Personen
 - N = Anzahl der Karten (nach Entfernung der Täterkarte)

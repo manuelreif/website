@@ -7,7 +7,7 @@ format: html
 
 <br>
 
-<img src="media/impr.png" alt="Impressum" class="float-img-right" style="width: 20%;">
+<img src="media/impr.png" alt="Impressum" class="float-img-right float-img-klein" style="width: 20%;">
 
 
 Verantwortlich für den Inhalt dieser Seite:
