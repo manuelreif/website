@@ -103,9 +103,9 @@ body nav :not(pre) > code:not(.sourceCode) {
   }
 }
 
-// Karten auf der Packages-Seite; Akzentfarbe pro Package über --pkg-accent
+// Karten auf der Packages-Seite; gemeinsame Akzentfarbe (Rot des PP-Stickers), pro Karte über --pkg-accent änderbar
 .pkg-card {
-  --pkg-accent: #{$accent-yellow};
+  --pkg-accent: rgb(215, 40, 96);
   border: 1px solid $border-color;
   border-top: 4px solid var(--pkg-accent);
   border-radius: 10px;
@@ -179,6 +179,31 @@ a.pkg-badge:hover {
 // Icons der about-Links brauchen die Body-Schrift, sonst sehen sie komisch aus
 div.quarto-about-solana .about-entity .about-link {
   font-family: var(--bs-body-font-family);
+}
+
+// solana unter 992px: Links als Zeile statt großer Buttons, Foto kleiner, Text linksbündig
+@media (max-width: 991.98px) {
+  div.quarto-about-solana .about-entity .about-links {
+    flex-direction: row;
+    justify-content: center;
+    column-gap: .8em;
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  div.quarto-about-solana .about-entity .about-link {
+    font-size: 1em;
+    padding: .35em .6em;
+    border-radius: 4px;
+  }
+
+  div.quarto-about-solana .about-contents {
+    text-align: left;
+  }
+
+  div.quarto-about-solana .about-entity .about-image {
+    width: 13em !important;
+  }
 }
 
 // Cookie-Banner (TermsFeed, über website.cookie-consent): kompakt und in den Farben des Themes.

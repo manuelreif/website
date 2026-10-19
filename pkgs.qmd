@@ -9,7 +9,7 @@ Der Code unten ist jeweils ein kurzes Beispiel aus der Dokumentation.
 
 <!-- Status bitte prüfen: PP auf CRAN, oxo, mcIRT und svyPVpack nur auf GitHub -->
 
-::: {.pkg-card style="--pkg-accent: rgb(215, 40, 96);"}
+::: {.pkg-card}
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
 [![](hex_sticker/PP_krabbe.png){.pkg-hex fig-alt="Hexsticker PP"}](https://cran.r-project.org/package=PP)
@@ -45,7 +45,7 @@ res1plmle <- PP_4pl(respm = itmat,
 :::
 :::
 
-::: {.pkg-card style="--pkg-accent: rgb(16, 120, 149);"}
+::: {.pkg-card}
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
 [![](hex_sticker/oxo_hex.png){.pkg-hex fig-alt="Hexsticker oxo"}](https://github.com/manuelreif/oxo)
@@ -83,7 +83,7 @@ ox_design(
 :::
 :::
 
-::: {.pkg-card style="--pkg-accent: rgb(205, 118, 50);"}
+::: {.pkg-card}
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
 [![](hex_sticker/mcirt_hex.png){.pkg-hex fig-alt="Hexsticker mcIRT"}](https://github.com/manuelreif/mcIRT)
@@ -121,7 +121,7 @@ res_nrm  <- nrm(reshdat1)
 :::
 :::
 
-::: {.pkg-card style="--pkg-accent: rgb(133, 154, 165);"}
+::: {.pkg-card}
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
 [![](hex_sticker/svyPVpack1.png){.pkg-hex fig-alt="Hexsticker svyPVpack"}](https://github.com/manuelreif/svyPVpack)

@@ -55,6 +55,26 @@ auswahl = stationen
   }))
   .sort((a, b) => gruppenNamen.indexOf(a.gruppe) - gruppenNamen.indexOf(b.gruppe) || a.start - b.start)
 
+// Zeitleiste: gleiche Gruppe, Titel und Organisation mit zeitlicher Überschneidung
+// werden zu einem Balken zusammengefasst, die Einzelteile stehen im Tooltip
+zeitleiste = d3.groups(auswahl, d => `${d.gruppe}|${d.titel}|${d.org}`)
+  .flatMap(([, eintraege]) => {
+    const balken = [];
+    for (const d of eintraege) {
+      const letzter = balken.at(-1);
+      if (letzter && d.start <= letzter.ende_plot) {
+        letzter.teile.push(d);
+        letzter.ende_plot = d3.max([letzter.ende_plot, d.ende_plot]);
+        letzter.laufend ||= d.laufend;
+        letzter.ende = letzter.laufend ? null : letzter.ende_plot;
+      } else {
+        balken.push({...d, teile: [d]});
+      }
+    }
+    return balken;
+  })
+  .sort((a, b) => gruppenNamen.indexOf(a.gruppe) - gruppenNamen.indexOf(b.gruppe) || a.start - b.start)
+
 mitte = new Date((d3.min(stationen, d => d.start).getTime() + heute.getTime()) / 2)
 ```
 
@@ -62,24 +82,26 @@ mitte = new Date((d3.min(stationen, d => d.start).getTime() + heute.getTime()) /
 //| echo: false
 Plot.plot({
   width,
-  height: auswahl.length * 46 + 40,
+  height: zeitleiste.length * 46 + 40,
   marginLeft: 8,
   marginRight: 8,
   style: {fontFamily: "var(--bs-body-font-family)", fontSize: "13px", color: "currentColor", background: "transparent"},
   x: {type: "utc", label: null, grid: true, domain: [d3.min(stationen, d => d.start), heute]},
-  y: {domain: auswahl.map(d => d.id), axis: null, paddingInner: 0.1},
+  y: {domain: zeitleiste.map(d => d.id), axis: null, paddingInner: 0.1},
   color: {domain: gruppenNamen, range: farben, legend: true},
   marks: [
     // Balken im unteren Teil jeder Zeile, oben ist Platz für die Beschriftung
-    Plot.barX(auswahl, {x1: "start", x2: "ende_plot", y: "id", fill: "gruppe", insetTop: 22, rx: 4}),
+    Plot.barX(zeitleiste, {x1: "start", x2: "ende_plot", y: "id", fill: "gruppe", insetTop: 22, rx: 4}),
     // laufende Stationen: Pfeil am rechten Ende
-    Plot.text(auswahl.filter(d => d.laufend), {x: "ende_plot", y: "id", text: () => "▶", dy: 11, dx: -2, textAnchor: "end", fill: "white", fontSize: 10}),
+    Plot.text(zeitleiste.filter(d => d.laufend), {x: "ende_plot", y: "id", text: () => "▶", dy: 11, dx: -2, textAnchor: "end", fill: "white", fontSize: 10}),
     // Beschriftung links- bzw. rechtsbündig, damit sie nicht aus dem Bild läuft
-    Plot.text(auswahl.filter(d => d.start < mitte), {x: "start", y: "id", text: "label", textAnchor: "start", dy: -8, fill: "currentColor"}),
-    Plot.text(auswahl.filter(d => d.start >= mitte), {x: "ende_plot", y: "id", text: "label", textAnchor: "end", dy: -8, fill: "currentColor"}),
-    Plot.tip(auswahl, Plot.pointerY({
+    Plot.text(zeitleiste.filter(d => d.start < mitte), {x: "start", y: "id", text: "label", textAnchor: "start", dy: -8, fill: "currentColor"}),
+    Plot.text(zeitleiste.filter(d => d.start >= mitte), {x: "ende_plot", y: "id", text: "label", textAnchor: "end", dy: -8, fill: "currentColor"}),
+    Plot.tip(zeitleiste, Plot.pointerY({
       x1: "start", x2: "ende_plot", y: "id",
-      title: d => `${d.titel}\n${d.org} · ${zeitraum(d)}\n\n${d.kurz}`
+      title: d => `${d.titel}\n${d.org} · ${zeitraum(d)}\n\n${
+        d.teile.length > 1 ? d.teile.map(t => `${zeitraum(t)}: ${t.kurz}`).join("\n") : d.kurz
+      }`
     }))
   ]
 })
