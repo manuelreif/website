@@ -206,6 +206,19 @@ div.quarto-about-solana .about-entity .about-link {
   font-family: var(--bs-body-font-family);
 }
 
+// Codeberg gibt es weder in Bootstrap Icons noch in Font Awesome: Logo aus Simple Icons (CC0)
+// als Maske, damit es wie die anderen Icons die Textfarbe übernimmt
+.codeberg-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -.125em;
+  background-color: currentColor;
+  $codeberg-svg: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11.955.49A12 12 0 0 0 0 12.49a12 12 0 0 0 1.832 6.373L11.838 5.928a.187.14 0 0 1 .324 0l10.006 12.935A12 12 0 0 0 24 12.49a12 12 0 0 0-12-12 12 12 0 0 0-.045 0zm.375 6.467l4.416 16.553a12 12 0 0 0 5.137-4.213z'/%3E%3C/svg%3E";
+  -webkit-mask: url($codeberg-svg) no-repeat center / contain;
+  mask: url($codeberg-svg) no-repeat center / contain;
+}
+
 // solana unter 992px: Links als Zeile statt großer Buttons, Foto kleiner, Text linksbündig
 @media (max-width: 991.98px) {
   div.quarto-about-solana .about-entity .about-links {

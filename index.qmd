@@ -22,6 +22,8 @@ about:
       href: https://www.linkedin.com/in/manuel-reif-338a78258/
     - icon: github
       href: https://github.com/manuelreif
+    - text: '<span class="codeberg-icon" role="img" aria-label="Codeberg"></span>'
+      href: https://codeberg.org/manuelreif
     - icon: envelope
       href: mailto:info@manuelreif.at
     - icon: mastodon
